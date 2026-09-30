@@ -1,0 +1,272 @@
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@implements IDisposable
+
+<!-- ======================================================== -->
+<!-- 1. MOBILE TOP NAVBAR (< 992px) - MANTIDO EXATAMENTE IGUAL -->
+<!-- ======================================================== -->
+<nav class="navbar navbar-light px-3 w-100 brutal-navbar d-lg-none" style="z-index: 1050;">
+    <div class="container-fluid">
+        <AuthorizeView>
+            <Authorized>
+                <NavLink class="navbar-brand d-flex align-items-center text-dark text-decoration-none" href="dashboard" onclick="window.handleNavClick(event, 'dashboard')">
+                    <span class="font-headline fw-black text-dark me-2" style="font-size: 2.2rem; line-height: 0.9;">π</span>
+                    <span class="font-headline fw-bold fs-3 text-dark tracking-tight">LUCRO</span>
+                    <span class="font-headline fs-3 text-dark fw-medium ms-1">IMPRESSO</span>
+                </NavLink>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="navbar-brand d-flex align-items-center text-dark text-decoration-none" href="/" onclick="window.handleNavClick(event, '/')">
+                    <span class="font-headline fw-black text-dark me-2" style="font-size: 2.2rem; line-height: 0.9;">π</span>
+                    <span class="font-headline fw-bold fs-3 text-dark tracking-tight">LUCRO</span>
+                    <span class="font-headline fs-3 text-dark fw-medium ms-1">IMPRESSO</span>
+                </NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+
+        <button class="navbar-toggler custom-toggler brutal-border-2" type="button" data-bs-toggle="collapse" data-bs-target="#menuBrutal" aria-controls="menuBrutal" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="material-symbols-outlined text-dark fs-2">menu</span>
+        </button>
+
+        <div class="collapse navbar-collapse custom-mobile-menu" id="menuBrutal">
+            <ul id="abas-sistema" class="navbar-nav mx-auto mb-2 mb-lg-0 gap-3 text-center mt-3">
+                <AuthorizeView>
+                    <NotAuthorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link nav-brutal" href="" Match="NavLinkMatch.All" onclick="window.handleNavClick(event, '/'); closeMenuMobile()">
+                                <span class="material-symbols-outlined fs-5 me-1">home</span>PÁGINA INICIAL
+                            </NavLink>
+                        </li>
+                    </NotAuthorized>
+                </AuthorizeView>
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item">
+                            <NavLink class="nav-link nav-brutal" href="dashboard" onclick="window.handleNavClick(event, 'dashboard'); closeMenuMobile()">
+                                <span class="material-symbols-outlined fs-5 me-1">dashboard</span>DASHBOARD
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link nav-brutal" href="clientes" onclick="window.handleNavClick(event, 'clientes'); closeMenuMobile()">
+                                <span class="material-symbols-outlined fs-5 me-1">group</span>CLIENTES
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link nav-brutal" href="pecas" onclick="window.handleNavClick(event, 'pecas'); closeMenuMobile()">
+                                <span class="material-symbols-outlined fs-5 me-1">view_in_ar</span>PEÇAS
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link nav-brutal" href="maquinas" onclick="window.handleNavClick(event, 'maquinas'); closeMenuMobile()">
+                                <span class="material-symbols-outlined fs-5 me-1">precision_manufacturing</span>MÁQUINAS
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link nav-brutal" href="material" onclick="window.handleNavClick(event, 'material'); closeMenuMobile()">
+                                <span class="material-symbols-outlined fs-5 me-1">inventory_2</span>MATERIAL
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link nav-brutal" href="acabamento" onclick="window.handleNavClick(event, 'acabamento'); closeMenuMobile()">
+                                <span class="material-symbols-outlined fs-5 me-1">palette</span>ACABAMENTO
+                            </NavLink>
+                        </li>
+                        <li class="nav-item">
+                            <NavLink class="nav-link nav-brutal" href="producao" onclick="window.handleNavClick(event, 'producao'); closeMenuMobile()">
+                                <span class="material-symbols-outlined fs-5 me-1">factory</span>PRODUÇÃO
+                            </NavLink>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+            </ul>
+
+            <div class="d-flex justify-content-center mt-4 pb-3 align-items-center gap-3">
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="dropdown">
+                            <button class="btn btn-user-brutal dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Menu do Usuário">
+                                <span class="material-symbols-outlined fs-4">person</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark brutal-border shadow-lg">
+                                <li>
+                                    <NavLink class="dropdown-item d-flex align-items-center gap-2" href="configuracoes" onclick="closeMenuMobile()">
+                                        <span class="material-symbols-outlined fs-5">settings</span>
+                                        Configurações
+                                    </NavLink>
+                                </li>
+                                <li><hr class="dropdown-divider border-secondary"></li>
+                                <li>
+                                    <form method="post" action="/auth/logout">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="dropdown-item dropdown-item-danger d-flex align-items-center gap-2 text-danger" style="border: none; background: none; width: 100%; text-align: left; cursor: pointer;">
+                                            <span class="material-symbols-outlined fs-5"></span>
+                                            Sair
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                         <NavLink class="btn btn-black d-flex align-items-center gap-2" href="login" onclick="window.handleNavClick(event, 'login'); closeMenuMobile()">
+                            <span class="material-symbols-outlined fs-5">login</span>
+                            <span>Entrar</span>
+                        </NavLink>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ======================================================== -->
+<!-- 2. DESKTOP LATERAL SIDEBAR (>= 992px) - RECOLHÍVEL -->
+<!-- ======================================================== -->
+<aside class="brutal-sidebar d-none d-lg-flex" id="brutal-sidebar">
+    <!-- Topo da Sidebar: Logo e Botão de Recolher -->
+    <div class="sidebar-header d-flex align-items-center justify-content-between p-3 brutal-border-b">
+        <AuthorizeView>
+            <Authorized>
+                <NavLink class="sidebar-brand d-flex align-items-center text-dark text-decoration-none" href="dashboard" onclick="window.handleNavClick(event, 'dashboard')">
+                    <span class="font-headline fw-black text-dark pi-icon me-2" style="font-size: 2.8rem; line-height: 0.85;">π</span>
+                    <div class="brand-text-wrapper">
+                        <span class="font-headline fw-bold fs-4 text-dark tracking-tight d-block">LUCRO</span>
+                        <span class="font-headline fs-5 text-dark fw-medium d-block" style="margin-top: -4px;">IMPRESSO</span>
+                    </div>
+                </NavLink>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="sidebar-brand d-flex align-items-center text-dark text-decoration-none" href="/" onclick="window.handleNavClick(event, '/')">
+                    <span class="font-headline fw-black text-dark pi-icon me-2" style="font-size: 2.8rem; line-height: 0.85;">π</span>
+                    <div class="brand-text-wrapper">
+                        <span class="font-headline fw-bold fs-4 text-dark tracking-tight d-block">LUCRO</span>
+                        <span class="font-headline fs-5 text-dark fw-medium d-block" style="margin-top: -4px;">IMPRESSO</span>
+                    </div>
+                </NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+
+        <button class="btn btn-toggle-sidebar" onclick="window.toggleSidebar()" type="button" title="Recolher / Expandir barra lateral">
+            <span class="material-symbols-outlined icon-collapse">keyboard_double_arrow_left</span>
+            <span class="material-symbols-outlined icon-expand">keyboard_double_arrow_right</span>
+        </button>
+    </div>
+
+    <!-- Navegação Vertical: Abas do Sistema com Efeitos Neo-Brutalistas -->
+    <div class="sidebar-body flex-grow-1 p-3 overflow-y-auto">
+        <ul class="nav flex-column gap-3">
+            <AuthorizeView>
+                <NotAuthorized>
+                    <li class="nav-item">
+                        <NavLink class="nav-link nav-brutal-sidebar" href="" Match="NavLinkMatch.All" title="Página Inicial" onclick="window.handleNavClick(event, '/')">
+                            <span class="material-symbols-outlined">home</span>
+                            <span class="nav-text ms-2">PÁGINA INICIAL</span>
+                        </NavLink>
+                    </li>
+                </NotAuthorized>
+            </AuthorizeView>
+            <AuthorizeView>
+                <Authorized>
+                    <li class="nav-item">
+                        <NavLink class="nav-link nav-brutal-sidebar" href="dashboard" title="Dashboard" onclick="window.handleNavClick(event, 'dashboard')">
+                            <span class="material-symbols-outlined">dashboard</span>
+                            <span class="nav-text ms-2">DASHBOARD</span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link nav-brutal-sidebar" href="clientes" title="Clientes" onclick="window.handleNavClick(event, 'clientes')">
+                            <span class="material-symbols-outlined">group</span>
+                            <span class="nav-text ms-2">CLIENTES</span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link nav-brutal-sidebar" href="pecas" title="Peças" onclick="window.handleNavClick(event, 'pecas')">
+                            <span class="material-symbols-outlined">view_in_ar</span>
+                            <span class="nav-text ms-2">PEÇAS</span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link nav-brutal-sidebar" href="maquinas" title="Máquinas" onclick="window.handleNavClick(event, 'maquinas')">
+                            <span class="material-symbols-outlined">precision_manufacturing</span>
+                            <span class="nav-text ms-2">MÁQUINAS</span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link nav-brutal-sidebar" href="material" title="Material" onclick="window.handleNavClick(event, 'material')">
+                            <span class="material-symbols-outlined">inventory_2</span>
+                            <span class="nav-text ms-2">MATERIAL</span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link nav-brutal-sidebar" href="acabamento" title="Insumos de Acabamento" onclick="window.handleNavClick(event, 'acabamento')">
+                            <span class="material-symbols-outlined">palette</span>
+                            <span class="nav-text ms-2">ACABAMENTO</span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-item">
+                        <NavLink class="nav-link nav-brutal-sidebar" href="producao" title="Produção" onclick="window.handleNavClick(event, 'producao')">
+                            <span class="material-symbols-outlined">factory</span>
+                            <span class="nav-text ms-2">PRODUÇÃO</span>
+                        </NavLink>
+                    </li>
+                </Authorized>
+            </AuthorizeView>
+        </ul>
+    </div>
+
+    <!-- Rodapé da Sidebar: Perfil do Usuário / Login -->
+    <div class="sidebar-footer p-3 brutal-border-t">
+        <AuthorizeView>
+            <Authorized>
+                <div class="dropup w-100">
+                    <button class="nav-link nav-brutal-sidebar btn-conta-brutal w-100" id="btn-sidebar-conta" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Conta do Usuário" onclick="return window.onSidebarContaClick(event);">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="nav-text ms-2">CONTA</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark brutal-border w-100 shadow-lg">
+                        <li>
+                            <NavLink class="dropdown-item d-flex align-items-center gap-2" href="configuracoes">
+                                <span class="material-symbols-outlined fs-5">settings</span>
+                                Configurações
+                            </NavLink>
+                        </li>
+                        <li><hr class="dropdown-divider border-secondary"></li>
+                        <li>
+                            <form method="post" action="/auth/logout">
+                                <AntiforgeryToken />
+                                <button type="submit" class="dropdown-item dropdown-item-danger d-flex align-items-center gap-2 text-danger" style="border: none; background: none; width: 100%; text-align: left; cursor: pointer;">
+                                    <span class="material-symbols-outlined fs-5">logout</span>
+                                    Sair da Sessão
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink class="nav-link nav-brutal-sidebar w-100" href="login" title="Entrar" onclick="window.handleNavClick(event, 'login')">
+                    <span class="material-symbols-outlined">login</span>
+                    <span class="nav-text ms-2">ENTRAR</span>
+                </NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
+</aside>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Nav.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        StateHasChanged();
+        _ = JS.InvokeVoidAsync("scrollAoTopoInstante");
+    }
+
+    public void Dispose()
+    {
+        Nav.LocationChanged -= OnLocationChanged;
+    }
+}

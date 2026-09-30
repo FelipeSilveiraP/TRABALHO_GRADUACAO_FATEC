@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Diagrama e Especificação de Máquina de Estados — LucroImpresso</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 15mm;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #0f172a;
+      line-height: 1.5;
+      font-size: 10.5pt;
+      margin: 0;
+      padding: 0;
+    }
+    .header-box {
+      border: 2px solid #0f172a;
+      border-radius: 8px;
+      padding: 16px 20px;
+      background: #f8fafc;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 18pt;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      margin: 0 0 4px 0;
+    }
+    h2 {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #1e3a8a;
+      border-bottom: 2px solid #1e293b;
+      padding-bottom: 4px;
+      margin-top: 22px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 9.5pt;
+      margin-top: 8px;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 18px 0;
+      page-break-inside: avoid;
+      border: 1.5px solid #1e293b;
+      font-size: 9pt;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 7px 10px;
+      vertical-align: top;
+    }
+    th {
+      background-color: #f1f5f9;
+      font-weight: 700;
+      color: #0f172a;
+      text-transform: uppercase;
+      font-size: 8.5pt;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    .state-card {
+      border: 2px solid #1e293b;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      background: #ffffff;
+      page-break-inside: avoid;
+    }
+    .state-title {
+      font-weight: 800;
+      font-size: 10.5pt;
+      color: #1e3a8a;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+    }
+    .state-body {
+      font-family: monospace;
+      font-size: 9pt;
+      color: #334155;
+    }
+    code {
+      font-family: monospace;
+      background: #f1f5f9;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-size: 8.5pt;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 8pt;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .badge-rn {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .diagram-box {
+      border: 2px solid #334155;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 14px;
+      margin: 14px 0;
+      page-break-inside: avoid;
+      font-family: monospace;
+      font-size: 8.5pt;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-box">
+    <h1>Especificação Técnica e Diagrama de Máquinas de Estado</h1>
+    <div style="font-size: 11pt; color: #2563eb; font-weight: 600;">Ciclos de Vida de Domínio &bull; Sistema LucroImpresso &bull; FATEC</div>
+    <div class="meta-grid">
+      <div><strong>Aluno:</strong> Felipe Silveira Pessoa</div>
+      <div><strong>Curso:</strong> CST Análise e Desenvolvimento de Sistemas</div>
+      <div><strong>Stack:</strong> C# .NET 9 / Blazor Server / MariaDB</div>
+      <div><strong>Padrão:</strong> UML 2.5 State Machine Specification</div>
+    </div>
+  </div>
+
+  <h2>1. Introdução e Visão Geral</h2>
+  <p>
+    O Diagrama de Máquina de Estados (UML 2.5) modela formalmente os estados discretos, transições válidas, condições de guarda e efeitos colaterais dos objetos nucleares do <strong>LucroImpresso</strong>. O ciclo principal governa a entidade <strong>Orçamento (`Orcamento`)</strong> em estreita integração com as regras de negócio de precificação, controle de estoque (<strong>RN004</strong>), confirmações explícitas de segurança (<strong>RN005</strong>), ciclo de vida com expurgo em 180 dias (<strong>RN006</strong>) e cofre acumulador perpétuo (<strong>RN007</strong>).
+  </p>
+
+  <h2>2. Máquina de Estados Principal: Ciclo de Vida do Orçamento e Produção</h2>
+
+  <div class="state-card">
+    <div class="state-title">
+      <span>[ST01] EmElaboração (Transient)</span>
+      <span class="badge">Status Inicial em Memória</span>
+    </div>
+    <div class="state-body">
+      <strong>entry /</strong> Carregar catálogo de insumos (Clientes, Peças, Máquinas, Materiais e Acabamentos)<br>
+      <strong>do /</strong> Calcular custos científicos em tempo real: Material (g), Insumos Químicos (mL), Energia Elétrica (Watts/kWh) e Mão de Obra<br>
+      <strong>exit /</strong> Validar saldo de estoque e integridade dos limites via OrcamentoValidator<br>
+      <strong>Transição /</strong> SalvarOrcamento() [Saldo Suficiente &amp; Dados Válidos] &rarr; Status = <strong>Pendente</strong> (Persistido no MariaDB)
+    </div>
+  </div>
+
+  <div class="state-card">
+    <div class="state-title">
+      <span>[ST02] Pendente (Persisted)</span>
+      <span class="badge badge-rn">RF013 / RN008</span>
+    </div>
+    <div class="state-body">
+      <strong>entry /</strong> Orçamento salvo na base de dados com identificador do locatário (UsuarioId)<br>
+      <strong>do /</strong> Permitir consulta, reedição de parâmetros e recálculo antes do fechamento com o cliente<br>
+      <strong>exit /</strong> Bloquear alterações simultâneas durante envio para a fila de produção<br>
+      <strong>Transições /</strong> IniciarImpressao() &rarr; <strong>EmImpressão</strong> | Excluir() [Confirmado via Modal (RN005)] &rarr; <strong>Removido</strong>
+    </div>
+  </div>
+
+  <div class="state-card">
+    <div class="state-title">
+      <span>[ST03] EmImpressão (Active Production)</span>
+      <span class="badge">RF015</span>
+    </div>
+    <div class="state-body">
+      <strong>entry /</strong> Ordem inserida na fila operacional de produção da oficina maker<br>
+      <strong>do /</strong> Impressora 3D em execução física (consumindo filamento e energia elétrica)<br>
+      <strong>exit /</strong> Exigir confirmação explícita do desfecho mecânico (Concluído ou Falha) (RN005)<br>
+      <strong>Transições /</strong> Concluir() [RN005] &rarr; <strong>Concluído</strong> | RegistrarFalha() [RN005] &rarr; <strong>Falha</strong>
+    </div>
+  </div>
+
+  <div class="state-card">
+    <div class="state-title">
+      <span>[ST04] Concluído (Terminal Operational)</span>
+      <span class="badge badge-rn">RN004 / RF017</span>
+    </div>
+    <div class="state-body">
+      <strong>entry /</strong> Deduzir automaticamente estoque físico: Material (g) e Insumos Químicos (mL) (RN004)<br>
+      <strong>do /</strong> Totalizar receita e lucro líquido nos KPIs do Dashboard (RF029)<br>
+      <strong>exit /</strong> Expurgo agendado ou transferência contábil de encerramento<br>
+      <strong>Transições /</strong> Expurgo180Dias() &rarr; <strong>Histórico Financeiro</strong> | Excluir() [RN005] &rarr; <strong>Histórico Financeiro</strong>
+    </div>
+  </div>
+
+  <div class="state-card">
+    <div class="state-title">
+      <span>[ST05] Falha de Impressão (Terminal Defect)</span>
+      <span class="badge badge-rn">RN004 / RF016</span>
+    </div>
+    <div class="state-body">
+      <strong>entry /</strong> Deduzir material consumido como perda física (RN004) e registrar sinistro mecânico ("espaguete")<br>
+      <strong>do /</strong> Exibir alerta de perda no painel gerencial e permitir opção de reinício<br>
+      <strong>exit /</strong> Limpeza de dados ou arquivamento contábil<br>
+      <strong>Transições /</strong> ReiniciarImpressao() &rarr; <strong>EmImpressão</strong> | Expurgo180Dias() &rarr; <strong>Histórico Financeiro</strong>
+    </div>
+  </div>
+
+  <div class="state-card">
+    <div class="state-title">
+      <span>[ST06] Cofre de Histórico Financeiro (Perpetual Archive)</span>
+      <span class="badge badge-rn">RN006 / RN007 / RF020</span>
+    </div>
+    <div class="state-body">
+      <strong>entry /</strong> Transferir consolidados contábeis (receita bruta, custo de insumos, energia e lucro) para HistoricoFinanceiro<br>
+      <strong>do /</strong> Manter integridade histórica dos relatórios perpétuos sem degradar tabelas transacionais<br>
+      <strong>exit /</strong> Imutabilidade perpétua (registro definitivo de inteligência contábil)
+    </div>
+  </div>
+
+  <h2>3. Matriz Formal de Transições de Estado (OrcamentoStateMachine)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Estado Origem</th>
+        <th>Evento / Ação</th>
+        <th>Condição de Guarda</th>
+        <th>Efeito Colateral</th>
+        <th>Estado Destino</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>EmElaboração</strong></td>
+        <td>SalvarOrcamento()</td>
+        <td>Saldo Estoque Suficiente &amp; Dados Válidos</td>
+        <td>Gravação relacional com UsuarioId no MariaDB</td>
+        <td><strong>Pendente</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Pendente</strong></td>
+        <td>IniciarImpressao()</td>
+        <td>Nenhuma</td>
+        <td>Alocação da impressora na fila operacional</td>
+        <td><strong>EmImpressão</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Pendente</strong></td>
+        <td>Excluir()</td>
+        <td>Confirmação do Maker (RN005)</td>
+        <td>Exclusão física do registro da proposta</td>
+        <td><strong>[*] Removido</strong></td>
+      </tr>
+      <tr>
+        <td><strong>EmImpressão</strong></td>
+        <td>ConcluirProducao()</td>
+        <td>Confirmação do Maker (RN005)</td>
+        <td>Baixa automática de estoque (g e mL) (RN004)</td>
+        <td><strong>Concluído</strong></td>
+      </tr>
+      <tr>
+        <td><strong>EmImpressão</strong></td>
+        <td>RegistrarFalha()</td>
+        <td>Confirmação do Maker (RN005)</td>
+        <td>Dedução do material consumido no sinistro (RN004)</td>
+        <td><strong>Falha</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Falha</strong></td>
+        <td>ReiniciarImpressao()</td>
+        <td>Decisão do Maker em reimprimir</td>
+        <td>Reinserção na fila operacional de produção</td>
+        <td><strong>EmImpressão</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Concluído / Falha</strong></td>
+        <td>TimerDiarioCleanup()</td>
+        <td>DataCriacao &lt; UtcNow - 180 dias (RN006)</td>
+        <td>Consolidação contábil no Cofre Financeiro (RN007)</td>
+        <td><strong>Histórico Financeiro</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Concluído / Falha</strong></td>
+        <td>Excluir()</td>
+        <td>Confirmação do Maker (RN005)</td>
+        <td>Transferência contábil perpétua para Cofre (RN007)</td>
+        <td><strong>Histórico Financeiro</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>4. Máquina de Estados Complementar: Token de Recuperação de Senha</h2>
+  <div class="state-card">
+    <div class="state-title">
+      <span>Ciclo de Vida do Token Criptográfico (RF034 / RNF006)</span>
+      <span class="badge">Segurança OWASP ASVS</span>
+    </div>
+    <div class="state-body">
+      <strong>1. Token Inativo:</strong> Usuário em operação padrão, campo TokenRedefinicaoSenha = null.<br>
+      <strong>2. Token Ativo e Válido:</strong> Ao acionar Esqueci Minha Senha, o sistema gera GUID de alta entropia com validade de 2 horas (UtcNow + 120 min) e envia link seguro via SMTP.<br>
+      <strong>3. Senha Redefinida:</strong> Ao submeter nova senha forte dentro da janela de 2 horas, o sistema aplica hash BCrypt (work factor 11), anula o token e limpa a data de expiração.<br>
+      <strong>4. Token Expirado (Bloqueio Automático):</strong> Se UtcNow &gt; TokenRedefinicaoExpiracao, o acesso pelo token é sumariamente rejeitado contra ataques de replay e força bruta.
+    </div>
+  </div>
+
+  <h2>5. Conformidade com as Regras de Negócio e Testes Automatizados</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Regra de Negócio</th>
+        <th>Comportamento Governança na Máquina de Estados</th>
+        <th>Garantia em Teste Automatizado (xUnit)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>RN003</strong></td>
+        <td>Cálculo de consumo elétrico com base em Watts, tempo e tarifa kWh</td>
+        <td><code>MaquinaValidator_ValoresNegativos_DevemFalhar</code></td>
+      </tr>
+      <tr>
+        <td><strong>RN004</strong></td>
+        <td>Baixa física de estoque restrita estritamente a "Concluído" ou "Falha"</td>
+        <td><code>TransitarParaConcluido_DeveDeduzirEstoqueFisicoENaoPermitirSaldoNegativo</code></td>
+      </tr>
+      <tr>
+        <td><strong>RN005</strong></td>
+        <td>Exclusões manuais e desfechos exigem diálogo de confirmação explícita</td>
+        <td><code>ExigeConfirmacaoExplicita_StatusCriticos_DeveValidarRN005</code></td>
+      </tr>
+      <tr>
+        <td><strong>RN006</strong></td>
+        <td>Rotina automática de expurgo de registros inativos há mais de 180 dias</td>
+        <td><code>PodeSerExpurgado_AbaixoDe180Dias_DeveRetornarFalse / True</code></td>
+      </tr>
+      <tr>
+        <td><strong>RN007</strong></td>
+        <td>Preservação contábil perpétua no cofre de Histórico Financeiro</td>
+        <td><code>MultiTenantEInfraTests.Models_NovasInstancias_DevemInicializarComDataUtc</code></td>
+      </tr>
+      <tr>
+        <td><strong>RN008</strong></td>
+        <td>Isolamento Multi-Tenant estrito (Anti-IDOR por UsuarioId)</td>
+        <td><code>MultiTenantEInfraTests.cs</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>

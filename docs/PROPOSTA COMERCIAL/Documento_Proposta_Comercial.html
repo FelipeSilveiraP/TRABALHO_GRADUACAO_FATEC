@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Proposta Comercial de Software - LucroImpresso</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #0f172a;
+      line-height: 1.5;
+      padding: 35px 45px;
+      max-width: 1250px;
+      margin: 0 auto;
+    }
+
+    /* Header Box */
+    .header-box {
+      border: 3px solid #1e293b;
+      border-radius: 12px;
+      box-shadow: 6px 6px 0px #1e293b;
+      padding: 28px 36px;
+      background: #f8fafc;
+      margin-bottom: 30px;
+    }
+    .header-box h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    .header-box h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2563eb;
+      margin-bottom: 16px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      font-size: 13px;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 14px;
+    }
+    .meta-item strong {
+      color: #0f172a;
+    }
+
+    /* Headings */
+    h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 19px;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      border-bottom: 2px solid #1e293b;
+      padding-bottom: 6px;
+      margin-top: 32px;
+      margin-bottom: 16px;
+    }
+    h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 13.5px;
+      color: #334155;
+      margin-bottom: 12px;
+      text-align: justify;
+    }
+
+    /* Financial Cards Grid */
+    .financial-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 20px 0 28px 0;
+    }
+    .financial-card {
+      border: 2px solid #1e293b;
+      border-radius: 8px;
+      box-shadow: 4px 4px 0px #1e293b;
+      padding: 16px;
+      background: #ffffff;
+      text-align: center;
+    }
+    .financial-card.primary {
+      background: #eff6ff;
+      border-color: #2563eb;
+      box-shadow: 4px 4px 0px #2563eb;
+    }
+    .financial-card .num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+    .financial-card.primary .num {
+      color: #1d4ed8;
+    }
+    .financial-card .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+    }
+    .financial-card .sub {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 24px 0;
+      font-size: 12.5px;
+      border: 2px solid #1e293b;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 9px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background-color: #f1f5f9;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      color: #0f172a;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      border-bottom: 2px solid #1e293b;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .badge-blue { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    .badge-green { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .badge-amber { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+    /* Callout */
+    .callout {
+      background: #eff6ff;
+      border-left: 5px solid #2563eb;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin: 16px 0;
+      font-size: 13px;
+      color: #1e40af;
+    }
+
+    /* Signature Area */
+    .signature-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px;
+      margin-top: 45px;
+      padding-top: 25px;
+      border-top: 2px dashed #cbd5e1;
+    }
+    .signature-block {
+      text-align: center;
+    }
+    .signature-line {
+      border-bottom: 2px solid #1e293b;
+      margin-bottom: 10px;
+      height: 40px;
+    }
+    .signature-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13.5px;
+      color: #0f172a;
+    }
+    .signature-role {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        padding: 12mm 15mm;
+        font-size: 10pt;
+      }
+      .header-box {
+        box-shadow: none;
+        border: 2px solid #000;
+      }
+      .financial-card {
+        box-shadow: none;
+        border: 1px solid #000;
+      }
+      table {
+        page-break-inside: auto;
+      }
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+      }
+      h2, h3 {
+        page-break-after: avoid;
+      }
+      .signature-container {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-box">
+    <h1>Proposta Comercial e Orçamentária de Software</h1>
+    <h2>Sistema Especializado de Custos, Estoque e Precificação para Impressão 3D — LucroImpresso</h2>
+    <div class="meta-grid">
+      <div class="meta-item"><strong>Proponente:</strong> Felipe Silveira Pessoa</div>
+      <div class="meta-item"><strong>Instituição / Contexto:</strong> Trabalho de Graduação (FATEC)</div>
+      <div class="meta-item"><strong>Metodologia Métrica:</strong> Análise de Pontos de Função (IFPUG)</div>
+      <div class="meta-item"><strong>Stack Técnica:</strong> .NET 9 / Blazor Server / EF Core 9 / MariaDB</div>
+      <div class="meta-item"><strong>Regime de Contratação:</strong> Preço Fixo (Turnkey / Chave na Mão)</div>
+      <div class="meta-item"><strong>Garantia de Software:</strong> 90 dias incondicionais pós-entrega</div>
+    </div>
+  </div>
+
+  <div class="financial-grid">
+    <div class="financial-card primary">
+      <div class="num">R$ 4.449,60</div>
+      <div class="label">Investimento Total</div>
+      <div class="sub">Preço Fixo do Software</div>
+    </div>
+    <div class="financial-card">
+      <div class="num">R$ 20,00</div>
+      <div class="label">Valor Hora Técnica</div>
+      <div class="sub">Base de Cálculo FATEC</div>
+    </div>
+    <div class="financial-card">
+      <div class="num">222,48 h</div>
+      <div class="label">Esforço de Projeto</div>
+      <div class="sub">1 mês, 14 dias e 5 horas</div>
+    </div>
+    <div class="financial-card">
+      <div class="num">R$ 0,00</div>
+      <div class="label">Custo Licenças / SO</div>
+      <div class="sub">100% Livre de Royalties (RNF008)</div>
+    </div>
+  </div>
+
+  <h2>1. Resumo Executivo e Oportunidade de Negócio</h2>
+  <p>
+    Esta proposta comercial formaliza os entregáveis de engenharia de software para o sistema <strong>LucroImpresso</strong>.
+    O setor de impressão 3D no Brasil enfrenta desafios graves na precificação de peças: grande parte dos empreendedores
+    realiza cálculos simplistas baseados unicamente no peso do plástico, ignorando despesas ocultas cruciais como o
+    <strong>consumo elétrico em kWh</strong>, o uso de
+    <strong>insumos de acabamento químico (primers, tintas e vernizes dosados em mL)</strong> e as perdas de filamento
+    decorrentes de <strong>sinistros de impressão ("espaguete")</strong>.
+  </p>
+  <p>
+    O <strong>LucroImpresso</strong> soluciona esse problema ao disponibilizar uma plataforma web moderna, reativa e
+    científica, desenvolvida em <strong>C# 13, .NET 9 e Blazor Server</strong>, integrada a banco de dados relacional
+    <strong>MariaDB 10.11</strong> e orquestrada via contêineres <strong>Docker</strong> sob conformidade estrita com o
+    princípio de Custo R$ 0,00 de licenciamento (RNF008).
+  </p>
+
+  <h2>2. Escopo do Fornecimento (Entregáveis por Módulo)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 180px;">Módulo Funcional</th>
+        <th style="width: 90px;">Requisitos</th>
+        <th>Descrição dos Entregáveis Técnicos e Funcionais</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Autenticação & Multi-Tenant</strong></td>
+        <td><span class="badge badge-blue">RF033-036</span></td>
+        <td>Autenticação via Cookies seguros com Claims, criptografia BCrypt com salt dinâmico, recuperação de senha por e-mail com token de 2h, isolamento estrito de dados por <code>UsuarioId</code> (Anti-IDOR) e Rate Limiting.</td>
+      </tr>
+      <tr>
+        <td><strong>2. Gestão de Matérias-Primas</strong></td>
+        <td><span class="badge badge-blue">RF001, 003-006</span></td>
+        <td>Cadastro completo de filamentos e resinas com cálculo automático do preço por grama (R$/g), controle de estoque remanescente e alertas visuais de margem crítica (RN001).</td>
+      </tr>
+      <tr>
+        <td><strong>3. Insumos de Acabamento</strong></td>
+        <td><span class="badge badge-blue">RF002, 005, 006</span></td>
+        <td>Módulo exclusivo para primers, tintas, vernizes e solventes dosados e custeados em mililitros (R$/mL) com cálculo de mão de obra de acabamento e pós-processamento (RN002).</td>
+      </tr>
+      <tr>
+        <td><strong>4. Parque de Máquinas</strong></td>
+        <td><span class="badge badge-blue">RF025, 026</span></td>
+        <td>Cadastro de impressoras 3D com parametrização de consumo elétrico em Watts e custo da tarifa de energia em kWh (RN003).</td>
+      </tr>
+      <tr>
+        <td><strong>5. Gestão de Clientes</strong></td>
+        <td><span class="badge badge-blue">RF021-024</span></td>
+        <td>Cadastro com herança disjunta (Pessoa Física ou Jurídica), validação matemática de dígitos verificadores de CPF e CNPJ em tempo real e formatação de contatos e endereços.</td>
+      </tr>
+      <tr>
+        <td><strong>6. Catálogo de Peças 3D</strong></td>
+        <td><span class="badge badge-blue">RF027, 028</span></td>
+        <td>Armazenamento de modelos 3D recorrentes com peso e tempo de fatiamento pré-configurados, link de repositórios STL (Thingiverse, Printables) e sanitização anti-XSS.</td>
+      </tr>
+      <tr>
+        <td><strong>7. Motor de Precificação</strong></td>
+        <td><span class="badge badge-blue">RF007-014</span></td>
+        <td>Composição científica de custos diretos (material, insumos em mL, energia, mão de obra), margem de lucro real sobre a mão de obra, bloqueio por saldo insuficiente e status inicial "Pendente".</td>
+      </tr>
+      <tr>
+        <td><strong>8. Fila de Produção & Baixa</strong></td>
+        <td><span class="badge badge-blue">RF015-018</span></td>
+        <td>Kanban/Fila de ordens de impressão com baixa física automática no estoque restrita a "Concluído" ou "Falha de Impressão" (espaguete) com confirmação explícita em modal (RN004, RN005).</td>
+      </tr>
+      <tr>
+        <td><strong>9. Dashboard & Cofre Histórico</strong></td>
+        <td><span class="badge badge-blue">RF019, 020, 029-031</span></td>
+        <td>Painel de Indicadores-Chave (KPIs) com faturamento e lucro líquido real consolidados, serviço em background de expurgo de 180 dias (RN006) e preservação perpétua no cofre contábil (RN007).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. Dimensionamento Técnico e Métricas de Esforço (APF)</h2>
+  <p>
+    Em estrita conformidade com a documentação acadêmica de métricas de software da FATEC, o esforço do projeto
+    foi dimensionado através da técnica de <strong>Análise de Pontos de Função (APF / IFPUG - ISO/IEC 20926)</strong>:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Componente Métrica</th>
+        <th style="width: 140px; text-align: center;">Quantidade / Valor</th>
+        <th>Detalhamento Metodológico</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Pontos de Função Brutos (FP'b)</td>
+        <td style="text-align: center;"><strong>206 FP</strong></td>
+        <td>Totalização de Entradas (28), Saídas (35), Consultas (36), Arquivos Internos (60) e Interfaces (47).</td>
+      </tr>
+      <tr>
+        <td>Fator de Ajuste de Complexidade (FA)</td>
+        <td style="text-align: center;"><strong>1,35</strong></td>
+        <td>$0{,}65 + (0{,}01 \times 70)$ — Calculado sobre as 14 características gerais de influência do sistema (grau máximo 5).</td>
+      </tr>
+      <tr>
+        <td>Pontos de Função Ajustados (FP'r)</td>
+        <td style="text-align: center;"><strong>278,10 FP</strong></td>
+        <td>$206 \times 1{,}35$ — Tamanho funcional efetivo homologado.</td>
+      </tr>
+      <tr>
+        <td>Estimativa de Linhas de Código (LOC)</td>
+        <td style="text-align: center;"><strong>5.562 LOC</strong></td>
+        <td>20 linhas de C# por Ponto de Função ($278{,}1 \times 20$).</td>
+      </tr>
+      <tr>
+        <td>Produtividade Média de Sistema Web</td>
+        <td style="text-align: center;"><strong>3.300 LOC/mês</strong></td>
+        <td>Velocidade referencial de engenharia adotada no projeto.</td>
+      </tr>
+      <tr>
+        <td>Prazo Técnico Total Estimado</td>
+        <td style="text-align: center;"><strong>1,685 meses</strong></td>
+        <td><strong>1 Mês, 14 Dias, 5 Horas e 45 Minutos</strong> (222,48 horas de desenvolvimento).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>4. Cronograma de Entrega por Marcos e Condições Comerciais</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 90px;">Marco</th>
+        <th>Entregáveis Associados</th>
+        <th style="width: 100px; text-align: center;">Percentual</th>
+        <th style="width: 120px; text-align: right;">Valor Nominal</th>
+        <th>Condição de Faturamento</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Marco 1</strong></td>
+        <td>Setup de desenvolvimento, arquitetura .NET 9 / EF Core, migrações MariaDB e entrega dos módulos de Autenticação, Materiais, Máquinas e Clientes.</td>
+        <td style="text-align: center;"><span class="badge badge-amber">40%</span></td>
+        <td style="text-align: right;"><strong>R$ 1.779,84</strong></td>
+        <td>Na assinatura do contrato e início do projeto.</td>
+      </tr>
+      <tr>
+        <td><strong>Marco 2</strong></td>
+        <td>Conclusão do Motor de Precificação e Orçamentos, Insumos de Acabamento em mL e módulo de Fila de Produção com baixa física de estoque.</td>
+        <td style="text-align: center;"><span class="badge badge-amber">30%</span></td>
+        <td style="text-align: right;"><strong>R$ 1.334,88</strong></td>
+        <td>Na entrega e validação do fluxo operacional.</td>
+      </tr>
+      <tr>
+        <td><strong>Marco 3</strong></td>
+        <td>Dashboard de KPIs, Background Service de expurgo e cofre financeiro, conteinerização Docker, aprovação da suíte de 82 testes e homologação final.</td>
+        <td style="text-align: center;"><span class="badge badge-amber">30%</span></td>
+        <td style="text-align: right;"><strong>R$ 1.334,88</strong></td>
+        <td>Na entrega final do sistema, código e manuais.</td>
+      </tr>
+      <tr>
+        <td colspan="2"><strong>TOTAL CONSOLIDADO DO INVESTIMENTO (PREÇO FIXO)</strong></td>
+        <td style="text-align: center;"><span class="badge badge-green">100%</span></td>
+        <td style="text-align: right;"><strong style="font-size: 14px; color: #15803d;">R$ 4.449,60</strong></td>
+        <td><strong>Quitação Integral</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>5. Garantia Técnica, SLA e Propriedade Intelectual</h2>
+  <div class="callout">
+    <strong>Garantia Incondicional de 90 Dias:</strong> A contar da homologação final, o proponente assegura a correção
+    imediata de quaisquer inconformidades funcionais ou de cálculo de regras de negócio sem custos adicionais.
+    Todos os direitos autorais patrimoniais do código-fonte e da documentação serão transferidos ao Contratante.
+  </div>
+
+  <div class="signature-container">
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-name">Felipe Silveira Pessoa</div>
+      <div class="signature-role">Proponente / Engenheiro de Software Responsável</div>
+      <div class="signature-role">CPF: 999.999.999-99</div>
+    </div>
+    <div class="signature-block">
+      <div class="signature-line"></div>
+      <div class="signature-name">Empreendedor / Maker Contratante</div>
+      <div class="signature-role">Aceite Formal de Escopo, Cronograma e Investimento</div>
+      <div class="signature-role">CPF / CNPJ: ________________________</div>
+    </div>
+  </div>
+
+</body>
+</html>

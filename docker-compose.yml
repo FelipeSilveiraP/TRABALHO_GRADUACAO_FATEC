@@ -1,0 +1,40 @@
+# ==============================================================================
+# docker-compose.yml - Pilha Completa do Sistema LucroImpresso
+# Execução com 1 comando (Web App Blazor + MariaDB) - Custo R$ 0,00
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # Serviço do Banco de Dados Relacional
+  db:
+    image: mariadb:10.11
+    container_name: lucroimpresso-mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME:-LucroImpressoDB}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT:-3308}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # Serviço da Aplicação Web (.NET 9 / Blazor)
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lucroimpresso-web
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "${WEB_PORT:-5067}:8080"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=${DB_NAME:-LucroImpressoDB};User=${DB_USER};Password=${DB_PASSWORD};
+      - ASPNETCORE_ENVIRONMENT=Production
+
+volumes:
+  db_data:

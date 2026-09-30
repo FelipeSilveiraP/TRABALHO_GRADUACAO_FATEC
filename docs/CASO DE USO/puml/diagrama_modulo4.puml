@@ -1,0 +1,27 @@
+@startuml
+title Módulo 4: Orçamentos e Precificação
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam monochrome false
+
+actor "Empreendedor" as Emp
+actor "Software Fatiador\n<<Ferramenta Externa>>" as Fat
+
+rectangle "Sistema LucroImpresso" {
+  usecase "UC19: Gerar Novo Orçamento\ncom Custos Detalhados" as UC19
+  usecase "UC20: Alertar Estoque\nInsuficiente" as UC20
+  usecase "UC21: Editar Orçamento\nExistente" as UC21
+  usecase "UC22: Excluir Orçamento com\nPreservação Histórica" as UC22
+}
+
+Emp --> UC19
+Emp --> UC21
+Emp --> UC22
+
+Fat --> UC19 : "Fornece peso (g)\ne tempo (h)"
+
+UC20 ..> UC19 : <<estende>>
+
+@enduml

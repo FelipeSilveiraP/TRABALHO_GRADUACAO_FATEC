@@ -1,0 +1,61 @@
+.dashboard-container {
+    padding: 1.25rem 1.5rem;
+    min-height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.text-xs {
+    font-size: 0.75rem;
+}
+
+.alertas-scroll-container {
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+.alertas-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.alertas-scroll-container::-webkit-scrollbar-track {
+    background: #f0ebe1;
+    border: 1px solid #1a1a1a;
+}
+
+.alertas-scroll-container::-webkit-scrollbar-thumb {
+    background: #1a1a1a;
+}
+
+.alertas-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+}
+
+.alert-item-card {
+    transition: all 0.15s ease-in-out;
+    background-color: #ffffff;
+    border: 2px solid #1a1a1a;
+    box-shadow: 2px 2px 0px #1a1a1a;
+    border-radius: 0;
+}
+
+.alert-item-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0px #1a1a1a;
+    background-color: #faf7f2;
+}
+
+.alert-item-card:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px #1a1a1a;
+}
+
+.alert-item-card .arrow-icon {
+    transition: transform 0.15s ease-in-out;
+}
+
+.alert-item-card:hover .arrow-icon {
+    transform: translateX(3px);
+    color: #1a1a1a !important;
+}

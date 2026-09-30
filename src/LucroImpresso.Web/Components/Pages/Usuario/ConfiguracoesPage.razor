@@ -1,0 +1,416 @@
+@page "/configuracoes"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@using LucroImpresso.Web.Models
+@using LucroImpresso.Web.Interfaces
+@using LucroImpresso.Web.Services
+@inject IUsuarioRepository UsuarioRepo
+@inject UsuarioContextService UsuarioCtx
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<PageTitle>LucroImpresso | Configurações</PageTitle>
+
+<div class="page-container" style="max-width: 800px; margin: 0 auto; padding: 1.25rem 1.5rem;">
+    <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 pb-3 brutal-border-b">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 bg-white brutal-border-2 px-3 py-1 mb-2">
+                <span class="material-symbols-outlined text-dark fs-5">settings</span>
+                <span class="font-headline text-xs font-black uppercase text-dark">PREFERÊNCIAS</span>
+            </div>
+            <h1 class="font-headline text-dark fw-black mb-0 display-6 uppercase tracking-tight">CONFIGURAÇÕES DA CONTA</h1>
+            <p class="font-body text-muted fs-6 mt-1 mb-0 fw-semibold">Gerencie seu nome de usuário, e-mail e credenciais de acesso ao sistema.</p>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrEmpty(mensagemSucesso))
+    {
+        <div class="alert alert-success mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">check_circle</span>
+            @mensagemSucesso
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(mensagemErro))
+    {
+        <div class="alert alert-danger mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">error</span>
+            @mensagemErro
+        </div>
+    }
+
+    @if (carregando && usuario == null)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-dark" role="status"></div>
+            <p class="font-headline text-dark fw-bold mt-2 uppercase">Carregando dados do usuário...</p>
+        </div>
+    }
+    else if (usuario != null)
+    {
+        @* ── Seção: Alterar Nome de Usuário ── *@
+        <div class="bg-white brutal-border p-4 p-md-5 mb-5 brutal-shadow-lg">
+            <div class="d-flex align-items-center gap-2 pb-3 border-bottom brutal-border-b mb-4">
+                <span class="material-symbols-outlined text-dark fs-3">badge</span>
+                <h3 class="font-headline fw-black text-dark uppercase mb-0 fs-5">ALTERAR NOME DE USUÁRIO</h3>
+            </div>
+
+            <EditForm Model="@formNome" OnValidSubmit="SalvarNome" FormName="formNome">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label text-dark">Novo Nome de Usuário</label>
+                        <InputText @bind-Value="formNome.NovoNome"
+                                   class="form-control"
+                                   placeholder="@usuario.NomeUsuario"
+                                   maxlength="30" />
+                        <small class="text-muted fw-semibold" style="font-size: 0.73rem;">Mínimo 3 caracteres. Apenas letras, números, underscores (_) e pontos (.).</small>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-yellow w-100 py-3 fs-6" disabled="@carregando">
+                            @if (carregando)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>AGUARDE...</span>
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined fs-5">save</span>
+                                <span>SALVAR NOME</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+
+        @* ── Seção: Alterar E-mail ── *@
+        <div class="bg-white brutal-border p-4 p-md-5 mb-5 brutal-shadow-lg">
+            <div class="d-flex align-items-center gap-2 pb-3 border-bottom brutal-border-b mb-4">
+                <span class="material-symbols-outlined text-dark fs-3">mail</span>
+                <h3 class="font-headline fw-black text-dark uppercase mb-0 fs-5">ALTERAR E-MAIL</h3>
+            </div>
+
+            <div class="mb-3 p-3 bg-surface-container brutal-border-2">
+                <span class="font-headline text-xs font-black uppercase text-dark d-block mb-1">E-MAIL ATUAL</span>
+                <span class="fw-bold text-dark">@usuario.Email</span>
+            </div>
+
+            <EditForm Model="@formEmail" OnValidSubmit="SalvarEmail" FormName="formEmail">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label text-dark">Novo E-mail</label>
+                        <InputText @bind-Value="formEmail.NovoEmail"
+                                   type="email"
+                                   class="form-control"
+                                   placeholder="seunome@email.com" />
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-yellow w-100 py-3 fs-6" disabled="@carregando">
+                            @if (carregando)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>AGUARDE...</span>
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined fs-5">save</span>
+                                <span>SALVAR E-MAIL</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+
+        @* ── Seção: Alterar Senha ── *@
+        <div class="bg-white brutal-border p-4 p-md-5 mb-5 brutal-shadow-lg">
+            <div class="d-flex align-items-center gap-2 pb-3 border-bottom brutal-border-b mb-4">
+                <span class="material-symbols-outlined text-dark fs-3">lock_reset</span>
+                <h3 class="font-headline fw-black text-dark uppercase mb-0 fs-5">ALTERAR SENHA DE ACESSO</h3>
+            </div>
+
+            <EditForm Model="@formSenha" OnValidSubmit="SalvarSenha" FormName="formSenha">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-12">
+                        <label class="form-label text-dark">Senha Atual</label>
+                        <InputText @bind-Value="formSenha.SenhaAtual"
+                                   type="password"
+                                   class="form-control"
+                                   placeholder="••••••••" />
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-dark">Nova Senha</label>
+                        <InputText @bind-Value="formSenha.NovaSenha"
+                                   type="password"
+                                   class="form-control"
+                                   placeholder="••••••••" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-dark">Confirmar Nova Senha</label>
+                        <InputText @bind-Value="formSenha.ConfirmarSenha"
+                                   type="password"
+                                   class="form-control"
+                                   placeholder="••••••••" />
+                    </div>
+                </div>
+
+                <!-- Requisitos de Senha -->
+                <div class="p-3 bg-surface-container brutal-border-2 mb-4">
+                    <span class="font-headline text-dark text-xs font-black uppercase d-block mb-2">
+                        <span class="material-symbols-outlined fs-6 align-middle me-1">checklist</span>
+                        REQUISITOS DA SENHA
+                    </span>
+                    <div class="row g-1" style="font-size: 0.73rem;">
+                        <div class="col-6"><span class="text-muted fw-semibold">✓ Mínimo 8 caracteres</span></div>
+                        <div class="col-6"><span class="text-muted fw-semibold">✓ 1 letra maiúscula (A-Z)</span></div>
+                        <div class="col-6"><span class="text-muted fw-semibold">✓ 1 letra minúscula (a-z)</span></div>
+                        <div class="col-6"><span class="text-muted fw-semibold">✓ 1 número (0-9)</span></div>
+                        <div class="col-12"><span class="text-muted fw-semibold">✓ 1 caractere especial (!@@#$%^&*?_-)</span></div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-yellow w-100 py-3 fs-5" disabled="@carregando">
+                            @if (carregando)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>AGUARDE...</span>
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined fs-5">vpn_key</span>
+                                <span>ATUALIZAR SENHA</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+
+        @* ── Botão Voltar ── *@
+        <div class="d-flex justify-content-center mt-2">
+            <button class="btn btn-outline-secondary px-5 py-3 fs-6" @onclick='() => Nav.NavigateTo("/dashboard", forceLoad: true)'>
+                ← VOLTAR AO DASHBOARD
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    private Usuario? usuario;
+    private FormNome formNome = new();
+    private FormEmail formEmail = new();
+    private FormSenha formSenha = new();
+    private bool carregando = false;
+    private string? mensagemSucesso;
+    private string? mensagemErro;
+    private int usuarioId = 0;
+
+    // ── ViewModels simples para os formulários ──
+    private class FormNome
+    {
+        public string NovoNome { get; set; } = string.Empty;
+    }
+
+    private class FormEmail
+    {
+        public string NovoEmail { get; set; } = string.Empty;
+    }
+
+    private class FormSenha
+    {
+        public string SenhaAtual { get; set; } = string.Empty;
+        public string NovaSenha { get; set; } = string.Empty;
+        public string ConfirmarSenha { get; set; } = string.Empty;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuarioId = await UsuarioCtx.GetUsuarioIdAsync();
+        await CarregarUsuario();
+    }
+
+    private async Task CarregarUsuario()
+    {
+        usuario = await UsuarioRepo.GetByIdAsync(usuarioId);
+    }
+
+    private async Task SalvarNome()
+    {
+        mensagemSucesso = null;
+        mensagemErro = null;
+
+        if (string.IsNullOrWhiteSpace(formNome.NovoNome))
+        {
+            mensagemErro = "O nome de usuário não pode ser vazio.";
+            return;
+        }
+
+        var nomeTrimmed = formNome.NovoNome.Trim();
+
+        if (nomeTrimmed.Length < 3)
+        {
+            mensagemErro = "O nome de usuário deve ter pelo menos 3 caracteres.";
+            return;
+        }
+
+        if (nomeTrimmed.Length > 30)
+        {
+            mensagemErro = "O nome de usuário não pode ter mais de 30 caracteres.";
+            return;
+        }
+
+        if (!System.Text.RegularExpressions.Regex.IsMatch(nomeTrimmed, @"^[a-zA-Z0-9_.]+$"))
+        {
+            mensagemErro = "O nome de usuário deve conter apenas letras, números, underscores (_) e pontos (.).";
+            return;
+        }
+
+        // Verifica se o nome já existe
+        var existente = await UsuarioRepo.GetByNomeAsync(nomeTrimmed);
+        if (existente != null && existente.Id != usuarioId)
+        {
+            mensagemErro = "Este nome de usuário já está em uso.";
+            return;
+        }
+
+        carregando = true;
+        try
+        {
+            usuario!.NomeUsuario = nomeTrimmed;
+            await UsuarioRepo.UpdateAsync(usuario);
+            formNome = new FormNome();
+            mensagemSucesso = "Nome de usuário atualizado com sucesso! Faça login novamente para aplicar.";
+
+            // Redireciona para re-login via POST pois o cookie tem o nome antigo
+            await Task.Delay(2000);
+            await JS.InvokeVoidAsync("eval", "var f = document.querySelector('form[action=\"/auth/logout\"]') || document.createElement('form'); if (!f.parentNode) { f.method = 'POST'; f.action = '/auth/logout'; document.body.appendChild(f); } f.submit();");
+        }
+        catch (Exception)
+        {
+            mensagemErro = "Ocorreu um erro inesperado ao atualizar o nome. Tente novamente.";
+        }
+        finally
+        {
+            carregando = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SalvarEmail()
+    {
+        mensagemSucesso = null;
+        mensagemErro = null;
+
+        if (string.IsNullOrWhiteSpace(formEmail.NovoEmail))
+        {
+            mensagemErro = "O e-mail não pode ser vazio.";
+            return;
+        }
+
+        var emailTrimmed = formEmail.NovoEmail.Trim().ToLower();
+
+        if (emailTrimmed.Length > 100)
+        {
+            mensagemErro = "O e-mail não pode ter mais de 100 caracteres.";
+            return;
+        }
+
+        if (!System.Text.RegularExpressions.Regex.IsMatch(emailTrimmed, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
+        {
+            mensagemErro = "O formato do e-mail é inválido.";
+            return;
+        }
+
+        // Verifica se o email já existe
+        if (await UsuarioRepo.EmailExisteAsync(emailTrimmed))
+        {
+            // Verifica se não é o email do próprio usuário
+            var donoDuplicado = await UsuarioRepo.GetByIdAsync(usuarioId);
+            if (donoDuplicado?.Email?.ToLower() != emailTrimmed)
+            {
+                mensagemErro = "Este e-mail já está cadastrado por outro usuário.";
+                return;
+            }
+        }
+
+        carregando = true;
+        try
+        {
+            usuario!.Email = emailTrimmed;
+            await UsuarioRepo.UpdateAsync(usuario);
+            formEmail = new FormEmail();
+            mensagemSucesso = "E-mail atualizado com sucesso!";
+        }
+        catch (Exception)
+        {
+            mensagemErro = "Ocorreu um erro inesperado ao atualizar o e-mail. Tente novamente.";
+        }
+        finally
+        {
+            carregando = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SalvarSenha()
+    {
+        mensagemSucesso = null;
+        mensagemErro = null;
+
+        if (string.IsNullOrWhiteSpace(formSenha.SenhaAtual))
+        {
+            mensagemErro = "Informe a senha atual.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(formSenha.NovaSenha))
+        {
+            mensagemErro = "Informe a nova senha.";
+            return;
+        }
+
+        // VALIDAÇÃO CENTRALIZADA (mesma do UsuarioRepository)
+        var erroForcaSenha = UsuarioRepo.ValidarForcaSenha(formSenha.NovaSenha);
+        if (erroForcaSenha != null)
+        {
+            mensagemErro = erroForcaSenha;
+            return;
+        }
+
+        if (formSenha.NovaSenha != formSenha.ConfirmarSenha)
+        {
+            mensagemErro = "A nova senha e a confirmação não coincidem.";
+            return;
+        }
+
+        // Valida a senha atual
+        if (!BCrypt.Net.BCrypt.Verify(formSenha.SenhaAtual, usuario!.Senha))
+        {
+            mensagemErro = "A senha atual está incorreta.";
+            return;
+        }
+
+        carregando = true;
+        try
+        {
+            usuario.Senha = BCrypt.Net.BCrypt.HashPassword(formSenha.NovaSenha);
+            await UsuarioRepo.UpdateAsync(usuario);
+            formSenha = new FormSenha();
+            mensagemSucesso = "Senha alterada com sucesso!";
+        }
+        catch (Exception)
+        {
+            mensagemErro = "Ocorreu um erro inesperado ao alterar a senha. Tente novamente.";
+        }
+        finally
+        {
+            carregando = false;
+            StateHasChanged();
+        }
+    }
+}

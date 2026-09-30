@@ -1,0 +1,359 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ST10 AutoBot Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-secondary-container": "#1a1a1a",
+                "inverse-on-surface": "#f5f0e8",
+                "error": "#cc0000",
+                "outline": "#1a1a1a",
+                "surface": "#f5f0e8",
+                "on-tertiary-fixed-variant": "#1a1a1a",
+                "on-primary-fixed": "#1a1a1a",
+                "background": "#f5f0e8",
+                "on-tertiary-container": "#1a1a1a",
+                "surface-variant": "#e8e3da",
+                "surface-container": "#eee9e0",
+                "on-background": "#1a1a1a",
+                "on-surface": "#1a1a1a",
+                "error-container": "#ffdad6",
+                "inverse-surface": "#1a1a1a",
+                "surface-bright": "#faf7f2",
+                "outline-variant": "#d0cbc3",
+                "on-primary": "#ffffff",
+                "secondary": "#e63b2e",
+                "primary-fixed-dim": "#e6b800",
+                "on-secondary-fixed-variant": "#1a1a1a",
+                "surface-container-low": "#f2ede5",
+                "tertiary-fixed-dim": "#a8c6ff",
+                "tertiary-container": "#d6e3ff",
+                "on-primary-container": "#1a1a1a",
+                "tertiary": "#0055ff",
+                "primary-fixed": "#ffcc00",
+                "secondary-fixed-dim": "#ffb3ab",
+                "on-secondary": "#1a1a1a",
+                "on-error": "#ffffff",
+                "tertiary-fixed": "#d6e3ff",
+                "primary": "#1a1a1a",
+                "inverse-primary": "#f5f0e8",
+                "secondary-container": "#ffdad6",
+                "surface-container-lowest": "#ffffff",
+                "on-error-container": "#93000a",
+                "surface-container-highest": "#e2ddd4",
+                "secondary-fixed": "#ffdad6",
+                "surface-container-high": "#e8e3da",
+                "on-tertiary-fixed": "#1a1a1a",
+                "surface-tint": "#1a1a1a",
+                "surface-dim": "#d6d1c9",
+                "on-tertiary": "#ffffff",
+                "on-primary-fixed-variant": "#1a1a1a",
+                "on-secondary-fixed": "#1a1a1a",
+                "on-surface-variant": "#4a4a4a",
+                "primary-container": "#ffcc00"
+        },
+        "borderRadius": {
+                "DEFAULT": "0px",
+                "lg": "0px",
+                "xl": "0px",
+                "full": "0px"
+        },
+        "spacing": {},
+        "fontFamily": {
+                "headline": [
+                        "Space Grotesk"
+                ],
+                "display": [
+                        "Space Grotesk"
+                ],
+                "body": [
+                        "Inter"
+                ],
+                "label": [
+                        "Space Grotesk"
+                ]
+        },
+        "fontSize": {}
+},
+    },
+  }
+</script>
+<style>
+        body {
+            background-color: #f5f0e8;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .font-headline {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .brutal-border {
+            border: 4px solid #1a1a1a;
+        }
+        .brutal-border-b {
+            border-bottom: 4px solid #1a1a1a;
+        }
+        .brutal-border-r {
+            border-right: 4px solid #1a1a1a;
+        }
+        .brutal-border-t {
+            border-top: 4px solid #1a1a1a;
+        }
+        
+        .step-card {
+            transition: transform 0.1s ease;
+        }
+        
+        .step-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 8px 8px 0px 0px #1a1a1a;
+        }
+
+        .step-card:active {
+            transform: translate(0, 0);
+            box-shadow: 0px 0px 0px 0px #1a1a1a;
+        }
+
+        .terminal-scroll::-webkit-scrollbar {
+            width: 12px;
+            border-left: 4px solid #1a1a1a;
+        }
+        .terminal-scroll::-webkit-scrollbar-track {
+            background: #ffffff;
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb {
+            background: #1a1a1a;
+        }
+    </style>
+</head>
+<body class="text-on-background h-screen w-screen flex flex-col overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between px-6 py-4 bg-primary-container brutal-border-b shrink-0 z-10">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline text-[32px] font-bold" data-icon="bolt">bolt</span>
+<h1 class="font-headline text-[28px] text-outline font-bold uppercase tracking-tight">ST10 AUTOMÁTICO</h1>
+<div class="ml-6 px-4 py-2 bg-surface brutal-border flex items-center gap-3">
+<div class="h-4 w-4 bg-secondary brutal-border"></div>
+<span class="font-headline text-sm text-outline font-bold uppercase">System Active</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="hover:bg-primary-fixed-dim transition-colors p-2 brutal-border bg-surface text-outline font-bold">
+<span class="material-symbols-outlined text-[28px]" data-icon="help">help</span>
+</button>
+<button class="flex items-center gap-2 px-6 py-3 bg-secondary hover:bg-error text-on-error brutal-border transition-all font-bold uppercase tracking-widest"><span class="material-symbols-outlined text-[24px]" data-icon="power_settings_new">power_settings_new</span><span class="font-headline text-sm">PARAR AUTOMAÇÃO</span></button>
+</div>
+</header>
+<!-- Main Content Layout -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Central Workspace -->
+<main class="flex-1 flex flex-col lg:flex-row overflow-hidden bg-background">
+<!-- Automation Flow Panel -->
+<div class="flex-1 overflow-y-auto p-6 lg:p-8 flex flex-col gap-10 terminal-scroll">
+<!-- Prominent Service Name Area -->
+<div class="bg-surface p-8 brutal-border">
+<label class="font-headline text-xl text-outline font-bold mb-4 flex items-center gap-3 uppercase">
+<div class="w-8 h-8 bg-tertiary brutal-border flex items-center justify-center text-white"><span class="material-symbols-outlined text-[20px]" data-icon="badge">badge</span></div>
+Nome do Serviço / Central (Obrigatório)
+</label>
+<input class="w-full h-16 px-6 bg-surface-container-lowest brutal-border text-xl font-headline font-bold text-on-surface focus:outline-none focus:ring-0 focus:bg-surface-bright transition-none" placeholder="Digite o nome do serviço ou central..." type="text">
+<p class="font-body text-on-surface-variant mt-3 font-semibold uppercase text-xs tracking-wider">Este nome será usado para criar a pasta e nomear os arquivos originais e resetados.</p>
+</div>
+<!-- Status & Realignment Section -->
+<div class="flex flex-col md:flex-row gap-6 bg-surface p-6 brutal-border items-stretch justify-between">
+<button class="h-16 px-8 bg-secondary hover:bg-error text-on-error font-headline font-bold uppercase brutal-border transition-transform active:translate-y-1 flex items-center gap-3 text-lg">
+<span class="material-symbols-outlined font-bold" data-icon="sync">sync</span>
+REALINHAR ST10
+</button>
+<div class="flex flex-wrap items-stretch gap-4">
+<div class="flex items-center gap-4 bg-primary-container px-6 py-3 brutal-border">
+<span class="font-headline text-sm font-bold uppercase text-outline">Status:</span>
+<div class="flex items-center gap-3">
+<div class="h-5 w-5 bg-secondary brutal-border"></div>
+<span class="font-headline text-base font-bold text-outline">Porta COM4</span>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface px-6 py-3 brutal-border">
+<span class="font-headline text-sm font-bold uppercase text-outline">Estado:</span>
+<div class="flex items-center gap-3">
+<div class="h-5 w-5 bg-error brutal-border"></div>
+<span class="font-headline text-base font-bold text-error">ST10 Não Realinhada</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Central Selection Section -->
+<div class="bg-surface p-8 brutal-border">
+<label class="font-headline text-xl text-outline font-bold mb-4 flex items-center gap-3 uppercase">
+<div class="w-8 h-8 bg-primary-container brutal-border flex items-center justify-center text-outline"><span class="material-symbols-outlined text-[20px]" data-icon="memory">memory</span></div>
+Selecionar Central
+</label>
+<select class="w-full h-16 px-6 bg-surface-container-lowest brutal-border text-xl font-headline font-bold text-on-surface focus:outline-none focus:ring-0 focus:bg-surface-bright transition-none appearance-none cursor-pointer" id="central-select" onchange="onCentralSelect()">
+<option disabled="" selected="" value="">Selecione a central para ver as instruções de soldagem...</option>
+<optgroup label="01-CENTRAIS DE INJEÇÃO">
+<option value="IAW_4AF">IAW_4AF_</option>
+<option value="IAW_4AFB">IAW_4AFB_</option>
+<option value="IAW_4AFR">IAW_4AFR_</option>
+<option value="ME_7.4.9">ME_7.4.9_</option>
+<option value="ME_7.5.20">ME_7.5.20_</option>
+</optgroup>
+</select>
+<button class="mt-6 h-16 px-8 w-full bg-outline hover:bg-outline-variant text-on-primary font-headline font-bold uppercase brutal-border transition-transform active:translate-y-1 flex items-center justify-center gap-3 text-lg" id="view-instructions-btn" onclick="openModal()">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+Ver Instruções de Soldagem
+</button>
+</div>
+<div class="bg-surface p-8 brutal-border">
+<label class="font-headline text-xl text-outline font-bold mb-4 flex items-center gap-3 uppercase">
+<div class="w-8 h-8 bg-tertiary brutal-border flex items-center justify-center text-white"><span class="material-symbols-outlined text-[20px]" data-icon="save">save</span></div>
+Escreva um nome para Salvar o ARQUIVO ORIGINAL no sistema:
+</label>
+<div class="flex gap-4">
+<input class="flex-1 h-16 px-6 bg-surface-container-lowest brutal-border text-lg font-headline font-bold text-on-surface focus:outline-none focus:ring-0 focus:bg-surface-bright transition-none" placeholder="Ex: original_st10_v1..." type="text">
+<button class="h-16 px-8 bg-tertiary hover:bg-tertiary-fixed-dim text-white font-headline font-bold uppercase brutal-border transition-transform active:translate-y-1 flex items-center gap-3 text-lg" onclick="document.getElementById('step-1-container').classList.remove('hidden')">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+Confirmar
+</button>
+</div>
+</div>
+<!-- 4-Step Sequence -->
+<div class="flex flex-col gap-6 max-w-5xl mx-auto w-full mb-10">
+<h2 class="font-headline text-3xl text-outline font-bold mb-4 brutal-border-b pb-4 uppercase tracking-tighter">Sequência de Automação</h2>
+<!-- Step 1 -->
+<div class="" id="step-1-container">
+<button class="step-card w-full h-24 bg-primary-container brutal-border flex items-center p-0 relative overflow-visible cursor-pointer text-left" onclick="document.getElementById('step-2-container').classList.remove('hidden'); const log = document.querySelector('.terminal-scroll.p-6.bg-surface-container-lowest'); log.innerHTML += '&lt;div class=&quot;text-tertiary font-bold&quot;&gt;[SYSTEM] Leitura concluída com sucesso. Arquivo salvo.&lt;/div&gt;'; log.innerHTML += '&lt;div class=&quot;text-outline font-bold&quot;&gt;[SYSTEM] Preparando para apagar bancos...&lt;/div&gt;'; log.scrollTop = log.scrollHeight;">
+<div class="bg-outline h-full w-20 flex items-center justify-center brutal-border-r">
+<span class="font-headline text-4xl font-black text-on-primary">1</span>
+</div>
+<div class="px-6 flex flex-col flex-1">
+<span class="font-headline text-xl text-outline font-black tracking-widest uppercase">LEITURA DO ARQUIVO ORIGINAL E SALVAMENTO</span>
+<span class="font-body text-sm text-outline mt-1 font-semibold">Criar pasta, configurar opções e ler flash original</span>
+</div>
+<div class="bg-surface h-full w-20 flex items-center justify-center brutal-border-l">
+<span class="material-symbols-outlined text-outline text-[40px] font-bold" data-icon="file_download">file_download</span>
+</div>
+</button>
+</div>
+<!-- Step 2 Section -->
+<div id="step-2-container">
+<button class="step-card w-full h-24 bg-secondary brutal-border flex items-center p-0 relative overflow-visible cursor-pointer text-left" onclick="document.getElementById('banks-modal').classList.remove('hidden')">
+<div class="bg-outline h-full w-20 flex items-center justify-center brutal-border-r">
+<span class="font-headline text-4xl font-black text-on-primary">2</span>
+</div>
+<div class="px-6 flex flex-col flex-1">
+<span class="font-headline text-xl text-on-error font-black tracking-widest uppercase">APAGAR BANCOS (ERASE)</span>
+<span class="font-body text-sm text-on-error mt-1 font-semibold">Selecionar e apagar bancos de memória da ST10</span>
+</div>
+<div class="bg-surface h-full w-20 flex items-center justify-center brutal-border-l">
+<span class="material-symbols-outlined text-outline text-[40px] font-bold" data-icon="delete_sweep">delete_sweep</span>
+</div>
+</button>
+</div>
+<!-- Step 3 -->
+<div class="" id="step-3-container"><button class="step-card w-full h-24 bg-tertiary brutal-border flex items-center p-0 relative overflow-visible cursor-pointer text-left" onclick="document.getElementById('naming-section-current').classList.remove('hidden'); const log = document.querySelector('.terminal-scroll.p-6.bg-surface-container-lowest'); log.innerHTML += '&lt;div class=\'text-outline font-bold\'&gt;[SYSTEM] Iniciando leitura do arquivo atual...&lt;/div&gt;'; log.scrollTop = log.scrollHeight;">
+<div class="bg-outline h-full w-20 flex items-center justify-center brutal-border-r">
+<span class="font-headline text-4xl font-black text-on-primary">3</span>
+</div>
+<div class="px-6 flex flex-col flex-1">
+<span class="font-headline text-xl text-white font-black tracking-widest uppercase">BOTÃO 3: LER E SALVAR O ARQUIVO ATUAL APÓS O RESETE</span>
+<span class="font-body text-sm text-white mt-1 font-semibold">Ler arquivo .hex modificado para verificação</span>
+</div>
+<div class="bg-surface h-full w-20 flex items-center justify-center brutal-border-l">
+<span class="material-symbols-outlined text-outline text-[40px] font-bold" data-icon="document_scanner">document_scanner</span>
+</div>
+</button></div>
+<div class="bg-surface p-8 brutal-border mt-6 hidden" id="naming-section-current">
+<label class="font-headline text-xl text-outline font-bold mb-4 flex items-center gap-3 uppercase">
+<div class="w-8 h-8 bg-tertiary brutal-border flex items-center justify-center text-white"><span class="material-symbols-outlined text-[20px]" data-icon="save">save</span></div>
+Escreva um nome para Salvar o ARQUIVO ATUAL no sistema:
+</label>
+<div class="flex gap-4">
+<input class="flex-1 h-16 px-6 bg-surface-container-lowest brutal-border text-lg font-headline font-bold text-on-surface focus:outline-none focus:ring-0 focus:bg-surface-bright transition-none" placeholder="Ex: resetado_st10_v1..." type="text">
+<button class="h-16 px-8 bg-tertiary hover:bg-tertiary-fixed-dim text-white font-headline font-bold uppercase brutal-border transition-transform active:translate-y-1 flex items-center gap-3 text-lg" onclick="const log = document.querySelector('.terminal-scroll.p-6.bg-surface-container-lowest'); log.innerHTML += '&lt;div class=\'text-tertiary font-bold\'&gt;[SYSTEM] Arquivo atual salvo com sucesso.&lt;/div&gt;'; log.scrollTop = log.scrollHeight; document.getElementById('step-4-container').classList.remove('hidden');">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+Confirmar
+</button>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="" id="step-4-container">
+<button class="step-card w-full h-24 bg-surface brutal-border flex items-center p-0 relative overflow-visible cursor-pointer text-left hover:bg-surface-variant">
+<div class="bg-outline h-full w-20 flex items-center justify-center brutal-border-r">
+<span class="font-headline text-4xl font-black text-on-primary">4</span>
+</div>
+<div class="px-6 flex flex-col flex-1">
+<span class="font-headline text-xl text-outline font-black tracking-widest uppercase">COMPARAÇÃO DE ARQUIVOS</span>
+<span class="font-body text-sm text-outline mt-1 font-semibold">Comparar arquivo original vs resetado (Diff)</span>
+</div>
+<div class="bg-surface-container-highest h-full w-20 flex items-center justify-center brutal-border-l">
+<span class="material-symbols-outlined text-outline text-[40px] font-bold" data-icon="difference">difference</span>
+</div>
+</button>
+</div>
+</div>
+</div>
+<!-- Terminal / Activity Logs Panel -->
+<div class="w-full lg:w-[450px] bg-surface brutal-border-l flex flex-col shrink-0 z-10">
+<div class="px-6 py-5 brutal-border-b bg-primary-container flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-8 h-8 bg-outline flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[20px] font-bold" data-icon="description">description</span></div><h2 class="font-headline text-xl text-outline font-black uppercase tracking-widest">Logs de Atividade</h2></div></div>
+<div class="flex-1 overflow-y-auto terminal-scroll p-6 bg-surface-container-lowest font-body font-bold text-sm leading-loose flex flex-col gap-2 selection:bg-primary/50">
+<!-- Terminal area starts empty -->
+<div class="text-tertiary font-bold">[SYSTEM] Leitura concluída com sucesso. Arquivo salvo.</div><div class="text-outline font-bold">[SYSTEM] Preparando para apagar bancos...</div><div class="text-tertiary font-bold">[SYSTEM] Leitura concluída com sucesso. Arquivo salvo.</div><div class="text-outline font-bold">[SYSTEM] Preparando para apagar bancos...</div><div class="text-secondary font-bold">[SYSTEM] Bancos apagados com sucesso!</div><div class="text-outline font-bold">[SYSTEM] Aguardando próxima etapa...</div><div class="text-outline font-bold">[SYSTEM] Iniciando leitura do arquivo atual...</div><div class="text-tertiary font-bold">[SYSTEM] Arquivo atual salvo com sucesso.</div></div>
+</div>
+</main>
+</div>
+<!-- Footer Status Bar -->
+<!-- Instruction Modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-outline/90 backdrop-blur-none p-6 hidden" id="instruction-modal">
+<div class="bg-surface brutal-border shadow-[16px_16px_0px_0px_#e63b2e] w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden relative">
+<header class="flex items-center justify-between px-8 py-6 bg-primary-container brutal-border-b">
+<h2 class="font-headline text-2xl text-outline font-black uppercase">Instruções de Soldagem - Procedimento Leitura/Resete</h2>
+<button class="p-2 bg-surface brutal-border hover:bg-error hover:text-white transition-colors text-outline font-bold" onclick="closeModal()">
+<span class="material-symbols-outlined text-[32px] font-bold" data-icon="close">close</span>
+</button>
+</header>
+<div class="flex-1 overflow-y-auto p-8 bg-background flex flex-col gap-8">
+<div class="bg-surface p-8 brutal-border">
+<h3 class="font-headline text-2xl text-outline mb-6 brutal-border-b pb-4 font-black uppercase">Detalhes da Placa</h3>
+<div class="aspect-video bg-surface-container-lowest brutal-border flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-[80px] text-outline opacity-50">image</span>
+<div class="absolute bottom-6 right-6 text-sm font-headline font-bold text-outline bg-primary px-4 py-2 brutal-border uppercase">Mockup: PDF/Imagem da Solda</div>
+</div>
+<p class="font-body text-outline mt-6 text-lg font-bold uppercase leading-relaxed">
+Siga atentamente as instruções de soldagem indicadas na documentação oficial. Certifique-se de que os contatos do boot mode estejam corretamente fechados antes de iniciar a operação.
+</p>
+</div>
+</div>
+<footer class="p-6 bg-surface-container brutal-border-t flex justify-end">
+<button class="h-16 px-10 bg-outline hover:bg-outline-variant text-on-primary font-headline font-black text-xl brutal-border uppercase transition-transform active:translate-y-1 flex items-center gap-3" onclick="closeModal()">
+<span class="material-symbols-outlined font-bold" data-icon="check">check</span>
+Entendi, fechar instruções
+</button>
+</footer>
+</div>
+</div>
+<script>
+function onCentralSelect() {
+    const select = document.getElementById('central-select');
+    if (select.value) {
+        document.getElementById('instruction-modal').classList.remove('hidden');
+    }
+}
+function closeModal() {
+    document.getElementById('instruction-modal').classList.add('hidden');
+    document.getElementById('view-instructions-btn').classList.remove('hidden');
+    document.getElementById('step-1-container').classList.remove('hidden');
+}
+function openModal() {
+    document.getElementById('instruction-modal').classList.remove('hidden');
+}
+</script>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-outline/90 backdrop-blur-none p-6 hidden" id="banks-modal"><div class="bg-surface brutal-border shadow-[16px_16px_0px_0px_#e63b2e] w-full max-w-2xl flex flex-col overflow-hidden"><header class="flex items-center justify-between px-8 py-6 bg-secondary brutal-border-b"><div class="flex items-center gap-4"><div class="w-10 h-10 bg-surface brutal-border flex items-center justify-center text-outline"><span class="material-symbols-outlined font-bold" data-icon="delete_sweep">delete_sweep</span></div><h2 class="font-headline text-2xl text-on-error font-black uppercase">ESCOLHA QUAL BANCO VAI APAGAR</h2></div><button class="p-2 bg-surface brutal-border hover:bg-outline hover:text-white transition-colors text-outline font-bold" onclick="document.getElementById('banks-modal').classList.add('hidden')"><span class="material-symbols-outlined font-bold" data-icon="close">close</span></button></header><div class="p-8 bg-background flex flex-col gap-8"><div class="brutal-border p-6 bg-surface-container-lowest"><legend class="text-sm font-headline font-black text-outline mb-6 uppercase tracking-widest border-b-4 border-outline pb-2 inline-block">Select banks</legend><div class="grid grid-cols-2 gap-x-12 gap-y-4" id="banks-grid"></div></div><div class="flex flex-col gap-4"><button class="w-full py-4 bg-primary hover:bg-primary-fixed-dim brutal-border font-headline font-black text-outline uppercase tracking-wider text-lg transition-colors" onclick="document.querySelectorAll('#banks-grid input').forEach(i =&gt; i.checked = true)">SELECIONAR TUDO</button><button class="w-full py-4 bg-surface hover:bg-surface-variant brutal-border font-headline font-black text-outline uppercase tracking-wider text-lg transition-colors" onclick="document.querySelectorAll('#banks-grid input').forEach(i =&gt; i.checked = false)">LIMPAR TODAS MARCAÇÕES</button><div class="grid grid-cols-2 gap-4 mt-4"><button class="py-5 bg-outline hover:bg-outline-variant text-white brutal-border font-headline font-black text-xl uppercase" onclick="document.getElementById('banks-modal').classList.add('hidden')">CANCELAR</button><button class="py-5 bg-secondary hover:bg-error text-white brutal-border font-headline font-black text-xl uppercase transition-transform active:translate-y-1" onclick="document.getElementById('banks-modal').classList.add('hidden'); const log = document.querySelector('.terminal-scroll.p-6.bg-surface-container-lowest'); log.innerHTML += '&lt;div class=&quot;text-secondary font-bold&quot;&gt;[SYSTEM] Bancos apagados com sucesso!&lt;/div&gt;'; log.innerHTML += '&lt;div class=&quot;text-outline font-bold&quot;&gt;[SYSTEM] Aguardando próxima etapa...&lt;/div&gt;'; log.scrollTop = log.scrollHeight; document.getElementById('step-3-container').classList.remove('hidden');">APAGAR BANCOS SELECIONADOS</button></div></div></div></div></div><script>const grid = document.getElementById('banks-grid'); for(let i=0; i<=15; i++) { grid.innerHTML += `<label class="flex items-center gap-4 cursor-pointer group hover:bg-surface-container-highest p-2 -ml-2 brutal-border border-transparent hover:border-outline"><input type="checkbox" class="w-6 h-6 brutal-border bg-surface-container-lowest text-tertiary focus:ring-0 checked:bg-tertiary"><span class="text-lg font-headline font-bold text-outline uppercase">Bank ${i}</span></label>`; }</script>
+</body></html>

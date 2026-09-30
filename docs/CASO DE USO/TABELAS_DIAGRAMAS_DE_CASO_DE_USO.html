@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabelas de Diagramas de Casos de Uso — LucroImpresso</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 15mm;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #0f172a;
+      line-height: 1.5;
+      font-size: 11pt;
+      margin: 0;
+      padding: 10px;
+    }
+    h1 {
+      font-size: 20pt;
+      color: #0f172a;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      font-weight: 800;
+    }
+    .header-sub {
+      color: #2563eb;
+      font-size: 11pt;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 22px;
+      page-break-inside: avoid;
+      border: 2px solid #1e293b;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      vertical-align: top;
+      font-size: 10pt;
+    }
+    th {
+      background-color: #f1f5f9;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    td.col-field {
+      width: 130px;
+      font-weight: 700;
+      background-color: #f8fafc;
+      color: #1e3a8a;
+    }
+    td.col-desc {
+      color: #334155;
+      text-align: justify;
+    }
+    .uc-title {
+      font-weight: 800;
+      color: #0f172a;
+      background-color: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Tabelas de Diagramas de Casos de Uso (UML)</h1>
+  <div class="header-sub">Sistema Especializado de Custos e Precificação para Impressão 3D — LucroImpresso &bull; FATEC</div>
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC01: Realizar Login (RF033 / RNF005 / RNF006)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Usuário cadastrado no banco de dados; aplicação web em execução.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a tela de autenticação (/login).<br>2. Insere o E-mail / Nome de Usuário e a Senha de Acesso.<br>3. Clica no botão "INICIAR SESSÃO".<br>4. O sistema valida as credenciais contra o banco de dados MariaDB/MariaDB utilizando conferência de hash criptográfico via BCrypt.Verify().<br>5. Confirmada a autenticidade, o sistema gera o cookie de autenticação seguro (CookieAuthenticationDefaults) contendo as Claims de identidade do usuário (UsuarioId, Nome, Email).<br>6. O sistema redireciona o Empreendedor autenticado para o Painel Geral (/dashboard).</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RF033 / RNF005 / RNF006: Acesso restrito protegido por autenticação baseada em Cookies seguros com Claims. Senhas armazenadas exclusivamente em formato de hash criptográfico BCrypt. Se as credenciais forem inválidas, o acesso é sumariamente negado e um alerta visual de erro é retornado na tela de login.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Sessão autenticada ativa no navegador e isolamento dos dados do usuário carregado no contexto do sistema (Multi-Tenancy).</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC02: Alterar Nome de Usuário (RF033)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>O Empreendedor deve estar devidamente autenticado e na página de Configurações (/configuracoes).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa o menu de configurações da conta (/configuracoes).<br>2. O sistema carrega o nome de usuário atual cadastrado no banco de dados.<br>3. Na seção "Alterar Nome de Usuário", o Empreendedor digita o novo nome desejado.<br>4. Clica no botão "SALVAR NOME".<br>5. O sistema valida se o campo possui no mínimo 3 caracteres e se o nome já não está em uso por outro cadastro.<br>6. O sistema atualiza a entidade no banco de dados MariaDB via Entity Framework Core.<br>7. O sistema exibe mensagem de sucesso e redireciona para logout após 2 segundos para renovação dos cookies de acesso.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>O nome de usuário não pode ser vazio, deve possuir ao menos 3 caracteres e ser único no sistema.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Nome de usuário atualizado e sessão reiniciada para atualizar a identidade nas requisições.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC03: Alterar Senha de Acesso (RF033 / RNF006)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>O Empreendedor deve estar autenticado e acessar a página de Configurações (/configuracoes).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a seção "Alterar Senha de Acesso" em /configuracoes.<br>2. Informa a "Senha Atual", a "Nova Senha" e a "Confirmar Nova Senha".<br>3. Clica no botão "ATUALIZAR SENHA".<br>4. O sistema verifica se a nova senha possui ao menos 4 caracteres e se coincide rigorosamente com a confirmação.<br>5. O sistema verifica se a senha atual fornecida confere com o hash salvo no banco via BCrypt.Verify().<br>6. O sistema gera a nova criptografia com BCrypt.HashPassword() e persiste a alteração no banco de dados.<br>7. O sistema limpa os campos do formulário e exibe notificação visual de sucesso.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RNF006: A senha atual deve ser estritamente validada antes de permitir a alteração. A nova senha deve ter no mínimo 4 caracteres e coincidir com a confirmação. O hash gerado é irreversível.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Nova credencial de acesso gravada com segurança criptográfica no banco de dados.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC04: Cadastrar Nova Conta de Usuário (Sign-Up) (RF034 / RNF005 / RNF006)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor (Visitante)</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Aplicação web em execução e usuário não autenticado.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a tela de registro de usuário (/cadastro).<br>2. Preenche Nome Completo, E-mail válido, Senha de Acesso e Confirmação de Senha.<br>3. Clica no botão "CRIAR CONTA".<br>4. O sistema valida os campos obrigatórios e verifica a unicidade do e-mail no banco de dados.<br>5. O sistema gera o hash criptográfico da senha utilizando BCrypt com salt aleatório e custo de trabalho adaptativo.<br>6. O sistema persiste o novo usuário no MariaDB provisionando automaticamente seu ambiente isolado de locatário (Multi-Tenant).<br>7. O sistema exibe notificação de sucesso e redireciona o usuário para a tela de login (/login).</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RF034 / RNF005 / RNF006: O e-mail deve ser único e ter formato válido. As senhas são criptografadas com BCrypt. Cada usuário cadastrado possui isolamento de dados estrito por UsuarioId.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Conta de usuário criada com sucesso e habilitada para login imediato.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC05: Recuperar Senha via E-mail (RF035)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Usuário com e-mail previamente cadastrado no sistema.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a tela de recuperação de acesso (/esqueci-senha).<br>2. Informa seu e-mail cadastrado e clica em "ENVIAR LINK DE RECUPERAÇÃO".<br>3. O sistema localiza o usuário e gera um token criptográfico temporário com prazo de validade determinado.<br>4. O sistema dispara um e-mail formatado via protocolo SMTP contendo o link exclusivo de redefinição (/redefinir-senha/{token}).<br>5. O Empreendedor acessa o link recebido por e-mail, digita a nova senha e confirma.<br>6. O sistema valida a autenticidade e expiração do token, grava o novo hash da senha via BCrypt e invalida o token utilizado.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RF035: Token de uso único, com expiração programada (30 minutos) e transporte seguro via SMTP.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Credenciais de acesso redefinidas com segurança sem exposição de dados sigilosos.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC06: Cadastrar Peça (com link STL) (RF028 / RF029)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Empreendedor autenticado e na página de Peças (/pecas).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa o catálogo de peças (/pecas).<br>2. Insere o Nome da Peça ou Modelo 3D (obrigatório).<br>3. Informa o Peso Estimado em gramas (g) e o Tempo Estimado de Impressão (HH:MM).<br>4. Opcionalmente, informa o link direto do repositório/nuvem para o arquivo STL correspondente.<br>5. Clica no botão "SALVAR".<br>6. O sistema vincula o registro ao usuário logado (UsuarioId) e persiste a nova peça no banco de dados MariaDB.<br>7. A tabela inferior é atualizada imediatamente exibindo o novo modelo cadastrado.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RF028 / RF029: O nome da peça é obrigatório (limite de 200 caracteres). O link STL é opcional (limite de 2000 caracteres). Os dados técnicos de peso e tempo servem como base para o pré-carregamento automático em novos orçamentos.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Peça cadastrada e disponibilizada para seleção imediata na elaboração de orçamentos.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC07: Consultar Peças (RF028)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Empreendedor autenticado no sistema.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor navega até a rota /pecas.<br>2. O sistema consulta o banco de dados via EF Core filtrando as peças pelo identificador do usuário autenticado (UsuarioId).<br>3. O sistema renderiza a lista em tabela detalhando: Nome da peça, Peso Estimado (g), Tempo Base (HH:MM), botão de acesso ao link STL (se houver) e opções de gerenciamento.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RNF005: Arquitetura multi-tenant: o usuário visualiza estritamente os modelos cadastrados por sua própria conta.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Catálogo de modelos 3D visualizado pelo Empreendedor.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC08: Editar / Excluir Peça (RF028 / RN006)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Existir ao menos uma peça cadastrada vinculada ao usuário.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>Subfluxo Edição:<br>1. O Empreendedor localiza a peça na tabela e clica em "Editar".<br>2. O formulário superior entra em "Modo Edição" carregando os dados da peça.<br>3. O Empreendedor ajusta o nome, peso, tempo ou o link STL e clica em "ATUALIZAR".<br>4. O sistema persiste as modificações no banco de dados.<br>Subfluxo Exclusão:<br>1. O Empreendedor clica no botão "Excluir" ao lado da peça.<br>2. O sistema exibe prompt de segurança: "Você deseja realmente excluir esta peça?".<br>3. O Empreendedor confirma a operação.<br>4. O sistema remove o registro via PecaRepo.DeleteAsync() e atualiza a listagem.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN006: Proteção contra Exclusão Acidental (exigência de prompt de confirmação antes de remover dados).</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Registro da peça atualizado ou excluído permanentemente da base de dados.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC09: Cadastrar Máquina (Watts e Tarifa de Energia) (RF025 / RF026)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Empreendedor autenticado e na tela de Máquinas (/maquinas).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a gestão do parque de impressoras (/maquinas).<br>2. Preenche o Nome da Máquina (ex: Bambu Lab P1S, Ender 3).<br>3. Informa a Potência de Consumo em Watts (W) utilizando máscara de entrada.<br>4. Informa o Custo por kWh (R$) cobrado pela concessionária de energia.<br>5. Clica no botão "SALVAR".<br>6. O sistema valida os limites numéricos, associa a máquina ao usuário logado (UsuarioId) e grava no banco de dados MariaDB.<br>7. A listagem de máquinas é atualizada na tela exibindo as taxas operacionais.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN003 / RF025 / RF026: A potência deve ser superior a 0 W e a tarifa de kWh deve ser maior que R$ 0,00, alimentando o custo de consumo de energia elétrica nos orçamentos.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Impressora 3D cadastrada e habilitada para alimentar os cálculos energéticos de produção.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC10: Consultar Máquinas (RF026)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Conexão ativa com o banco de dados e usuário logado.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a página /maquinas.<br>2. O sistema realiza busca assíncrona no banco ordenando as máquinas por data de cadastro mais recente.<br>3. O sistema renderiza a tabela detalhando: Data de Cadastro, Nome da Máquina, Potência em Watts, Tarifa de Energia (R$/kWh), Custo de Aquisição e Vida Útil.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN009 / RNF005: Isolamento multi-tenant: exibe apenas o maquinário pertencente ao usuário conectado.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Parque de impressoras visualizado com seus parâmetros técnicos e contábeis.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC11: Editar / Excluir Máquina (RF026 / RN006)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>A máquina selecionada deve existir previamente no banco de dados.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>Subfluxo Edição:<br>1. O Empreendedor clica em "Editar" no registro da máquina.<br>2. O formulário é preenchido com as propriedades atuais da máquina.<br>3. O Empreendedor altera dados de potência, tarifa de energia, valor de compra ou vida útil e clica em "ATUALIZAR".<br>4. O sistema valida e grava as atualizações no banco.<br>Subfluxo Exclusão:<br>1. O Empreendedor clica no botão "Excluir".<br>2. O sistema aciona o diálogo de confirmação: "Você deseja realmente deletar esse registro?".<br>3. Ao confirmar, o sistema remove a entidade do banco de dados MariaDB via MaquinaRepo.DeleteAsync().</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN006: Confirmação obrigatória antes de qualquer exclusão manual para prevenir perda acidental de parâmetros.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Parâmetros da máquina modificados ou equipamento excluído da base.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC12: Cadastrar Cliente (PF ou PJ) (RF022 / RF023 / RF024)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Empreendedor autenticado e na tela de Clientes (/clientes).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor seleciona o Tipo de Cadastro: "Pessoa Física (PF)" ou "Pessoa Jurídica (PJ)".<br>2. Se Pessoa Física: insere CPF (com máscara automática), Nome Completo, Celular e Endereço Completo (Rua, Número, Bairro, Cidade, Estado e CEP).<br>3. Se Pessoa Jurídica: insere CNPJ (com máscara automática), Razão Social, Celular e Endereço Completo.<br>4. Clica no botão "SALVAR CLIENTE".<br>5. O sistema valida a herança exclusiva (XT) e a consistência dos campos.<br>6. O sistema grava o Cliente, seu Endereço atrelado e a especialização correspondente (PF ou PJ) via Entity Framework Core vinculando ao locatário ativo.<br>7. A tabela de clientes exibe o novo registro imediatamente.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RF022: Especialização Exclusiva e Total (XT) do modelo conceitual: todo cliente deve ser estritamente PF ou PJ (nunca ambos, nunca nenhum). RF023/RF024: Formatação de documentos e obrigatoriedade de celular único e endereço estruturado.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Cliente registrado na base comercial pronto para ser vinculado a orçamentos.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC13: Consultar Clientes (RF022)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Usuário autenticado no sistema.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a página de Clientes (/clientes).<br>2. O sistema recupera os dados incluindo as entidades relacionadas (Endereco, PessoaFisica, PessoaJuridica).<br>3. A interface renderiza uma tabela contendo: Etiqueta de Tipo (PF ou PJ), Nome ou Razão Social, Documento formatado, Celular e Cidade.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN009: Leitura restrita aos clientes vinculados ao usuário autenticado (Multi-tenant).</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Base comercial de clientes disponibilizada para consulta e conferência.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC14: Editar / Excluir Cliente (RF022 / RF025 / RN006)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>O cliente deve estar cadastrado na base do usuário.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>Subfluxo Edição:<br>1. O Empreendedor clica no botão "Editar" ao lado do cliente.<br>2. O formulário superior é preenchido com todos os dados pessoais, empresariais e endereço.<br>3. O Empreendedor realiza os ajustes necessários e clica em "ATUALIZAR CLIENTE".<br>4. O sistema persiste as alterações no MariaDB via ClienteRepo.UpdateAsync().<br>Subfluxo Exclusão:<br>1. O Empreendedor clica em "Excluir".<br>2. O sistema intercepta a ação com o prompt: "Você deseja realmente excluir este cliente? Esta ação não pode ser desfeita.".<br>3. O Empreendedor confirma a remoção.<br>4. O sistema apaga o cliente e seus registros vinculados por cascata.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN006: Proteção contra Exclusão Acidental mediante prompt de confirmação. Na edição, a troca do tipo (PF/PJ) é bloqueada para manter a integridade da chave estrangeira especializada.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Cadastro de cliente atualizado ou removido em definitivo do sistema.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC15: Cadastrar Matéria-Prima de Impressão (Filamento/Resina) (RF001 / RN001)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Empreendedor autenticado e na tela de Materiais (/material).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a tela de Materiais (/material).<br>2. Preenche o Nome do Material (ex: PLA Premium Preto), a Cor, o Tipo de Polímero (ex: PLA, ABS, PETG, Resina), o Peso Original do Rolo em gramas (ex: 1000g), o Saldo Atual em gramas e o Valor Pago em Reais (ex: R$ 95,00).<br>3. Clica no botão "SALVAR".<br>4. O sistema calcula automaticamente o Preço por Grama (RN001): PrecoPorGrama = ValorPago / PesoRoloGramas.<br>5. O sistema valida se o saldo não excede a capacidade do rolo e persiste o registro no banco MariaDB via EF Core.<br>6. O material surge na tabela de estoque com seu preço unitário calculado.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN001: Preço por grama é calculado pela fórmula PrecoPorGrama = ValorPago / PesoRoloGramas. Validação: o saldo atual em gramas não pode ser superior ao peso total original do rolo.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Matéria-prima cadastrada e pronta para dedução e composição de custos de orçamentos.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC16: Cadastrar Insumo de Acabamento (Tintas, Primers, Vernizes) (RF002 / RN002)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Empreendedor autenticado e na tela de Insumos de Acabamento (/acabamentos).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa o menu lateral e clica em "Acabamento" (/acabamentos).<br>2. Seleciona o Tipo de Insumo no dropdown: [Tinta], [Primer], [Verniz], [Solvente / Diluente], [Outro].<br>3. Informa o Nome do Insumo (ex: "Primer Cinza Acrilex", "Verniz Fosco Spray", "Tinta Acrílica Vermelha").<br>4. Informa a Cor ou Acabamento (ex: "Cinza", "Incolor", "Vermelho Brilhante").<br>5. Informa a Capacidade / Volume total em mL (ex: 300 ml) e o Valor Pago em Reais (ex: R$ 38,00).<br>6. Clica no botão "SALVAR".<br>7. O sistema calcula automaticamente o Custo por mL (RN002): CustoPorMl = ValorPago / VolumeTotalMl.<br>8. O sistema valida os campos obrigatórios e grava a entidade Acabamento vinculada ao locatário ativo.<br>9. A tabela exibe o insumo cadastrado com seu custo unitário por mL.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN002: O custo unitário por mililitro (mL) é a base de cálculo para a dosagem selecionada no orçamento. Registro vinculado ao tenant.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Insumo de acabamento cadastrado e habilitado para integração no orçamento de pós-processamento.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC17: Consultar Estoque e Alertas Críticos (RF003 / RF004)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Existir materiais ou insumos de acabamento cadastrados e conexão ativa com o banco.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a aba de Materiais (/material), Insumos de Acabamento (/acabamentos) ou o Dashboard (/dashboard).<br>2. O sistema consulta as tabelas de estoque do usuário e exibe: Nome, Tipo, Capacidade Total, Saldo Atual, Valor Pago e Custo Unitário.<br>3. O sistema aplica regras visuais sobre o saldo:<br>   - Se Saldo <= 20% da capacidade: Exibe alerta vermelho crítico (Alerta Crítico).<br>   - Se Saldo <= 50% da capacidade: Exibe indicador amarelo de atenção.<br>   - Se Saldo > 50%: Exibe indicador regular.<br>4. O Dashboard renderiza cards de alerta caso qualquer material ou acabamento esteja em nível crítico.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RF003 / RF004: Alertas dinâmicos preventivos de nível de insumo para evitar paradas inesperadas na linha de fabricação.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Empreendedor informado sobre a disponibilidade física e necessidade de reposição de matérias-primas e insumos de acabamento.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC18: Editar / Excluir Insumos de Estoque (RF005 / RF006 / RN006)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>O material ou acabamento selecionado deve existir no banco de dados.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>Subfluxo Edição:<br>1. O Empreendedor clica no botão "Editar" na linha do material ou acabamento desejado.<br>2. Os dados cadastrais são carregados no formulário de edição.<br>3. O Empreendedor faz os ajustes desejados (ex: recalibrar saldo ou atualizar valor de compra).<br>4. Clica em "ATUALIZAR".<br>5. O sistema recalcula o valor unitário (por grama ou por mL) e atualiza o registro no banco.<br>Subfluxo Exclusão:<br>1. O Empreendedor clica no botão "Excluir".<br>2. O sistema aciona diálogo de confirmação: "Você deseja realmente excluir este item?".<br>3. Ao confirmar, o sistema remove a entidade do banco de dados via repositório especializado.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN001 / RN002: Recalcular automaticamente o valor base unitário sempre que o valor pago ou o peso/volume sofrer alteração. RN006: Proteção contra exclusão acidental via confirmação.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Dados do inventário atualizados ou item removido permanentemente da base.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC19: Gerar Novo Orçamento com Custos Detalhados (RF007 a RF014)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor, Software Fatiador (Ferramenta Externa)</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Existir ao menos um Cliente, uma Peça, uma Máquina e um Material cadastrados. Modelo fatiado previamente.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Software Fatiador externo gera a estimativa técnica de peso em gramas e tempo de impressão (HH:MM).<br>2. O Empreendedor acessa /orcamento/novo.<br>3. Seleciona o Cliente Solicitante, a Peça (modelo 3D), a Máquina de Impressão e a Matéria-Prima desejada.<br>4. Insere o Nome do Projeto, o Peso Estimado (g), o Tempo de Impressão (HH:MM) e a Taxa Horária de Impressão (R$).<br>5. Opcionalmente, clica em "+ ADICIONAR INSUMO DE ACABAMENTO" para selecionar um ou múltiplos insumos (primer, tintas, verniz, solvente) informando a quantidade consumida em mL para cada um.<br>6. Opcionalmente, informa o Tempo de Acabamento (HH:MM) e a Taxa Horária de Acabamento (R$).<br>7. Informa a Margem de Lucro desejada sobre a mão de obra.<br>8. O sistema processa o cálculo de precificação 3D em tempo real:<br>   - Custo Material = Peso (g) * PrecoPorGrama (RN001)<br>   - Custo Acabamento = Somatória de (Consumo_mL * CustoPorMl) + (Tempo Acabamento * Taxa Horária Acabamento) (RN002)<br>   - Custo Energia = (Potência da Máquina (W) / 1000) * Tempo (h) * Tarifa kWh (RN003)<br>   - Custo Total Produção = Custo Material + Custo Acabamento + Custo Energia<br>   - Preço de Venda Sugerido = Custo Total Produção + Mão de Obra + Margem de Lucro<br>   - Margem de Lucro Real = (Lucro Líquido / Preço de Venda) * 100%<br>9. O Empreendedor clica em "SALVAR ORÇAMENTO".<br>10. O sistema valida as seleções, grava o orçamento com status inicial "Pendente" (RF013) atrelado ao tenant e redireciona para a Linha de Produção (/producao).</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN001, RN002, RN003: Composição completa de custos cruzando material, insumos de acabamento em mL, mão de obra de acabamento em HH:MM e energia elétrica. O orçamento é salvo com status "Pendente". Nenhuma baixa de estoque de filamento ou acabamento é efetuada na criação do orçamento (RN004).</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Orçamento criado, precificado analiticamente e registrado na Fila Operacional.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC20: Bloquear Criação de Orçamento com Saldo Insuficiente (RF011)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Sistema LucroImpresso</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Empreendedor preenchendo os dados de peso ou acabamentos na elaboração ou edição de orçamento (UC19).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O sistema monitora a quantidade de peso em gramas e os volumes em mL dos insumos de acabamento inseridos pelo Empreendedor.<br>2. O sistema compara essas quantidades com os saldos atuais dos materiais no estoque físico.<br>3. Se o peso requerido ou o volume de acabamento for superior ao saldo disponível em estoque, o sistema bloqueia imediatamente o salvamento da proposta e emite a mensagem de erro: "Erro: Material insuficiente".<br>4. O Empreendedor é obrigado a reabastecer o estoque ou readequar o projeto antes de concluir o registro.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RF011: Bloqueio estrito de ordens e propostas de orçamento quando não houver disponibilidade física suficiente de materiais ou insumos em estoque.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Integridade do estoque preservada e operação inconsistente prevenida com sucesso.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC21: Editar Orçamento Existente (RF015)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>O orçamento deve existir no banco e não pode estar com status "Concluído".</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a Linha de Produção e clica em "Editar" na ordem desejada (/orcamento/editar/{id}).<br>2. O sistema preenche os campos do formulário com os dados cadastrados.<br>3. O Empreendedor altera os valores de peso, acabamentos, tempos, mão de obra, máquina ou material.<br>4. O sistema recalcula instantaneamente os custos, o preço sugerido e a margem de lucro real.<br>5. O Empreendedor clica em "ATUALIZAR ORÇAMENTO".<br>6. O sistema persiste as alterações no banco de dados e retorna para /producao.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>Se o orçamento já foi registrado com o status "Concluído", o sistema redireciona e impede a edição, pois o ciclo produtivo e a baixa de estoque já foram consolidados.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Orçamento atualizado com os novos parâmetros comerciais e técnicos.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC22: Excluir Orçamento com Preservação Histórica (RF015 / RN006 / RN008)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>O orçamento deve constar na Fila de Produção.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. Na Linha de Produção (/producao), o Empreendedor clica no botão "Excluir" correspondente ao orçamento.<br>2. O sistema emite a caixa de diálogo de confirmação: "Você deseja realmente deletar esse registro permanentemente?".<br>3. O Empreendedor confirma a solicitação.<br>4. Se o orçamento possuía status "Concluído", o sistema transfere seus totais contábeis para o cofre de Histórico Financeiro antes de remover (RN008).<br>5. O sistema executa a exclusão da ordem no MariaDB via OrcamentoRepo.DeleteAsync() e recarrega a fila.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN006: Proteção contra Exclusão Acidental mediante interceptação por prompt de segurança. RN008: Preservação de faturamento histórico consolidando totais no cofre financeiro.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Registro de orçamento excluído da base de dados com integridade contábil preservada.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC23: Alterar Status da Ordem de Produção (RF016)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Orçamento cadastrado na Fila de Produção com o status "Pendente".</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa a Fila Operacional (/producao).<br>2. Localiza o orçamento e atualiza seu status conforme a evolução produtiva (ex: clica em "INICIAR IMPRESSÃO").<br>3. O sistema atualiza o status do registro para StatusOrcamento.EmImpressao (ou EmProducao).<br>4. O sistema salva a modificação no banco de dados.<br>5. A interface atualiza o badge visual para "IMPRIMINDO" e disponibiliza os botões de encerramento da peça ("CONCLUIR" e "FALHA").</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>Transição de estado para controle operacional do chão de fábrica. Nesta etapa ainda não ocorre baixa de estoque no inventário (RN005).</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Orçamento marcado em fase ativa de manufatura.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC24: Registrar Orçamento como Concluído (RF016 / RF018) [«inclui» UC26]</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Orçamento estar com status ativo e peça física ter sido finalizada pela impressora 3D.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor clica no botão "CONCLUIR" na linha da ordem de serviço.<br>2. O sistema exibe prompt de confirmação detalhado indicando os débitos: "Você quer realmente Concluir '{Peça}'? Após isso a edição não ficará mais disponível. O estoque sofrerá baixa dos materiais e acabamentos utilizados.".<br>3. O Empreendedor confirma a conclusão.<br>4. INCLUI (UC26): O sistema executa a dedução automática do estoque de matéria-prima (g) e de insumos de acabamento (mL).<br>5. O sistema atualiza o status do orçamento para StatusOrcamento.Concluido.<br>6. O sistema consolida a receita na listagem financeira e exibe notificação de sucesso com o total debitado.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN005: Gatilho de Baixa de Estoque. A dedução física do material e acabamentos só ocorre no encerramento da produção. Orçamentos concluídos têm sua edição permanentemente bloqueada para preservar o histórico financeiro.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Pedido finalizado com sucesso, matéria-prima e insumos debitados do estoque e receita operacional consolidada no faturamento.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC25: Registrar Falha de Impressão (RF017 / RF018) [«inclui» UC26]</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Ocorrência de defeito mecânico ou operacional na impressão 3D (ex: descolamento de mesa, "espaguete", entupimento).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor clica no botão "FALHA" na linha da respectiva ordem.<br>2. O sistema emite mensagem de confirmação: "Registrar falha em '{Peça}'? A perda de material e acabamentos será descontada do estoque.".<br>3. O Empreendedor confirma o registro.<br>4. INCLUI (UC26): O sistema aciona a rotina de baixa de estoque para deduzir o filamento e acabamentos perdidos.<br>5. O sistema altera o status do orçamento para StatusOrcamento.Falha.<br>6. O sistema computa o evento como prejuízo operacional de material e energia, sem gerar receita.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN005: Garantia de baixa de estoque de material consumido mesmo sem venda realizada, evitando discrepâncias e estoque "fantasma" no inventário físico da oficina.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Orçamento arquivado como Falha, estoque físico regularizado e prejuízo material registrado.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC26: Deduzir Estoque de Materiais e Acabamentos (RF018 / RN005)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Sistema LucroImpresso</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Invocação automática via relacionamento «inclui» a partir do UC24 (Conclusão) ou UC25 (Falha).</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O sistema recupera a quantidade exata de gramas (PesoGramas) e as dosagens em mL de acabamento vinculadas ao orçamento finalizado.<br>2. O sistema obtém no banco de dados a entidade Material e as entidades Acabamento correspondentes.<br>3. O sistema desconta o consumo: Saldo = Saldo - Consumo. Se o resultado for inferior a zero, o saldo é nivelado em zero.<br>4. O sistema grava os novos saldos no MariaDB através do MaterialRepo.UpdateAsync() e AcabamentoRepo.UpdateAsync().</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN005: A dedução deve corresponder com precisão ao peso e volume estipulados no orçamento da peça produzida.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Saldo em gramas do material e volume em mL dos acabamentos atualizados em tempo real no banco de dados.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC27: Visualizar Painel Operacional (Receitas, Despesas e Caixa) (RF030 / RF031 / RF032)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Empreendedor</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>Empreendedor autenticado no sistema.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O Empreendedor acessa o painel de controle (/dashboard).<br>2. O sistema consulta as ordens concluídas ativas e calcula as Receitas Totais de vendas.<br>3. O sistema calcula as Despesas Totais somando o custo de matérias-primas gastas, insumos de acabamento consumidos e consumo elétrico das máquinas.<br>4. O sistema soma os totais acumulados preservados no cofre de Histórico Financeiro (RF031).<br>5. O sistema deduz as despesas das receitas e apura o Lucro Líquido Real e o Caixa Atual do negócio.<br>6. O sistema renderiza os cartões com indicadores visuais (KPIs) de Receitas, Despesas detalhadas, Lucro Líquido e Total de Orçamentos.<br>7. O sistema exibe o total de peças entregues, a lista de Alertas Críticos de Estoque (filamentos e acabamentos) e a tabela com os últimos orçamentos cadastrados.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RF030 / RF031 / RF032: Apresentação consolidada de indicadores-chave de desempenho em tempo real para tomada de decisão financeira rápida do empreendedor.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>O Empreendedor visualiza a saúde financeira real e o fluxo operacional de sua manufatura aditiva.</td></tr>
+  </table>
+
+  <table>
+    <tr><th style='width: 140px;'>Campo</th><th>Descrição</th></tr>
+    <tr><td class='col-field uc-title'>Caso de Uso</td><td class='col-desc uc-title'><strong>UC28: Varrer e Excluir Orçamentos Antigos (> 180 dias) (RF019 / RF020 / RN006 / RN007)</strong></td></tr>
+    <tr><td class='col-field'>Ator Principal</td><td class='col-desc'>Sistema (Timer / Background Service)</td></tr>
+    <tr><td class='col-field'>Pré-condições</td><td class='col-desc'>O serviço em segundo plano DatabaseCleanupService (BackgroundService nativo do .NET) em execução no servidor.</td></tr>
+    <tr><td class='col-field'>Fluxo Principal</td><td class='col-desc'>1. O serviço de background executa periodicamente através de um temporizador regular (PeriodicTimer).<br>2. O sistema inicializa um escopo de injeção de dependência (IServiceScopeFactory) para acessar os repositórios necessários.<br>3. O repositório identifica no MariaDB os orçamentos cuja data de criação seja superior a 180 dias (6 meses).<br>4. O sistema preserva o faturamento acumulado consolidando os valores totais de receitas, custos de material, acabamento, energia e lucro na tabela de Histórico Financeiro antes da purga dos registros físicos (RN007).<br>5. O sistema remove em lote os registros antigos e consolida as alterações no banco com SaveChangesAsync().<br>6. O serviço registra log de êxito e permanece em espera para o ciclo seguinte.</td></tr>
+    <tr><td class='col-field'>Regras de Negócio</td><td class='col-desc'>RN006: Ciclo de vida de dados com expurgo automático de orçamentos inativos há mais de 180 dias (qualquer status). RN007: Preservação de Histórico (Cofre Acumulador) para garantir que o faturamento de vendas antigas não se perca após a limpeza.</td></tr>
+    <tr><td class='col-field'>Pós-condições</td><td class='col-desc'>Banco de dados otimizado, registros inativos removidos e integridade perpétua do histórico financeiro mantida.</td></tr>
+  </table>
+
+
+</body>
+</html>

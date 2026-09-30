@@ -1,0 +1,25 @@
+@startuml
+title Módulo 5: Fila Operacional e Produção
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam monochrome false
+
+actor "Empreendedor" as Emp
+
+rectangle "Sistema LucroImpresso" {
+  usecase "UC23: Alterar Status da\nOrdem de Produção" as UC23
+  usecase "UC24: Registrar Orçamento\ncomo Concluído" as UC24
+  usecase "UC25: Registrar Falha\nde Impressão" as UC25
+  usecase "UC26: Deduzir Estoque de\nMateriais e Acabamentos" as UC26
+}
+
+Emp --> UC23
+Emp --> UC24
+Emp --> UC25
+
+UC24 ..> UC26 : <<inclui>>
+UC25 ..> UC26 : <<inclui>>
+
+@enduml

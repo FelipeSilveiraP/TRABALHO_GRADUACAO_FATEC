@@ -1,0 +1,44 @@
+@startuml
+title Módulo 2: Cadastros Base (Peças, Máquinas, Clientes)
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam monochrome false
+
+actor "Empreendedor" as Emp
+
+rectangle "Sistema LucroImpresso" {
+
+  package "Gestão de Peças (Catálogo)" {
+    usecase "UC06: Cadastrar Peça\n(com link STL)" as UC06
+    usecase "UC07: Consultar Peças" as UC07
+    usecase "UC08: Editar / Excluir Peça" as UC08
+  }
+
+  package "Gestão de Máquinas (Impressoras 3D)" {
+    usecase "UC09: Cadastrar Máquina\n(Watts e Tarifa de Energia)" as UC09
+    usecase "UC10: Consultar Máquinas" as UC10
+    usecase "UC11: Editar / Excluir Máquina" as UC11
+  }
+
+  package "Gestão de Clientes" {
+    usecase "UC12: Cadastrar Cliente\n(PF ou PJ)" as UC12
+    usecase "UC13: Consultar Clientes" as UC13
+    usecase "UC14: Editar / Excluir Cliente" as UC14
+  }
+}
+
+Emp --> UC06
+Emp --> UC07
+Emp --> UC08
+
+Emp --> UC09
+Emp --> UC10
+Emp --> UC11
+
+Emp --> UC12
+Emp --> UC13
+Emp --> UC14
+
+@enduml

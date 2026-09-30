@@ -1,0 +1,352 @@
+@page "/producao"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@using LucroImpresso.Web.Models
+@using LucroImpresso.Web.Interfaces
+@using LucroImpresso.Web.Services
+@inject IOrcamentoRepository OrcamentoRepo
+@inject IMaterialRepository MaterialRepo
+@inject IAcabamentoRepository AcabamentoRepo
+@inject UsuarioContextService UsuarioCtx
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<PageTitle>LucroImpresso | Linha de Produção</PageTitle>
+
+<div class="page-container" style="max-width: 1400px; margin: 0 auto; padding: 1.25rem 1.5rem;">
+    <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 pb-3 brutal-border-b">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 bg-white brutal-border-2 px-3 py-1 mb-2">
+                <span class="material-symbols-outlined text-dark fs-5">conveyor_belt</span>
+                <span class="font-headline text-xs font-black uppercase text-dark">FILA OPERACIONAL</span>
+            </div>
+            <h1 class="font-headline text-dark fw-black mb-0 display-6 uppercase tracking-tight">LINHA DE PRODUÇÃO</h1>
+            <p class="font-body text-muted fs-6 mt-1 mb-0 fw-semibold">Gerencie o fluxo fabril, status de impressão e controle de baixa de estoque em tempo real.</p>
+        </div>
+        <div>
+            <a href="orcamento/novo" class="btn btn-yellow px-4 py-3 fs-6 brutal-shadow" data-enhance-nav="false">
+                <span class="material-symbols-outlined fs-5">add_circle</span>
+                NOVO ORÇAMENTO
+            </a>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrEmpty(mensagemFeedback))
+    {
+        <div class="alert alert-info mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">info</span>
+            @mensagemFeedback
+        </div>
+    }
+
+    <!-- BARRA DE FERRAMENTAS: BUSCA E FILTROS NEO-BRUTALISTAS -->
+    <div class="bg-white brutal-border p-4 mb-4 brutal-shadow">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-7 position-relative">
+                <input type="text" class="form-control" placeholder="🔍 Pesquisar por Cliente, Projeto ou Peça..." @bind="termoBusca" @bind:event="oninput" />
+            </div>
+            <div class="col-md-5">
+                <select class="form-select" @bind="filtroStatus">
+                    <option value="Todos">TODOS OS STATUS</option>
+                    <option value="Pendente">PENDENTES</option>
+                    <option value="EmImpressao">EM IMPRESSÃO</option>
+                    <option value="Concluido">CONCLUÍDOS</option>
+                    <option value="Falha">FALHAS REGISTRADAS</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABELA DE PRODUÇÃO / MASTER LIST -->
+    <div class="bg-white brutal-border p-4 brutal-shadow-lg">
+        <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom brutal-border-b">
+            <div class="d-flex align-items-center gap-2">
+                <span class="material-symbols-outlined text-dark fs-4">precision_manufacturing</span>
+                <h4 class="font-headline fw-black text-dark uppercase mb-0 fs-5">ORDENS DE SERVIÇO</h4>
+            </div>
+            <span class="badge bg-warning text-dark">@(FilaFiltrada?.Count() ?? 0) REGISTROS</span>
+        </div>
+
+        @if (carregando)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-dark" role="status"></div>
+                <p class="font-headline text-dark fw-bold mt-2 uppercase">Carregando linha de produção...</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table brutal-table text-dark mb-0">
+                    <thead>
+                        <tr>
+                            <th>DATA</th>
+                            <th>CLIENTE / PROJETO</th>
+                            <th>PEÇA</th>
+                            <th>MATERIAL</th>
+                            <th>PESO (EST.)</th>
+                            <th>TEMPO</th>
+                            <th>ACABAMENTO</th>
+                            <th>MARGEM</th>
+                            <th>VALOR TOTAL</th>
+                            <th>STL</th>
+                            <th>STATUS</th>
+                            <th class="text-center" style="min-width: 200px;">AÇÕES DE PRODUÇÃO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (FilaFiltrada == null)
+                        {
+                            <tr><td colspan="11" class="text-center text-muted py-4 font-headline fw-bold">Aguarde, carregando linha de produção...</td></tr>
+                        }
+                        else if (!FilaFiltrada.Any())
+                        {
+                            <tr><td colspan="11" class="text-center text-muted py-4 font-headline fw-bold">Nenhum registro encontrado com os filtros atuais.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var p in FilaFiltrada)
+                            {
+                                <tr>
+                                    <td><span class="font-body text-dark fw-semibold">@p.DataCriacao.ToString("dd/MM/yyyy")</span></td>
+                                    <td>
+                                        <strong class="font-headline text-dark d-block fs-6">@(p.Cliente?.NomeExibicao ?? "—")</strong>
+                                        <small class="font-body text-muted fw-semibold">@p.NomeProjeto</small>
+                                    </td>
+                                    <td>
+                                        @if (p.Peca != null)
+                                        {
+                                            <span class="font-body text-dark fw-bold">@p.Peca.NomePeca</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td><span class="badge bg-white text-dark brutal-border-2">@(p.Material?.Nome ?? "N/A")</span></td>
+                                    <td><span class="font-body text-dark fw-bold">@p.PesoGramas.ToString("N2") g</span></td>
+                                    <td><span class="font-body text-dark fw-semibold">@FormatarTempoProducao(p.TempoTotal)</span></td>
+                                    <td>
+                                        @if (p.OrcamentoAcabamentos != null && p.OrcamentoAcabamentos.Any())
+                                        {
+                                            @foreach(var oa in p.OrcamentoAcabamentos)
+                                            {
+                                                if (oa.Acabamento != null)
+                                                {
+                                                    <span class="badge bg-light text-dark brutal-border-2 me-1 mb-1 d-inline-block">
+                                                        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:@(oa.Acabamento.Cor); margin-right:4px; border:1px solid #000;"></span>
+                                                        @oa.Acabamento.NomeAcabamento (@oa.QuantidadeMl.ToString("N0") ml)
+                                                    </span>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">—</span>
+                                        }
+                                    </td>
+                                    <td><span class="font-headline text-dark fw-bold">@p.MargemLucroPercentual.ToString("N2")%</span></td>
+                                    <td><strong class="font-headline text-dark fs-6">@p.CustoFinal.ToString("C2")</strong></td>
+                                    <td>
+                                        @if (p.Peca != null && !string.IsNullOrEmpty(p.Peca.LinkArquivoStl))
+                                        {
+                                            <a href="@p.Peca.LinkArquivoStl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                                                STL ↗
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">—</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if(p.Status == StatusOrcamento.Pendente)
+                                        {
+                                            <span class="badge bg-warning text-dark">PENDENTE</span>
+                                        }
+                                        else if(p.Status == StatusOrcamento.EmImpressao)
+                                        {
+                                            <span class="badge bg-info text-dark">IMPRIMINDO</span>
+                                        }
+                                        else if(p.Status == StatusOrcamento.Concluido)
+                                        {
+                                            <span class="badge bg-primary text-white">CONCLUÍDO</span>
+                                        }
+                                        else if(p.Status == StatusOrcamento.Falha)
+                                        {
+                                            <span class="badge bg-danger text-white">FALHA</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex flex-column gap-2 align-items-center">
+                                            @if (p.Status == StatusOrcamento.Pendente)
+                                            {
+                                                <button class="btn btn-blue btn-sm w-100" @onclick="() => MudarStatus(p, StatusOrcamento.EmImpressao)">
+                                                    <span class="material-symbols-outlined fs-6">play_arrow</span>
+                                                    INICIAR IMPRESSÃO
+                                                </button>
+                                            }
+                                            @if (p.Status == StatusOrcamento.EmImpressao || p.Status == StatusOrcamento.Pendente)
+                                            {
+                                                <div class="d-flex gap-2 w-100">
+                                                    <button class="btn btn-yellow btn-sm flex-grow-1" @onclick="() => FinalizarProducao(p, true)">
+                                                        <span class="material-symbols-outlined fs-6">check</span>
+                                                        CONCLUIR
+                                                    </button>
+                                                    <button class="btn btn-red btn-sm flex-grow-1" @onclick="() => FinalizarProducao(p, false)">
+                                                        <span class="material-symbols-outlined fs-6">close</span>
+                                                        FALHA
+                                                    </button>
+                                                </div>
+                                            }
+
+                                            <div class="d-flex gap-2 w-100 justify-content-center">
+                                                @if (p.Status != StatusOrcamento.Concluido)
+                                                {
+                                                    <button class="btn btn-outline-warning btn-sm flex-grow-1" @onclick='() => Nav.NavigateTo($"/orcamento/editar/{p.Id}")'>
+                                                        <span class="material-symbols-outlined fs-6">edit</span>
+                                                        Editar
+                                                    </button>
+                                                }
+                                                <button class="btn btn-outline-danger btn-sm flex-grow-1" @onclick="() => ExcluirOrcamento(p.Id)">
+                                                    <span class="material-symbols-outlined fs-6">delete</span>
+                                                    Excluir
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Orcamento> todosOrcamentos = new();
+    private string termoBusca = "";
+    private string filtroStatus = "Todos";
+    private string? mensagemFeedback;
+    private bool carregando = false;
+    private int usuarioId = 0;
+
+    private IEnumerable<Orcamento> FilaFiltrada
+    {
+        get
+        {
+            var query = todosOrcamentos.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(termoBusca))
+            {
+                query = query.Where(o =>
+                    (o.Cliente?.NomeExibicao != null && o.Cliente.NomeExibicao.Contains(termoBusca, StringComparison.OrdinalIgnoreCase)) ||
+                    (o.NomeProjeto != null && o.NomeProjeto.Contains(termoBusca, StringComparison.OrdinalIgnoreCase)) ||
+                    (o.Peca?.NomePeca != null && o.Peca.NomePeca.Contains(termoBusca, StringComparison.OrdinalIgnoreCase))
+                );
+            }
+
+            if (filtroStatus != "Todos")
+            {
+                if (Enum.TryParse<StatusOrcamento>(filtroStatus, out var statusParseado))
+                    query = query.Where(o => o.Status == statusParseado);
+            }
+
+            return query;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuarioId = await UsuarioCtx.GetUsuarioIdAsync();
+        carregando = true;
+        try
+        {
+            await CarregarFila();
+        }
+        finally
+        {
+            carregando = false;
+        }
+    }
+
+    private async Task CarregarFila()
+    {
+        var dbOrcamentos = await OrcamentoRepo.GetAllAsync(usuarioId);
+        todosOrcamentos = dbOrcamentos.OrderByDescending(o => o.DataCriacao).ToList();
+    }
+
+    private async Task ExcluirOrcamento(int id)
+    {
+        bool confirmado = await JS.InvokeAsync<bool>("confirm", "Você deseja realmente deletar esse registro permanentemente?");
+        if (confirmado)
+        {
+            await OrcamentoRepo.DeleteAsync(id, usuarioId);
+            await CarregarFila();
+        }
+    }
+
+    private async Task MudarStatus(Orcamento p, StatusOrcamento novoStatus)
+    {
+        p.Status = novoStatus;
+        await OrcamentoRepo.UpdateAsync(p);
+        await CarregarFila();
+    }
+
+    private async Task FinalizarProducao(Orcamento p, bool sucesso)
+    {
+        mensagemFeedback = null;
+
+        string nomePeca = p.Peca?.NomePeca ?? p.NomeProjeto;
+        string nomeMaterial = p.Material?.Nome ?? "material";
+
+        string msgConfirmacao = sucesso
+            ? $"Você quer realmente Concluir '{nomePeca}'? Após isso a edição não ficará mais disponível. O estoque de {nomeMaterial} e insumos de acabamento sofrerão baixas."
+            : $"Registrar falha em '{nomePeca}'? A perda de {p.PesoGramas.ToString("N2")}g será descontada do material {nomeMaterial} e insumos de acabamento serão debitados.";
+
+        bool confirmado = await JS.InvokeAsync<bool>("confirm", msgConfirmacao);
+        if (!confirmado) return;
+
+        // RN003: BAIXA DE ESTOQUE MATERIAL E ACABAMENTO
+        if (p.Material != null)
+        {
+            p.Material.SaldoGramas -= (decimal)p.PesoGramas;
+            if (p.Material.SaldoGramas < 0) p.Material.SaldoGramas = 0;
+            await MaterialRepo.UpdateAsync(p.Material);
+        }
+
+        if (p.OrcamentoAcabamentos != null && p.OrcamentoAcabamentos.Any())
+        {
+            foreach(var oa in p.OrcamentoAcabamentos)
+            {
+                if (oa.Acabamento != null)
+                {
+                    oa.Acabamento.SaldoMililitros -= oa.QuantidadeMl;
+                    if (oa.Acabamento.SaldoMililitros < 0) oa.Acabamento.SaldoMililitros = 0;
+                    await AcabamentoRepo.UpdateAsync(oa.Acabamento);
+                }
+            }
+        }
+
+        p.Status = sucesso ? StatusOrcamento.Concluido : StatusOrcamento.Falha;
+        await OrcamentoRepo.UpdateAsync(p);
+
+        mensagemFeedback = sucesso
+            ? $"Impressão concluída. {p.PesoGramas.ToString("N2")}g debitadas do estoque com sucesso!"
+            : $"Falha computada. Perda de {p.PesoGramas.ToString("N2")}g registrada no estoque.";
+
+        await CarregarFila();
+    }
+
+    private string FormatarTempoProducao(decimal horas)
+    {
+        int tot = (int)Math.Round(horas * 60m);
+        int h = tot / 60;
+        int m = tot % 60;
+        if (m == 0) return $"{h}h";
+        return $"{h}h {m}m";
+    }
+}

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Documento de Portabilidade e Compatibilidade - LucroImpresso</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #0f172a;
+      line-height: 1.6;
+      padding: 40px 50px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Cover / Header Section */
+    .header-box {
+      border: 3px solid #1e293b;
+      border-radius: 12px;
+      box-shadow: 6px 6px 0px #1e293b;
+      padding: 30px 40px;
+      background: #f8fafc;
+      margin-bottom: 40px;
+    }
+    .header-box h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .header-box h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #3b82f6;
+      margin-bottom: 16px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      font-size: 13px;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 16px;
+    }
+    .meta-item strong {
+      color: #0f172a;
+    }
+
+    /* Section Styles */
+    h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      border-bottom: 2px solid #1e293b;
+      padding-bottom: 8px;
+      margin-top: 35px;
+      margin-bottom: 18px;
+    }
+    h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+    p {
+      font-size: 14px;
+      color: #334155;
+      margin-bottom: 14px;
+      text-align: justify;
+    }
+
+    /* Callout Card */
+    .callout {
+      background: #eff6ff;
+      border-left: 5px solid #2563eb;
+      padding: 16px 20px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 13.5px;
+      color: #1e40af;
+    }
+    .callout-amber {
+      background: #fffbeb;
+      border-left-color: #d97706;
+      color: #92400e;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0 30px 0;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1.5px solid #cbd5e1;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.3px;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid #1e293b;
+    }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-blue { background: #dbeafe; color: #1e40af; }
+
+    /* Code Blocks */
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-family: 'Courier New', Courier, monospace;
+      overflow-x: auto;
+      margin-bottom: 20px;
+      line-height: 1.45;
+    }
+
+    /* Pillars Grid (ISO 25010) */
+    .iso-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      margin-bottom: 25px;
+    }
+    .iso-card {
+      border: 2px solid #1e293b;
+      border-radius: 8px;
+      box-shadow: 4px 4px 0px #1e293b;
+      padding: 18px 20px;
+      background: #ffffff;
+    }
+    .iso-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: #1e3a8a;
+      margin-bottom: 6px;
+    }
+    .iso-card p {
+      font-size: 12.5px;
+      margin-bottom: 0;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 50px;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header / Metadata -->
+  <div class="header-box">
+    <h1>Documento de Portabilidade e Compatibilidade</h1>
+    <h2>Sistema LucroImpresso &bull; Manufatura Aditiva (Impressão 3D)</h2>
+    <div class="meta-grid">
+      <div class="meta-item"><strong>Instituição:</strong> FATEC &bull; Análise e Desenvolvimento de Sistemas</div>
+      <div class="meta-item"><strong>Norma Técnica:</strong> ISO/IEC 25010:2011 (SQuaRE)</div>
+      <div class="meta-item"><strong>Aluno / Autor:</strong> Felipe Silveira Pessoa</div>
+      <div class="meta-item"><strong>Stack:</strong> C# .NET 9 | Blazor Server | EF Core | MariaDB | Bootstrap 5</div>
+    </div>
+  </div>
+
+  <!-- Section 1 -->
+  <h2>1. Introdução e Objetivo do Documento</h2>
+  <p>
+    A <strong>Portabilidade</strong> é uma característica fundamental de qualidade de software definida pela norma internacional <strong>ISO/IEC 25010</strong>, representando a capacidade de um produto ser transferido com eficácia de um ambiente para outro mantendo sua integridade operacional e nível de desempenho.
+  </p>
+  <p>
+    No contexto do <strong>LucroImpresso</strong>, a portabilidade atende a dois requisitos fundamentais: atender a diversidade de estações de trabalho de <em>makers</em> e pequenas oficinas (estações Windows, notebooks Linux, dispositivos móveis na bancada) e cumprir a diretriz de <strong>Custo R$ 0,00</strong> (<strong>RNF008</strong>), garantindo que o software funcione sem a necessidade de adquirir licenças proprietárias de servidores ou runtimes pagos.
+  </p>
+
+  <!-- Section 2 -->
+  <h2>2. Enquadramento Normativo (ISO/IEC 25010)</h2>
+  <div class="iso-grid">
+    <div class="iso-card">
+      <h4>1. Adaptabilidade (Adaptability)</h4>
+      <p>Capacidade de executar em diferentes sistemas operacionais (Windows, Linux, macOS), processadores (x64, ARM64) e fatores de forma (Mobile, Tablet, Desktop) sem alteração de código.</p>
+    </div>
+    <div class="iso-card">
+      <h4>2. Instalabilidade (Installability)</h4>
+      <p>Facilidade de instalação e implantação através do runtime .NET 9, servidor embutido Kestrel ou orquestração em 1 comando com Docker Compose.</p>
+    </div>
+    <div class="iso-card">
+      <h4>3. Substituibilidade (Replaceability)</h4>
+      <p>Capacidade de substituir instâncias de banco de dados (MariaDB local, MariaDB em Docker, instâncias em nuvem) através do mapeamento agnóstico do Entity Framework Core 9.</p>
+    </div>
+    <div class="iso-card">
+      <h4>4. Coexistência (Co-existence)</h4>
+      <p>Capacidade de operar em perfeita harmonia com softwares fatiadores (UltiMaker Cura, PrusaSlicer, Bambu Studio) e repositórios 3D externos (Thingiverse, Printables).</p>
+    </div>
+  </div>
+
+  <!-- Section 3 -->
+  <h2>3. Matriz de Compatibilidade de Sistemas Operacionais e Runtime</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Sistema Operacional</th>
+        <th>Arquitetura</th>
+        <th>Modo de Execução</th>
+        <th>Status de Homologação</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Microsoft Windows 10 / 11</strong></td>
+        <td>x86_64 (amd64)</td>
+        <td>Kestrel Nativo / Docker Desktop</td>
+        <td><span class="badge badge-green">Homologado (Primário)</span></td>
+      </tr>
+      <tr>
+        <td><strong>Windows Server 2019 / 2022</strong></td>
+        <td>x86_64 (amd64)</td>
+        <td>Serviço do Windows / Kestrel</td>
+        <td><span class="badge badge-green">Homologado</span></td>
+      </tr>
+      <tr>
+        <td><strong>Ubuntu Linux 22.04 / 24.04 LTS</strong></td>
+        <td>x86_64 e aarch64 (ARM64)</td>
+        <td>Systemd Daemon / Docker</td>
+        <td><span class="badge badge-green">Homologado</span></td>
+      </tr>
+      <tr>
+        <td><strong>Debian GNU/Linux 12</strong></td>
+        <td>x86_64 e aarch64 (ARM64)</td>
+        <td>Nativo / Contêiner OCI</td>
+        <td><span class="badge badge-green">Homologado</span></td>
+      </tr>
+      <tr>
+        <td><strong>Alpine Linux 3.19+</strong></td>
+        <td>x86_64 e aarch64 (ARM64)</td>
+        <td>Contêiner Docker Ultra-Leve</td>
+        <td><span class="badge badge-green">Homologado</span></td>
+      </tr>
+      <tr>
+        <td><strong>macOS (Ventura, Sonoma, Sequoia)</strong></td>
+        <td>Apple Silicon (ARM64) / Intel</td>
+        <td>Nativo Kestrel / Docker</td>
+        <td><span class="badge badge-green">Homologado</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 4 -->
+  <h2>4. Matriz Cross-Browser e Responsividade</h2>
+  <p>
+    A interface do LucroImpresso foi desenvolvida sobre o framework <strong>Bootstrap 5.3</strong>, <strong>CSS3 Vanilla</strong> e o Design System <strong>Neo-Brutalista</strong>, comunicando-se de forma reativa com o servidor via protocolo aberto <strong>WebSockets (SignalR)</strong>, sem dependência de plugins proprietários:
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Navegador Web</th>
+        <th>Motor</th>
+        <th>Plataformas</th>
+        <th>Compatibilidade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Google Chrome (v110+)</strong></td>
+        <td>Blink / V8</td>
+        <td>Windows, Linux, macOS, Android</td>
+        <td><span class="badge badge-green">100% Suportado</span></td>
+      </tr>
+      <tr>
+        <td><strong>Microsoft Edge (v110+)</strong></td>
+        <td>Blink / V8</td>
+        <td>Windows, macOS, Linux, Android</td>
+        <td><span class="badge badge-green">100% Suportado</span></td>
+      </tr>
+      <tr>
+        <td><strong>Mozilla Firefox (v115+ ESR)</strong></td>
+        <td>Gecko / SpiderMonkey</td>
+        <td>Windows, Linux, macOS, Android</td>
+        <td><span class="badge badge-green">100% Suportado</span></td>
+      </tr>
+      <tr>
+        <td><strong>Apple Safari (v16+)</strong></td>
+        <td>WebKit / JavaScriptCore</td>
+        <td>macOS, iOS, iPadOS</td>
+        <td><span class="badge badge-green">100% Suportado</span></td>
+      </tr>
+      <tr>
+        <td><strong>Opera (v95+)</strong></td>
+        <td>Blink / V8</td>
+        <td>Windows, Linux, macOS, Android</td>
+        <td><span class="badge badge-green">100% Suportado</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 5 -->
+  <h2>5. Portabilidade de Banco de Dados e Criptografia</h2>
+  <div class="callout">
+    <strong>Padronização Universal de Datas em UTC:</strong> Todas as entidades do domínio (Orçamentos, Materiais, Máquinas, Clientes, Usuários e Histórico Financeiro) são gravadas utilizando fuso horário universal (<code>DateTimeKind.Utc</code>), assegurando que servidores hospedados em qualquer região geográfica ou contêiner preservem a integridade cronológica dos dados.
+  </div>
+  <p>
+    O acesso a dados é gerenciado pelo <strong>Entity Framework Core 9</strong> utilizando o provedor Pomelo (MariaDB). O sistema suporta nativamente <strong>MariaDB 10.5+ (LTS recomendado: MariaDB 10.11)</strong> e serviços em nuvem gerenciados (AWS RDS, Google Cloud SQL, Railway).
+  </p>
+
+  <!-- Section 6 -->
+  <h2>6. Implantação Universal via Docker Compose (1 Clique)</h2>
+  <p>
+    Para viabilizar a portabilidade instantânea em qualquer ambiente sem necessidade de instalar manualmente runtimes ou bancos de dados locais, o projeto disponibiliza os arquivos <code>Dockerfile</code> e <code>docker-compose.yml</code> na raiz:
+  </p>
+  <pre># Inicialização em contêiner em qualquer sistema operacional
+docker compose up -d
+
+# Verificação do status dos serviços
+docker compose ps</pre>
+
+  <!-- Section 7 -->
+  <h2>7. Rastreabilidade com os Requisitos Não Funcionais (RNF)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Requisito Não Funcional</th>
+        <th>Solução Arquitetural de Portabilidade</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>RNF001</strong></td>
+        <td>Aplicação C# .NET 9 / Blazor Server</td>
+        <td>Execução agnóstica sobre o .NET CLR em Windows, Linux e macOS.</td>
+      </tr>
+      <tr>
+        <td><strong>RNF002</strong></td>
+        <td>Design Neo-Brutalista e JS Nativo (masks.js)</td>
+        <td>Renderização responsiva universal (mobile, tablet, desktop) e padrões W3C.</td>
+      </tr>
+      <tr>
+        <td><strong>RNF003</strong></td>
+        <td>Banco Relacional MariaDB via EF Core</td>
+        <td>Substituibilidade de banco local, contêiner Docker ou instâncias cloud.</td>
+      </tr>
+      <tr>
+        <td><strong>RNF004</strong></td>
+        <td>Repository Pattern e DI Nativa</td>
+        <td>Desacoplamento total de infraestrutura e facilidade de substituição.</td>
+      </tr>
+      <tr>
+        <td><strong>RNF008</strong></td>
+        <td>Custo R$ 0,00 de Infraestrutura</td>
+        <td>Execução em Kestrel embutido e MariaDB comunitário sem licenças pagas.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Footer -->
+  <footer>
+    <div>Trabalho de Graduação (TG) &bull; ADS FATEC &bull; LucroImpresso</div>
+    <div>Aluno: Felipe Silveira Pessoa &bull; Orientador: [Nome do Orientador]</div>
+  </footer>
+
+</body>
+</html>

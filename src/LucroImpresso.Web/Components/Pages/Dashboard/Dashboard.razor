@@ -1,0 +1,309 @@
+@page "/dashboard"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@using LucroImpresso.Web.Models
+@using LucroImpresso.Web.Interfaces
+@using LucroImpresso.Web.Services
+@inject IOrcamentoRepository OrcamentoRepo
+@inject IMaterialRepository MaterialRepo
+@inject IAcabamentoRepository AcabamentoRepo
+@inject UsuarioContextService UsuarioCtx
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+
+<PageTitle>LucroImpresso | Dashboard</PageTitle>
+
+<div class="dashboard-container">
+    <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 pb-3 brutal-border-b">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 bg-white brutal-border-2 px-3 py-1 mb-2">
+                <span class="material-symbols-outlined text-dark fs-5">speed</span>
+                <span class="font-headline text-xs font-black uppercase text-dark">PAINEL OPERACIONAL</span>
+            </div>
+            <h1 class="font-headline text-dark fw-black mb-0 display-6 uppercase tracking-tight">VISÃO GERAL</h1>
+            <p class="font-body text-muted fs-6 mt-1 mb-0 fw-semibold">Central de comando e engenharia financeira da sua manufatura.</p>
+        </div>
+        <div>
+            <a href="orcamento/novo" class="btn btn-yellow px-4 py-3 fs-6 brutal-shadow" data-enhance-nav="false">
+                <span class="material-symbols-outlined fs-5">add_circle</span>
+                NOVO ORÇAMENTO
+            </a>
+        </div>
+    </header>
+
+    <!-- FINANÇAS (CARDS KPI NEO-BRUTALISTAS) -->
+    <div class="row g-4 mb-4">
+        <!-- Receitas -->
+        <div class="col-md-4">
+            <div class="bg-white brutal-border p-4 h-100" style="border-top: 8px solid #00aa44 !important;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="font-headline text-dark text-xs font-black uppercase tracking-wider">RECEITAS (VENDAS TOTAIS)</span>
+                    <div class="p-2 bg-surface-container brutal-border-2 d-flex align-items-center justify-content-center">
+                        <span class="material-symbols-outlined text-success fs-5">trending_up</span>
+                    </div>
+                </div>
+                <h2 class="font-headline fw-black mb-1" style="color: #008833; font-size: 2.2rem;">
+                    R$ @receitasTotais.ToString("N2")
+                </h2>
+                <span class="font-body text-muted small fw-bold uppercase">Soma de pedidos concluídos</span>
+            </div>
+        </div>
+
+        <!-- Despesas -->
+        <div class="col-md-4">
+            <div class="bg-white brutal-border p-4 h-100" style="border-top: 8px solid var(--color-secondary) !important;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="font-headline text-dark text-xs font-black uppercase tracking-wider">DESPESAS (MATERIAIS + ACABAMENTO + KWH)</span>
+                    <div class="p-2 bg-surface-container brutal-border-2 d-flex align-items-center justify-content-center">
+                        <span class="material-symbols-outlined text-danger fs-5">trending_down</span>
+                    </div>
+                </div>
+                <h2 class="font-headline fw-black mb-1 text-danger" style="font-size: 2.2rem;">
+                    R$ @despesasTotais.ToString("N2")
+                </h2>
+                <small class="font-body text-muted d-block fw-bold mt-1">
+                    Materiais: R$ @despesaMaterial.ToString("N2") | Energia: R$ @despesaEnergia.ToString("N2") | Acabamento: R$ @despesaAcabamento.ToString("N2")
+                </small>
+            </div>
+        </div>
+
+        <!-- Caixa Líquido -->
+        <div class="col-md-4">
+            <div class="bg-primary-container brutal-border p-4 h-100" style="border-top: 8px solid var(--color-tertiary) !important;">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="font-headline text-dark text-xs font-black uppercase tracking-wider">CAIXA ATUAL (LÍQUIDO)</span>
+                    <div class="p-2 bg-white brutal-border-2 d-flex align-items-center justify-content-center">
+                        <span class="material-symbols-outlined text-dark fs-5">account_balance_wallet</span>
+                    </div>
+                </div>
+                <h2 class="font-headline text-dark fw-black mb-1" style="font-size: 2.2rem;">
+                    R$ @caixaAtual.ToString("N2")
+                </h2>
+                <span class="font-body text-dark small fw-bold uppercase">Resultado operacional real</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÉTRICAS DE PRODUÇÃO -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="bg-white brutal-border p-4 h-100 text-center d-flex flex-column align-items-center justify-content-center">
+                <div class="p-3 bg-surface-container brutal-border-2 d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="material-symbols-outlined fs-2 text-dark">inventory</span>
+                </div>
+                <h6 class="font-headline text-muted text-xs font-black uppercase mb-1">PEÇAS ENTREGUES</h6>
+                <h3 class="font-headline text-dark fw-black mb-0 display-6">@totalPecas</h3>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-9">
+            <a href="/producao" data-enhance-nav="false" class="step-card bg-white brutal-border p-4 h-100 d-flex align-items-center text-decoration-none brutal-shadow position-relative">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-3 bg-primary-container brutal-border-2 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <span class="material-symbols-outlined fs-2 text-dark">assignment</span>
+                    </div>
+                    <div>
+                        <h6 class="font-headline text-muted text-xs font-black uppercase mb-1">ORÇAMENTOS TOTAIS NO SISTEMA</h6>
+                        <h3 class="font-headline text-dark fw-black mb-0 display-6">@quantidadeOrcamentos</h3>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined text-dark position-absolute" style="bottom: 1.25rem; right: 1.5rem; font-size: 2.5rem;">arrow_forward</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Alertas de Estoque -->
+        <div class="col-lg-4">
+            <div class="bg-white brutal-border p-4 h-100 d-flex flex-column brutal-shadow">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom brutal-border-b">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined text-danger fs-4">warning</span>
+                        <h5 class="font-headline fw-black text-dark uppercase mb-0 fs-5">ALERTAS DE ESTOQUE</h5>
+                    </div>
+                    <span class="badge bg-danger text-white fs-6">@alertasEstoque.Count</span>
+                </div>
+                
+                @if (alertasEstoque.Any())
+                {
+                    <div class="alertas-scroll-container flex-grow-1">
+                        @foreach (var alerta in alertasEstoque)
+                        {
+                            var corTexto = alerta.Percentual <= 0.20m ? "#cc0000" : "#d97706";
+                            <a href="@alerta.Rota" data-enhance-nav="false" class="alert-item-card d-block p-3 mb-2 text-decoration-none">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <span class="badge @(alerta.Tipo == "Tinta" ? "bg-warning text-dark" : "bg-dark text-white") font-headline text-xs px-2 py-1">
+                                        <span class="material-symbols-outlined fs-6 align-middle me-1">@(alerta.Tipo == "Tinta" ? "palette" : "inventory_2")</span>
+                                        @alerta.Tipo.ToUpper()
+                                    </span>
+                                    <div class="d-flex align-items-center gap-1 text-muted small fw-bold">
+                                        <span>Repor</span>
+                                        <span class="material-symbols-outlined fs-6 arrow-icon">arrow_forward</span>
+                                    </div>
+                                </div>
+                                <strong class="font-headline text-dark d-block mb-1 fs-6">
+                                    @alerta.Nome @(alerta.Complemento != null ? alerta.Complemento : "")
+                                </strong>
+                                <span class="font-body text-muted small d-block fw-semibold">
+                                    Restam apenas <span style="color: @corTexto; font-weight: 800;">@alerta.SaldoTexto</span> (@((alerta.Percentual * 100).ToString("F1"))% @alerta.UnidadeOriginalTexto).
+                                </span>
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="p-3 bg-surface-container text-center brutal-border-2 my-auto">
+                        <span class="material-symbols-outlined fs-1 text-success d-block mb-2">check_circle</span>
+                        <p class="font-headline text-dark fw-bold uppercase mb-0">Estoque 100% regularizado</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Últimos Orçamentos -->
+        <div class="col-lg-8">
+            <div class="bg-white brutal-border p-4 h-100">
+                <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom brutal-border-b">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined text-dark fs-4">receipt_long</span>
+                        <h5 class="font-headline fw-black text-dark uppercase mb-0 fs-5">ÚLTIMOS ORÇAMENTOS</h5>
+                    </div>
+                    <a href="/producao" data-enhance-nav="false" class="btn btn-outline-secondary btn-sm brutal-border-2 py-1 px-3">
+                        VER TODOS →
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table brutal-table text-dark mb-0">
+                        <thead>
+                            <tr>
+                                <th>CLIENTE / PROJETO</th>
+                                <th>VALOR DE VENDA</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ultimosOrcamentos == null || !ultimosOrcamentos.Any())
+                            {
+                                <tr><td colspan="3" class="text-center text-muted py-4 fw-bold font-headline">Nenhum orçamento cadastrado no momento.</td></tr>
+                            }
+                            else
+                            {
+                                @foreach (var orc in ultimosOrcamentos)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong class="font-headline d-block text-dark fs-6">@(orc.Cliente?.NomeExibicao ?? "—")</strong>
+                                            <small class="font-body text-muted fw-semibold">@orc.NomeProjeto</small>
+                                        </td>
+                                        <td><strong class="font-headline fs-6 text-dark">R$ @orc.CustoFinal.ToString("F2")</strong></td>
+                                        <td>
+                                            <span class="badge @GetStatusClass(orc.Status) text-dark fw-bold">
+                                                @(orc.Status == StatusOrcamento.EmImpressao ? "IMPRIMINDO" : orc.Status.ToString().ToUpper())
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private decimal receitasTotais;
+    private decimal despesaMaterial;
+    private decimal despesaEnergia;
+    private decimal despesaAcabamento;
+    private decimal despesasTotais;
+    private decimal caixaAtual;
+
+    private int totalPecas;
+    private int quantidadeOrcamentos;
+    private List<Orcamento> ultimosOrcamentos = new();
+    private record AlertaEstoqueItem(
+        string Tipo,
+        string Nome,
+        string? Complemento,
+        string Rota,
+        string SaldoTexto,
+        decimal Percentual,
+        string UnidadeOriginalTexto
+    );
+
+    private List<AlertaEstoqueItem> alertasEstoque = new();
+    private int usuarioId = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuarioId = await UsuarioCtx.GetUsuarioIdAsync();
+
+        receitasTotais = await OrcamentoRepo.GetTotalFaturamentoAsync(usuarioId);
+        despesaMaterial = await MaterialRepo.GetTotalDespesasMateriaisAsync(usuarioId);
+        despesaEnergia = await OrcamentoRepo.GetTotalDespesasEnergiaAsync(usuarioId);
+        despesaAcabamento = await AcabamentoRepo.GetTotalDespesasAcabamentosAsync(usuarioId);
+
+        despesasTotais = despesaMaterial + despesaEnergia + despesaAcabamento;
+        caixaAtual = receitasTotais - despesasTotais;
+
+        totalPecas = await OrcamentoRepo.GetTotalPecasAsync(usuarioId);
+        var todosOrcamentos = await OrcamentoRepo.GetAllAsync(usuarioId);
+        quantidadeOrcamentos = todosOrcamentos.Count;
+
+        ultimosOrcamentos = await OrcamentoRepo.GetUltimosOrcamentosAsync(3, usuarioId);
+
+        var estoque = await MaterialRepo.GetAllAsync(usuarioId);
+        var materiaisEmAlerta = estoque
+            .Where(m => m.SaldoGramas <= (m.PesoRoloGramas * 0.50m))
+            .Select(m => {
+                var percentual = m.PesoRoloGramas > 0 ? (m.SaldoGramas / m.PesoRoloGramas) : 0;
+                return new AlertaEstoqueItem(
+                    "Material",
+                    m.Nome,
+                    null,
+                    "/material",
+                    $"{m.SaldoGramas:F0}g",
+                    percentual,
+                    "do rolo"
+                );
+            });
+
+        var estoqueAcabamentos = await AcabamentoRepo.GetAllAsync(usuarioId);
+        var acabamentosEmAlerta = estoqueAcabamentos
+            .Where(a => a.SaldoMililitros <= (a.PesoLitros * 1000m * 0.50m))
+            .Select(a => {
+                var totalMl = a.PesoLitros * 1000m;
+                var percentual = totalMl > 0 ? (a.SaldoMililitros / totalMl) : 0;
+                var cor = string.IsNullOrWhiteSpace(a.Cor) ? null : $"({a.Cor})";
+                return new AlertaEstoqueItem(
+                    a.Tipo,
+                    a.NomeAcabamento,
+                    cor,
+                    "/acabamento",
+                    $"{a.SaldoMililitros:F0} ml",
+                    percentual,
+                    "do original"
+                );
+            });
+
+        alertasEstoque = materiaisEmAlerta
+            .Concat(acabamentosEmAlerta)
+            .OrderBy(a => a.Percentual)
+            .ToList();
+    }
+
+    private string GetStatusClass(StatusOrcamento status)
+    {
+        return status switch
+        {
+            StatusOrcamento.Pendente => "bg-warning",
+            StatusOrcamento.EmImpressao => "bg-info",
+            StatusOrcamento.Concluido => "bg-primary text-white",
+            StatusOrcamento.Falha => "bg-danger text-white",
+            _ => "bg-secondary"
+        };
+    }
+}

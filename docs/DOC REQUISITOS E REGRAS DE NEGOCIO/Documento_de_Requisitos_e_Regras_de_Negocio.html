@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Documento de Requisitos e Regras de Negócio — LucroImpresso</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 15mm;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #0f172a;
+      line-height: 1.5;
+      font-size: 11pt;
+      margin: 0;
+      padding: 10px;
+    }
+    h1 {
+      font-size: 18pt;
+      color: #0f172a;
+      text-transform: uppercase;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .header-sub {
+      color: #2563eb;
+      font-size: 11pt;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 10px;
+    }
+    h2 {
+      font-size: 13pt;
+      color: #1e3a8a;
+      border-bottom: 1.5px solid #cbd5e1;
+      padding-bottom: 4px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    p {
+      color: #334155;
+      text-align: justify;
+      margin-bottom: 10px;
+      font-size: 10.5pt;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0 20px 0;
+      page-break-inside: avoid;
+      border: 1.5px solid #1e293b;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 7px 10px;
+      vertical-align: top;
+      font-size: 9.5pt;
+    }
+    th {
+      background-color: #f1f5f9;
+      font-weight: 700;
+      color: #0f172a;
+      text-transform: uppercase;
+      font-size: 9pt;
+      letter-spacing: 0.3px;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 9pt;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Documento de Requisitos e Regras de Negócio</h1>
+  <div class="header-sub">Sistema Especializado de Custos, Estoque e Precificação para Impressão 3D — LucroImpresso &bull; FATEC</div>
+  <p>Documento de Requisitos e Regras de Negócio - LucroImpresso</p>
+  <p>Projeto: LucroImpresso</p>
+  <p>Autor: Felipe Silveira Pessoa</p>
+  <p>1. Introdução</p>
+  <p>Objetivo: Desenvolver uma aplicação web de gestão e cálculo automático de custos (materiais, insumos de acabamento, energia elétrica e tempo de trabalho) para otimizar a precificação e o controle de estoque de peças produzidas via manufatura aditiva (impressão 3D).</p>
+  <p>Público: Pequenos empreendedores, autônomos e "makers" do ramo de manufatura aditiva que necessitam de precisão e praticidade na substituição de planilhas complexas.</p>
+  <p>2. Requisitos Funcionais</p>
+  <p>Módulo 1: Gestão de Estoque e Materiais</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RF001</td>
+      <td>Permitir o cadastro de matérias-primas de impressão (filamentos e resinas), registrando nome, marca, cor, tipo de polímero (PLA, ABS, PETG, Resina), peso líquido inicial (g) e valor pago (R$).</td>
+      <td>Entrada/Armazenamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF002</td>
+      <td>Permitir o cadastro de insumos de acabamento (tintas, primers, vernizes, solventes/diluentes e outros), registrando nome, categoria/tipo, cor (ou incolor), volume/capacidade líquida (mL) e valor pago (R$).</td>
+      <td>Entrada/Armazenamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF003</td>
+      <td>Consultar o inventário em tempo real, exibindo a listagem de matérias-primas (quantidade remanescente em gramas) e de insumos de acabamento (saldo restante em mL).</td>
+      <td>Consulta/Saída</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF004</td>
+      <td>Exibir alerta visual em destaque na interface caso o estoque de filamento ou de qualquer insumo de acabamento esteja abaixo da margem de segurança configurada.</td>
+      <td>Processamento/Saída</td>
+      <td>Média</td>
+    </tr>
+    <tr>
+      <td>RF005</td>
+      <td>Permitir a edição e atualização dos dados cadastrais de materiais de impressão e insumos de acabamento.</td>
+      <td>Atualização</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF006</td>
+      <td>Permitir a exclusão manual de matérias-primas ou insumos de acabamento do banco de dados, mediante etapa obrigatória de confirmação do usuário.</td>
+      <td>Exclusão</td>
+      <td>Baixa</td>
+    </tr>
+  </table>
+  <p>Módulo 2: Precificação e Orçamentos</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RF007</td>
+      <td>Permitir a geração de orçamentos inserindo os parâmetros técnicos extraídos do fatiador (peso da peça em gramas e tempo de máquina em HH:MM) ou selecionando peças do catálogo pré-cadastrado.</td>
+      <td>Entrada/Armazenamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF008</td>
+      <td>Permitir a inclusão opcional de múltiplos insumos de acabamento no orçamento (ex: primer, tinta acrílica, verniz protetor, solvente), definindo o volume estimado consumido em mL para cada item.</td>
+      <td>Entrada/Armazenamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF009</td>
+      <td>Permitir o registro do tempo dedicado ao acabamento manual e pós-processamento (formato HH:MM) e calcular automaticamente o custo através da taxa horária de mão de obra de acabamento.</td>
+      <td>Entrada/Processamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF010</td>
+      <td>Calcular automaticamente o custo de energia elétrica consumida com base na potência da impressora 3D (Watts), tempo de impressão e tarifa da concessionária de energia (R$/kWh).</td>
+      <td>Processamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF011</td>
+      <td>Bloquear a formulação de orçamentos quando materiais ou insumos de acabamento possuam saldo insuficiente em estoque físico, exibindo mensagem de erro.</td>
+      <td>Processamento/Validação</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF012</td>
+      <td>Calcular o preço de venda sugerido através da composição analítica dos custos diretos (material, insumos de acabamento em mL, energia elétrica e mão de obra de acabamento) somado à margem de lucro real.</td>
+      <td>Processamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF013</td>
+      <td>Salvar o orçamento no sistema com status operacional inicial definido automaticamente como "Pendente" atrelado ao tenant.</td>
+      <td>Armazenamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF014</td>
+      <td>Permitir a consulta detalhada, edição e exclusão de orçamentos previamente registrados, com atualização segura de dados.</td>
+      <td>Entrada/Saída/Edição</td>
+      <td>Alta</td>
+    </tr>
+  </table>
+  <p>Módulo 3: Vendas e Produção</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RF015</td>
+      <td>Permitir a alteração do status do orçamento para "Aprovado", "Em Produção", "Concluído" ou "Cancelado/Rejeitado" conforme o ciclo comercial e produtivo.</td>
+      <td>Atualização</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF016</td>
+      <td>Permitir o registro de "Falha de Impressão" (espaguete, descolamento ou entupimento), contabilizando os custos de material e energia perdidos para rastreamento de perdas operacionais.</td>
+      <td>Atualização</td>
+      <td>Média</td>
+    </tr>
+    <tr>
+      <td>RF017</td>
+      <td>Deduzir automaticamente as quantidades de matéria-prima (em gramas) e de insumos de acabamento (em mL) do estoque cadastrado quando o status do pedido transicionar para "Concluído" ou "Falha de Impressão".</td>
+      <td>Processamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF018</td>
+      <td>Disponibilizar visualização de ordens de produção para acompanhamento ágil do fluxo de trabalho e status dos lotes em fabricação e acabamento.</td>
+      <td>Consulta/Saída</td>
+      <td>Alta</td>
+    </tr>
+  </table>
+  <p>Módulo 4: Rotinas Automáticas (Background)</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RF019</td>
+      <td>Varrer o banco de dados periodicamente via serviço de segundo plano (DatabaseCleanupService / IHostedService) para expurgar registros de orçamentos inativos há mais de 180 dias (6 meses).</td>
+      <td>Exclusão/Controle</td>
+      <td>Baixa</td>
+    </tr>
+    <tr>
+      <td>RF020</td>
+      <td>Consolidar e transferir automaticamente as métricas de receita, custos e margem de lucro dos orçamentos expurgados para o cofre financeiro acumulador (Histórico Financeiro), impedindo a perda de dados contábeis.</td>
+      <td>Processamento/Armazenamento</td>
+      <td>Alta</td>
+    </tr>
+  </table>
+  <p>Módulo 5: Gestão de Clientes</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RF021</td>
+      <td>Permitir o cadastro de clientes segregando Pessoa Física (CPF e Nome Completo) e Pessoa Jurídica (CNPJ e Razão Social), vinculando os registros exclusivamente ao locatário autenticado.</td>
+      <td>Entrada / Armazenamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF022</td>
+      <td>Validar a formatação e integridade de CPFs e CNPJs em tempo real, impedindo cadastros inválidos ou duplicados na base do usuário.</td>
+      <td>Processamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF023</td>
+      <td>Registrar informações completas de contato (celular com DDD) e endereço (Logradouro, Número, Bairro, Cidade, Estado) atrelados ao cliente.</td>
+      <td>Entrada/Processamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF024</td>
+      <td>Permitir a listagem, edição cadastral e exclusão de clientes com diálogo de confirmação.</td>
+      <td>Consulta/Atualização/Exclusão</td>
+      <td>Média</td>
+    </tr>
+  </table>
+  <p>Módulo 6: Gestão de Máquinas (Impressoras 3D)</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RF025</td>
+      <td>Permitir o cadastro (CRUD) de impressoras 3D com modelo, potência elétrica nominal (Watts) e valor da tarifa de energia em kWh.</td>
+      <td>Entrada / Armazenamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF026</td>
+      <td>Injetar os dados de consumo elétrico da máquina selecionada nos cálculos de orçamento.</td>
+      <td>Processamento</td>
+      <td>Alta</td>
+    </tr>
+  </table>
+  <p>Módulo 7: Gestão de Peças (Catálogo)</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RF027</td>
+      <td>Permitir o cadastro (CRUD) de peças e modelos 3D produzidos recorrentemente, definindo nome descritivo, peso estimado em gramas e tempo estimado de impressão.</td>
+      <td>Entrada / Armazenamento</td>
+      <td>Média</td>
+    </tr>
+    <tr>
+      <td>RF028</td>
+      <td>Permitir o carregamento automático dos dados da peça cadastrada diretamente no formulário de elaboração de orçamentos, acelerando a precificação.</td>
+      <td>Processamento/Interface</td>
+      <td>Média</td>
+    </tr>
+  </table>
+  <p>Módulo 8: Painel de Controle (Dashboard) e KPIs</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RF029</td>
+      <td>Exibir um Painel de Controle (Dashboard) dinâmico na tela inicial com Indicadores-Chave (KPIs): Faturamento Total, Lucro Líquido Real, Total de Orçamentos e status dos pedidos.</td>
+      <td>Consulta/ Saída</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF030</td>
+      <td>Consolidar os valores contábeis somando os orçamentos ativos no banco de dados e os totais acumulados no cofre de Histórico Financeiro, garantindo fidelidade estatística contínua.</td>
+      <td>Processamento/Saída</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF031</td>
+      <td>Exibir alertas visuais no painel principal indicando matérias-primas e insumos de acabamento que atingiram quantidade crítica em estoque.</td>
+      <td>Consulta/Saída</td>
+      <td>Média</td>
+    </tr>
+  </table>
+  <p>Módulo 9: Autenticação, Identidade e Segurança</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Tipo</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RF032</td>
+      <td>Validar o acesso ao sistema (Login) garantindo que apenas usuários autenticados visualizem ou alterem informações (Autenticação baseada em Cookies de Sessão seguros com Claims).</td>
+      <td>Segurança/Processamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF033</td>
+      <td>Permitir o registro de novas contas de usuário (Sign-up) com validação de unicidade de e-mail e provisionamento automático do ambiente isolado de locatário.</td>
+      <td>Entrada/Armazenamento</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RF034</td>
+      <td>Permitir a recuperação de credenciais através de envio de e-mail seguro (via protocolo SMTP) com token temporário e expirável para redefinição de senha.</td>
+      <td>Segurança/Processamento</td>
+      <td>Média</td>
+    </tr>
+    <tr>
+      <td>RF035</td>
+      <td>Permitir o encerramento seguro da sessão ativa (Logout) com imediata revogação de credenciais e limpeza de cookies no cliente.</td>
+      <td>Segurança</td>
+      <td>Média</td>
+    </tr>
+  </table>
+  <p>3. Requisitos Não Funcionais</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Categoria</th>
+      <th>Prioridade</th>
+    </tr>
+    <tr>
+      <td>RNF001</td>
+      <td>A aplicação web deve ser desenvolvida na linguagem C# 13 utilizando o framework ASP.NET Core 9 com Blazor (Interactive Server) para renderização reativa da interface.</td>
+      <td>Portabilidade / Desempenho</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RNF002</td>
+      <td>A interface deve implementar a estética Neo-Brutalista com tipografia moderna, componentes de alto contraste, feedback visual responsivo e máscaras nativas em JavaScript para moedas, pesos, tempos (HH:MM) e documentos.</td>
+      <td>Usabilidade / Interface</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RNF003</td>
+      <td>O sistema deve utilizar banco de dados relacional MariaDB 10.11 (LTS). O mapeamento objeto-relacional (ORM) e as operações de banco devem ser gerenciados pelo Entity Framework Core 9 (Pomelo).</td>
+      <td>Arquitetura de Dados</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RNF004</td>
+      <td>O sistema deve aplicar Injeção de Dependências nativa do .NET (IoC Container) estruturada no padrão Repository, assegurando baixo acoplamento e manutenibilidade do código.</td>
+      <td>Qualidade de Código</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RNF005</td>
+      <td>O sistema deve implementar arquitetura Multi-Tenant com isolamento estrito no nível de acesso a dados por locatário (UsuarioId), impedindo acesso não autorizado e vulnerabilidades de IDOR entre clientes.</td>
+      <td>Segurança / Arquitetura</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RNF006</td>
+      <td>As senhas de usuários devem ser armazenadas com proteção criptográfica robusta utilizando o algoritmo BCrypt com salt aleatório e custo de trabalho adaptativo, nunca em texto puro.</td>
+      <td>Segurança</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RNF007</td>
+      <td>A aplicação deve implementar limitação de taxa (Rate Limiting) em endpoints sensíveis contra ataques de força bruta, e sanitização contra vulnerabilidades OWASP (XSS e injeção de SQL).</td>
+      <td>Segurança</td>
+      <td>Alta</td>
+    </tr>
+    <tr>
+      <td>RNF008</td>
+      <td>Para garantir viabilidade econômica e custo R$ 0,00 na fase de protótipo e validação acadêmica do TG, a aplicação deve executar no servidor embutido Kestrel com banco de dados MariaDB comunitário local ou em contêiner Docker.</td>
+      <td>Infraestrutura / Custo</td>
+      <td>Média</td>
+    </tr>
+  </table>
+  <p>4. Regras de Negócio</p>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Descrição</th>
+      <th>Escopo / Módulo</th>
+      <th>Exceções / Condições</th>
+    </tr>
+    <tr>
+      <td>RN001</td>
+      <td>Precificação de Matéria-Prima: O valor da grama do material (filamento ou resina) será definido pela divisão do preço total pago pela sua capacidade líquida inicial em gramas (ex: R$ 120,00 / 1000g = R$ 0,12/g).</td>
+      <td>Precificação</td>
+      <td>Nenhuma.</td>
+    </tr>
+    <tr>
+      <td>RN002</td>
+      <td>Precificação de Insumos de Acabamento: O valor por mL de cada insumo (tinta, primer, verniz, solvente) é obtido pela divisão do preço do frasco pelo volume total em mL. O custo de acabamento no orçamento corresponde à soma do consumo de todos os insumos selecionados (mL consumido × custo/mL) acrescido do tempo de mão de obra de acabamento (Tempo Acabamento × Taxa Horária de Acabamento).</td>
+      <td>Precificação</td>
+      <td>A seleção de insumos e mão de obra de acabamento é opcional no orçamento.</td>
+    </tr>
+    <tr>
+      <td>RN003</td>
+      <td>Cálculo de Energia Elétrica: O custo de energia é calculado pela fórmula: (Potência em W / 1000) × Tempo de Impressão em Horas × Tarifa kWh.</td>
+      <td>Precificação / Máquinas</td>
+      <td>Requer impressora previamente cadastrada e selecionada no orçamento.</td>
+    </tr>
+    <tr>
+      <td>RN004</td>
+      <td>Gatilho de Baixa Automática de Estoque: A dedução das matérias-primas (em gramas) e dos insumos de acabamento (em mL) no inventário é restrita às etapas de finalização operacional.</td>
+      <td>Gestão de Estoque</td>
+      <td>O estoque só sofre redução quando o status transicionar para "Concluído" (sucesso da venda) ou "Falha de Impressão" (espaguete). Orçamentos em outros status não alteram o estoque.</td>
+    </tr>
+    <tr>
+      <td>RN005</td>
+      <td>Proteção contra Exclusão Acidental: Nenhuma exclusão de materiais, acabamentos, clientes, máquinas ou orçamentos pode ser realizada em clique único.</td>
+      <td>Manutenção de Dados</td>
+      <td>Deve haver obrigatoriamente uma caixa de diálogo ou prompt ("Tem certeza que deseja excluir?") interceptando a ação do usuário.</td>
+    </tr>
+    <tr>
+      <td>RN006</td>
+      <td>Ciclo de Vida de Dados: Orçamentos finalizados perdem utilidade operacional imediata após um longo período e sobrecarregam a base transacional.</td>
+      <td>Banco de Dados / Background</td>
+      <td>A rotina de expurgo é executada periodicamente por um Serviço de Background (DatabaseCleanupService / IHostedService) nativo do .NET, removendo registros de orçamentos inativos há mais de 180 dias (6 meses).</td>
+    </tr>
+    <tr>
+      <td>RN007</td>
+      <td>Preservação de Histórico (Cofre Acumulador): Nenhum registro ou valor contábil é perdido durante a limpeza de dados.</td>
+      <td>Banco de Dados / Financeiro</td>
+      <td>Ao expurgar ou excluir orçamentos via rotina periódica ou exclusão de concluídos, o sistema transfere obrigatoriamente os valores totais (receitas, custos e lucros) para o Histórico Financeiro, garantindo que os KPIs históricos permaneçam íntegros.</td>
+    </tr>
+    <tr>
+      <td>RN008</td>
+      <td>Isolamento Multi-Tenant (Anti-IDOR): Todos os dados do sistema são restritos e isolados por usuário (locatário).</td>
+      <td>Segurança / Arquitetura</td>
+      <td>Toda operação de leitura, gravação, alteração e exclusão é estritamente vinculada ao identificador do usuário autenticado (id_usuario), impedindo vazamento de dados entre empresas distintas.</td>
+    </tr>
+  </table>
+  <p>5. Glossário</p>
+  <p>Fatiador (Slicer): Software responsável por interpretar a geometria 3D e fatiar o modelo em camadas que a impressora entende, gerando estimativas de tempo e gasto de material.</p>
+  <p>STL: Formato de arquivo padrão utilizado na indústria de impressão 3D para representação de modelos geométricos tridimensionais.</p>
+  <p>Espaguete: Termo técnico na manufatura aditiva que descreve a falha operacional em que a peça descola da mesa aquecida e a impressora continua extrusando filamento solto no ar, acarretando perda total da peça e desperdício de matéria-prima.</p>
+  <p>Insumos de Acabamento: Produtos químicos e revestimentos (primers, tintas acrílicas, vernizes protetores e solventes/diluentes) aplicados no pós-processamento para aprimoramento estético e funcional das peças, dosados e custeados em mililitros (mL).</p>
+  <p>Eficiência Energética da Impressora: Cálculo do consumo de eletricidade da impressora 3D a partir da potência nominal em Watts, horas de operação fatiadas e tarifa da concessionária de energia em kWh.</p>
+  <p>Margem de Lucro Real: Relação percentual entre o valor cobrado pela mão de obra (lucro efetivo do empreendedor) e o preço final de venda sugerido do orçamento, demonstrando de forma transparente o retorno líquido da operação.</p>
+  <p>KPI: Key Performance Indicator (Indicador-Chave de Desempenho). Métricas quantitativas sintéticas exibidas no painel de controle que resumem a saúde financeira e operacional do negócio de forma imediata.</p>
+  <p>Cofre Financeiro (Histórico Consolidado): Entidade contábil acumuladora que preserva de forma perpétua os totais de receitas, custos e lucros de orçamentos expurgados após 180 dias, blindando as métricas históricas da empresa contra perdas de dados.</p>
+
+</body>
+</html>

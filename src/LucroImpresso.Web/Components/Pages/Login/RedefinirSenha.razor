@@ -1,0 +1,172 @@
+@page "/redefinir-senha"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using LucroImpresso.Web.Interfaces
+@attribute [AllowAnonymous]
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IUsuarioRepository UsuarioRepo
+
+<PageTitle>LucroImpresso | Redefinir Senha</PageTitle>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Token { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+
+    private bool _tokenValido;
+    private bool _verificando = true;
+    private string? _nomeUsuario;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            Nav.NavigateTo("/dashboard", forceLoad: true);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Token))
+        {
+            _tokenValido = false;
+            _verificando = false;
+            return;
+        }
+
+        var usuario = await UsuarioRepo.ObterPorTokenValidoAsync(Token);
+        if (usuario != null)
+        {
+            _tokenValido = true;
+            _nomeUsuario = usuario.NomeUsuario;
+        }
+        else
+        {
+            _tokenValido = false;
+        }
+
+        _verificando = false;
+    }
+}
+
+<div class="login-container">
+    <div class="brutal-login-card bg-white brutal-border p-4 p-md-5 brutal-shadow-lg">
+        <!-- Topo com Ícone e Título -->
+        <div class="text-center mb-4 pb-3 brutal-border-b">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary-container brutal-border-2 p-2 mb-2" style="width: 56px; height: 56px;">
+                <span class="material-symbols-outlined fs-2 text-dark">lock</span>
+            </div>
+            <h2 class="font-headline text-dark fw-black uppercase tracking-tight mb-1 fs-3">NOVA SENHA</h2>
+            <p class="font-body text-muted small fw-bold mb-0 text-uppercase">Crie sua nova credencial de acesso</p>
+        </div>
+
+        @if (_verificando)
+        {
+            <div class="text-center py-4">
+                <div class="spinner-border text-dark" role="status">
+                    <span class="visually-hidden">Validando...</span>
+                </div>
+                <p class="font-headline small fw-bold text-muted mt-2 text-uppercase">Validando token de segurança...</p>
+            </div>
+        }
+        else if (!_tokenValido)
+        {
+            <div class="alert alert-danger d-flex flex-column gap-2 mb-4 brutal-border-2 p-3" style="background-color: #ffdad6; color: #990000; border-color: #cc0000;">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="material-symbols-outlined fs-5">link_off</span>
+                    <span class="font-headline small fw-bold text-uppercase">Link Inválido ou Expirado</span>
+                </div>
+                <p class="font-body small mb-0" style="color: #660000; line-height: 1.4;">
+                    Este link de redefinição não é válido, já foi utilizado anteriormente ou ultrapassou a validade máxima de <strong>30 minutos</strong> por razões de segurança.
+                </p>
+            </div>
+
+            <a href="/esqueci-senha" class="btn btn-yellow w-100 py-3 fs-6 brutal-border-2 fw-black text-dark font-headline text-uppercase text-decoration-none text-center d-block">
+                <span class="material-symbols-outlined fs-5 align-middle me-1">refresh</span>
+                SOLICITAR NOVO LINK
+            </a>
+
+            <div class="text-center mt-3">
+                <a href="/login" class="font-headline text-dark fw-bold text-decoration-none small uppercase">
+                    ← Voltar ao Login
+                </a>
+            </div>
+        }
+        else
+        {
+            @if (!string.IsNullOrEmpty(Error))
+            {
+                <div class="alert alert-danger d-flex align-items-center gap-2 mb-4 brutal-border-2 p-3" style="background-color: #ffdad6; color: #990000; border-color: #cc0000;">
+                    <span class="material-symbols-outlined fs-5">error</span>
+                    <span class="font-headline small fw-bold">@Error</span>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(_nomeUsuario))
+            {
+                <div class="alert alert-info d-flex align-items-center gap-2 mb-3 brutal-border-2 p-2" style="background-color: #e0f2fe; color: #0369a1; border-color: #0284c7;">
+                    <span class="material-symbols-outlined fs-5">person</span>
+                    <span class="font-headline small fw-bold">Conta identificada: <strong>@_nomeUsuario</strong></span>
+                </div>
+            }
+
+            <form action="/auth/redefinir-senha" method="post">
+                <AntiforgeryToken />
+                <input type="hidden" name="token" value="@Token" />
+
+                <div class="mb-3">
+                    <label class="form-label text-dark fw-black small">
+                        <span class="material-symbols-outlined fs-6 align-middle me-1">lock</span>
+                        NOVA SENHA
+                    </label>
+                    <div class="input-group-password">
+                        <input type="password" name="novaSenha" class="form-control" placeholder="••••••••" required minlength="8" maxlength="64" autocomplete="new-password" />
+                        <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility(this)" title="Mostrar senha">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-dark fw-black small">
+                        <span class="material-symbols-outlined fs-6 align-middle me-1">verified_user</span>
+                        CONFIRMAR NOVA SENHA
+                    </label>
+                    <div class="input-group-password">
+                        <input type="password" name="confirmacaoSenha" class="form-control" placeholder="••••••••" required minlength="8" maxlength="64" autocomplete="new-password" />
+                        <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility(this)" title="Mostrar senha">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Requisitos de Senha -->
+                <div class="p-3 mb-4 bg-light brutal-border-2" style="font-size: 0.78rem;">
+                    <div class="fw-bold text-dark mb-1 font-headline text-uppercase">
+                        <span class="material-symbols-outlined fs-6 align-middle me-1">shield</span>
+                        Requisitos de Segurança:
+                    </div>
+                    <ul class="mb-0 ps-3 text-muted">
+                        <li>Mínimo de 8 caracteres (máx. 64)</li>
+                        <li>Pelo menos 1 letra maiúscula e 1 minúscula</li>
+                        <li>Pelo menos 1 número</li>
+                        <li>Pelo menos 1 caractere especial (!@@#$%^&*?_-)</li>
+                    </ul>
+                </div>
+
+                <button type="submit" class="btn btn-yellow w-100 py-3 fs-5 mt-2">
+                    <span class="material-symbols-outlined fs-4 align-middle me-1">save</span>
+                    SALVAR NOVA SENHA
+                </button>
+            </form>
+
+            <div class="mt-4 pt-3 border-top text-center">
+                <a href="/login" class="font-headline text-dark fw-bold text-decoration-none small uppercase">
+                    ← Cancelar e Voltar ao Login
+                </a>
+            </div>
+        }
+    </div>
+</div>

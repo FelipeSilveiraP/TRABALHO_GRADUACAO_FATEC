@@ -1,0 +1,21 @@
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+                <NotAuthorized>
+                    <RedirectToLogin />
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>LucroImpresso | Não Encontrado</PageTitle>
+            <LayoutView Layout="typeof(Layout.MainLayout)">
+                <div class="d-flex align-items-center justify-content-center flex-column" style="height: 100vh;">
+                    <h1 class="neon-text display-1 fw-bold">404</h1>
+                    <p class="text-white fs-4">A página solicitada não existe.</p>
+                </div>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

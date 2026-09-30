@@ -1,0 +1,25 @@
+@startuml
+title Módulo 1: Autenticação e Configurações
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam monochrome false
+
+actor "Empreendedor" as Emp
+
+rectangle "Sistema LucroImpresso" {
+  usecase "UC01: Realizar Login" as UC01
+  usecase "UC02: Alterar Nome de Usuário" as UC02
+  usecase "UC03: Alterar Senha de Acesso" as UC03
+  usecase "UC04: Cadastrar Nova Conta\nde Usuário (Sign-Up)" as UC04
+  usecase "UC05: Recuperar Senha\nvia E-mail" as UC05
+}
+
+Emp --> UC01
+Emp --> UC02
+Emp --> UC03
+Emp --> UC04
+Emp --> UC05
+
+@enduml

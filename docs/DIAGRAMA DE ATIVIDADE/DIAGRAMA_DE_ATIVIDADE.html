@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Diagramas de Atividade — LucroImpresso</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 15mm 15mm;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #0f172a;
+      line-height: 1.4;
+      margin: 0;
+      padding: 0;
+    }
+    .page {
+      page-break-after: always;
+      min-height: 250mm;
+      padding: 10px;
+    }
+    .page:last-child {
+      page-break-after: avoid;
+    }
+    h1 {
+      font-size: 18pt;
+      font-weight: 800;
+      color: #0f172a;
+      text-transform: uppercase;
+      margin: 0 0 4px 0;
+    }
+    .sub {
+      color: #2563eb;
+      font-size: 10.5pt;
+      font-weight: 600;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 8px;
+    }
+    .diagram-title {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #1e3a8a;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      background: #e0e7ff;
+      padding: 6px 12px;
+      border-left: 4px solid #4338ca;
+      border-radius: 4px;
+    }
+    .swimlanes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      border: 2px solid #1e293b;
+      border-radius: 8px;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+    .lane {
+      padding: 14px;
+    }
+    .lane:first-child {
+      border-right: 2px dashed #94a3b8;
+    }
+    .lane-header {
+      font-weight: 800;
+      font-size: 11pt;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 8px;
+      background: #1e293b;
+      color: #ffffff;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .activity-box {
+      border: 2px solid #334155;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 10px 12px;
+      font-size: 10pt;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 2px 2px 0px #334155;
+      margin-bottom: 12px;
+    }
+    .activity-box.system {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #1e3a8a;
+      box-shadow: 2px 2px 0px #2563eb;
+    }
+    .activity-box.success {
+      background: #ecfdf5;
+      border-color: #059669;
+      color: #065f46;
+      box-shadow: 2px 2px 0px #059669;
+    }
+    .arrow {
+      text-align: center;
+      font-size: 14pt;
+      color: #64748b;
+      margin: -6px 0 6px 0;
+      font-weight: 900;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 8.5pt;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: Cadastro de Material -->
+  <div class="page">
+    <h1>Diagrama de Atividades (UML 2.5)</h1>
+    <div class="sub">Sistema Especializado de Custos e Precificação para Impressão 3D — LucroImpresso &bull; FATEC</div>
+    <div class="diagram-title">Atividade 1: Cadastro de Material (Filamentos e Resinas)</div>
+
+    <div class="swimlanes">
+      <div class="lane">
+        <div class="lane-header">Empreendedor (Usuário)</div>
+        <div class="activity-box">Acessar Módulo de Materiais (/materiais)</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box">Preencher Dados do Insumo (Nome, Marca, Cor, Tipo, Peso Líquido em g e Valor Pago em R$)</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box">Clicar no Botão "SALVAR MATERIAL"</div>
+      </div>
+      <div class="lane">
+        <div class="lane-header">Sistema (Blazor / JS / C#)</div>
+        <div class="activity-box system">Renderizar Interface com Design Neo-Brutalista e Tabela de Saldos</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Aplicar Máscaras Nativas JS de Moeda (R$) e Peso (g)</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Validar DataAnnotations e Regra de Domínio (Saldo &le; Peso do Rolo)<br><span class="badge">IValidatableObject</span></div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Calcular Preço por Grama em Tempo Real<br><span class="badge">RN001</span></div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box success">Atrelar ao Usuário (Tenant) e Persistir no MariaDB 10.11</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Limpar Formulário e Recarregar Grid com Saldo Atualizado</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 2: Gerar Novo Orçamento -->
+  <div class="page">
+    <h1>Diagrama de Atividades (UML 2.5)</h1>
+    <div class="sub">Sistema Especializado de Custos e Precificação para Impressão 3D — LucroImpresso &bull; FATEC</div>
+    <div class="diagram-title">Atividade 2: Elaboração e Precificação de Orçamento</div>
+
+    <div class="swimlanes">
+      <div class="lane">
+        <div class="lane-header">Empreendedor (Usuário)</div>
+        <div class="activity-box">Acessar Módulo de Orçamentos (/orcamento/novo)</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box">Selecionar Cliente, Peça, Máquina e Material</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box">Informar Peso Estimado (g), Tempo (HH:MM), Mão de Obra e Insumos de Acabamento (mL)</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box">Acionar Comando "SALVAR ORÇAMENTO"</div>
+      </div>
+      <div class="lane">
+        <div class="lane-header">Sistema (Blazor / JS / C#)</div>
+        <div class="activity-box system">Carregar Catálogo de Insumos e Parâmetros Pré-configurados</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Calcular Custos em Tempo Real: Material (RN001), Insumos mL (RN002), Energia Elétrica (RN003) e Mão de Obra</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Validar Saldo Disponível em Estoque (Bloquear se Saldo Insuficiente)<br><span class="badge">RF011</span></div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Definir Status = "Pendente" (Sem Baixa Física de Estoque)<br><span class="badge">RF013</span></div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box success">Atrelar ao Usuário (Tenant) e Persistir no MariaDB 10.11</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Redirecionar para a Fila Operacional de Produção (/producao)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 3: Finalizar Produção com Baixa de Estoque -->
+  <div class="page">
+    <h1>Diagrama de Atividades (UML 2.5)</h1>
+    <div class="sub">Sistema Especializado de Custos e Precificação para Impressão 3D — LucroImpresso &bull; FATEC</div>
+    <div class="diagram-title">Atividade 3: Finalização de Produção e Baixa de Estoque</div>
+
+    <div class="swimlanes">
+      <div class="lane">
+        <div class="lane-header">Empreendedor (Usuário)</div>
+        <div class="activity-box">Acessar Painel da Linha de Produção (/producao)</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box">Clicar em "INICIAR IMPRESSÃO"</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box">Clicar em "CONCLUIR" ou "REGISTRAR FALHA"</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box">Confirmar Operação no Modal Interceptador<br><span class="badge">RN005</span></div>
+      </div>
+      <div class="lane">
+        <div class="lane-header">Sistema (Blazor / EF Core)</div>
+        <div class="activity-box system">Listar Fila Operacional de Pedidos Ordenados por Data</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Atualizar Status para "Em Impressão" (Sem Dedução de Estoque)</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Validar Transição de Estado e Exigir Confirmação Explícita<br><span class="badge">OrcamentoStateMachine</span></div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Deduzir Saldo Físico de Material (g) e Insumos Químicos (mL)<br><span class="badge">RN004</span></div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box success">Persistir Baixa de Estoque e Novo Status no MariaDB 10.11</div>
+        <div class="arrow">&darr;</div>
+        <div class="activity-box system">Exibir Alerta Visual de Feedback e Recarregar Fila Operacional</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

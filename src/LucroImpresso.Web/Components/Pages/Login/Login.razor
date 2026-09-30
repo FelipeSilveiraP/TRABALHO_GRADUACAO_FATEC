@@ -1,0 +1,119 @@
+@page "/login"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [AllowAnonymous]
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>LucroImpresso | Login</PageTitle>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool? Cadastrado { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool? SenhaRedefinida { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            Nav.NavigateTo("/dashboard", forceLoad: true);
+        } 
+    }
+}
+
+<div class="login-container">
+    <div class="brutal-login-card bg-white brutal-border p-4 p-md-5 brutal-shadow-lg">
+        <!-- Topo com Ícone e Título -->
+        <div class="text-center mb-4 pb-3 brutal-border-b">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary-container brutal-border-2 p-2 mb-2" style="width: 56px; height: 56px;">
+                <span class="font-headline fs-2 text-dark fw-black" style="line-height: 1;">π</span>
+            </div>
+            <h2 class="font-headline text-dark fw-black uppercase tracking-tight mb-1 fs-3">ACESSO AO SISTEMA</h2>
+            <p class="font-body text-muted small fw-bold mb-0 text-uppercase">Área de autenticação e gestão</p>
+        </div>
+
+        @if (Cadastrado == true)
+        {
+            <div class="alert alert-success d-flex align-items-center gap-2 mb-4 brutal-border-2 p-3" style="background-color: #d4f7dc; color: #006622; border-color: #00aa44;">
+                <span class="material-symbols-outlined fs-5">check_circle</span>
+                <span class="font-headline small fw-bold">Conta criada com sucesso! Digite seus dados para entrar.</span>
+            </div>
+        }
+
+        @if (SenhaRedefinida == true)
+        {
+            <div class="alert alert-success d-flex align-items-center gap-2 mb-4 brutal-border-2 p-3" style="background-color: #d4f7dc; color: #006622; border-color: #00aa44;">
+                <span class="material-symbols-outlined fs-5">check_circle</span>
+                <span class="font-headline small fw-bold">Senha redefinida com sucesso! Entre com sua nova senha.</span>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Error))
+        {
+            <div class="alert alert-danger d-flex align-items-center gap-2 mb-4 brutal-border-2 p-3" style="background-color: #ffdad6; color: #990000; border-color: #cc0000;">
+                <span class="material-symbols-outlined fs-5">error</span>
+                <span class="font-headline small fw-bold">
+                    @(Error == "campos_vazios" 
+                        ? "Por favor, preencha o usuário e a senha." 
+                        : "Usuário ou senha incorretos. Tente novamente.")
+                </span>
+            </div>
+        }
+
+        <form action="/auth/login" method="post">
+            <AntiforgeryToken />
+            
+            <div class="mb-3">
+                <label class="form-label text-dark fw-black small">
+                    <span class="material-symbols-outlined fs-6 align-middle me-1">person</span>
+                    NOME DE USUÁRIO
+                </label>
+                <input type="text" name="usuario" class="form-control" placeholder="Digite seu usuário..." required autocomplete="username" />
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label text-dark fw-black small">
+                    <span class="material-symbols-outlined fs-6 align-middle me-1">lock</span>
+                    SENHA DE ACESSO
+                </label>
+                <div class="input-group-password">
+                    <input type="password" name="senha" class="form-control" placeholder="••••••••" required autocomplete="current-password" />
+                    <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility(this)" title="Mostrar senha">
+                        <span class="material-symbols-outlined">visibility</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mb-4">
+                <a href="/esqueci-senha" class="font-headline text-dark fw-bold text-decoration-none small text-uppercase" style="font-size: 0.75rem;">
+                    Esqueceu sua senha?
+                </a>
+            </div>
+
+            <button type="submit" class="btn btn-yellow w-100 py-3 fs-5 mt-2">
+                <span class="material-symbols-outlined fs-4">login</span>
+                INICIAR SESSÃO
+            </button>
+        </form>
+
+        <div class="mt-4 pt-3 border-top text-center">
+            <p class="font-body text-muted small fw-semibold mb-2">Não tem uma conta?</p>
+            <a href="/cadastro" class="btn btn-white w-100 py-2 fs-6 brutal-border-2 fw-bold text-dark font-headline text-uppercase">
+                <span class="material-symbols-outlined fs-5 align-middle me-1">person_add</span>
+                CRIAR UMA CONTA
+            </a>
+        </div>
+
+        <div class="text-center mt-3">
+            <a href="/" class="font-headline text-dark fw-bold text-decoration-none small uppercase">
+                ← Voltar para a Página Inicial
+            </a>
+        </div>
+    </div>
+</div>

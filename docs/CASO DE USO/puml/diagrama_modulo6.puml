@@ -1,0 +1,20 @@
+@startuml
+title Módulo 6: Dashboard Financeiro e Background Job
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam monochrome false
+
+actor "Empreendedor" as Emp
+actor "Sistema (Timer /\nBackground Service)" as Sys
+
+rectangle "Sistema LucroImpresso" {
+  usecase "UC27: Visualizar Painel Operacional\n(Receitas, Despesas e Caixa)" as UC27
+  usecase "UC28: Varrer e Excluir Orçamentos\nAntigos (> 180 dias)" as UC28
+}
+
+Emp --> UC27
+Sys --> UC28
+
+@enduml

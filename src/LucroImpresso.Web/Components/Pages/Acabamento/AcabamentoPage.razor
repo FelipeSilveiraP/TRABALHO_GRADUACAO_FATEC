@@ -1,0 +1,403 @@
+@page "/acabamento"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@using LucroImpresso.Web.Models
+@using LucroImpresso.Web.Interfaces
+@using LucroImpresso.Web.Services
+@inject IAcabamentoRepository AcabamentoRepo
+@inject UsuarioContextService UsuarioCtx
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<PageTitle>LucroImpresso | Acabamento</PageTitle>
+
+<div class="page-container" style="max-width: 1300px; margin: 0 auto; padding: 1.25rem 1.5rem;">
+    <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 pb-3 brutal-border-b">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 bg-white brutal-border-2 px-3 py-1 mb-2">
+                <span class="material-symbols-outlined text-dark fs-5">palette</span>
+                <span class="font-headline text-xs font-black uppercase text-dark">ESTOQUE DE ACABAMENTO</span>
+            </div>
+            <h1 class="font-headline text-dark fw-black mb-0 display-6 uppercase tracking-tight">GESTÃO DE ACABAMENTO</h1>
+            <p class="font-body text-muted fs-6 mt-1 mb-0 fw-semibold">Controle master-detail de insumos de acabamento (tintas, primers, vernizes e solventes), cálculo do valor por mililitro e saldo disponível.</p>
+        </div>
+    </header>
+
+    @if (erroCarregamento)
+    {
+        <div class="alert alert-danger mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">error</span>
+            Falha na conexão com o banco de dados. Verifique o serviço SQL.
+        </div>
+    }
+
+    <!-- Topo: Master-Detail Form Neo-Brutalista -->
+    <div class="bg-white brutal-border p-4 p-md-5 mb-5 brutal-shadow-lg">
+        <div class="d-flex align-items-center justify-content-between pb-3 border-bottom brutal-border-b mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <span class="material-symbols-outlined text-dark fs-3">palette</span>
+                <h3 class="font-headline fw-black text-dark uppercase mb-0 fs-4">
+                    @(modoEdicao ? "EDITAR INSUMO DE ACABAMENTO" : "CADASTRAR NOVO INSUMO DE ACABAMENTO")
+                </h3>
+            </div>
+            @if (modoEdicao)
+            {
+                <span class="badge bg-warning text-dark">MODO EDIÇÃO</span>
+            }
+        </div>
+        
+        <EditForm Model="@formularioAcabamento" OnValidSubmit="SalvarAcabamento" FormName="formAcabamento">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger small mb-3 fw-bold font-headline" />
+            
+            <div class="row g-3">
+                <!-- Linha 1: Classificação e Identificação -->
+                <div class="col-md-3">
+                    <label class="form-label text-dark fw-bold">Tipo de Insumo <span class="text-danger">*</span></label>
+                    <InputSelect @bind-Value="formularioAcabamento.Tipo" @bind-Value:after="OnTipoChanged" class="form-select">
+                        <option value="Tinta">Tinta (Acrílica, Spray, Esmalte)</option>
+                        <option value="Primer">Primer (Fundo Preparador)</option>
+                        <option value="Verniz">Verniz (Fosco, Acetinado, Brilhante)</option>
+                        <option value="Solvente">Solvente / Diluente (Thinner, Álcool)</option>
+                        <option value="Outro">Outro Insumo</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => formularioAcabamento.Tipo)" class="text-danger fw-bold small" />
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label text-dark fw-bold">Nome do Insumo <span class="text-danger">*</span></label>
+                    <InputText @bind-Value="formularioAcabamento.NomeAcabamento" class="form-control" placeholder="Ex: Primer Cinza Acrilex, Verniz Fosco Spray, Thinner 5000, Acrílica Vermelha" maxlength="100" />
+                    <ValidationMessage For="@(() => formularioAcabamento.NomeAcabamento)" class="text-danger fw-bold small" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label text-dark fw-bold">Cor / Acabamento</label>
+                    <InputText @bind-Value="formularioAcabamento.Cor" class="form-control" placeholder="Ex: Incolor, Cinza, Vermelho..." maxlength="50" />
+                    <ValidationMessage For="@(() => formularioAcabamento.Cor)" class="text-danger fw-bold small" />
+                </div>
+
+                <!-- Linha 2: Volume, Saldo e Valores -->
+                <div class="col-md-3">
+                    <label class="form-label text-dark fw-bold">Volume Original <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="text" 
+                               class="form-control" 
+                               placeholder="Ex: 1" 
+                               oninput="window.masks.weightUnit(this)"
+                               @onchange="UpdatePeso"
+                               value="@pesoFormatted"
+                               maxlength="10" />
+                        <span class="input-group-text">L</span>
+                    </div>
+                    <ValidationMessage For="@(() => formularioAcabamento.PesoLitros)" class="text-danger fw-bold small" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-dark fw-bold">Saldo Atual <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="text" 
+                               class="form-control" 
+                               placeholder="Ex: 850" 
+                               oninput="window.masks.weightUnit(this)"
+                               @onchange="UpdateSaldo"
+                               value="@saldoFormatted"
+                               maxlength="10" />
+                        <span class="input-group-text">ml</span>
+                    </div>
+                    <ValidationMessage For="@(() => formularioAcabamento.SaldoMililitros)" class="text-danger fw-bold small" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-dark fw-bold">Valor Pago <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text">R$</span>
+                        <input type="text" 
+                               class="form-control" 
+                               placeholder="Ex: 85,00" 
+                               oninput="window.masks.money(this)"
+                               @onchange="UpdateValorPago"
+                               value="@valorPagoFormatted"
+                               maxlength="10" />
+                    </div>
+                    <ValidationMessage For="@(() => formularioAcabamento.ValorPago)" class="text-danger fw-bold small" />
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-yellow w-100 py-3 fs-6" disabled="@carregando">
+                        @if (carregando)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            <span>AGUARDE...</span>
+                        }
+                        else
+                        {
+                            <span class="material-symbols-outlined fs-5">@(modoEdicao ? "save" : "add_circle")</span>
+                            @((modoEdicao ? "ATUALIZAR" : "SALVAR INSUMO"))
+                        }
+                    </button>
+                </div>
+            </div>
+            @if (modoEdicao)
+            {
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="button" class="btn btn-outline-danger py-2 px-4" @onclick="CancelarEdicao">
+                        ✕ CANCELAR EDIÇÃO
+                    </button>
+                </div>
+            }
+        </EditForm>
+    </div>
+
+    <!-- Base: Tabela de Insumos -->
+    <div class="bg-white brutal-border p-4 brutal-shadow-lg">
+        <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom brutal-border-b">
+            <div class="d-flex align-items-center gap-2">
+                <span class="material-symbols-outlined text-dark fs-4">format_paint</span>
+                <h4 class="font-headline fw-black text-dark uppercase mb-0 fs-5">INSUMOS NO ESTOQUE</h4>
+            </div>
+            <span class="badge bg-warning text-dark">@(acabamentos.Count) ITENS</span>
+        </div>
+
+        @if (carregando && !acabamentos.Any())
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-dark" role="status"></div>
+                <p class="font-headline text-dark fw-bold mt-2 uppercase">Sincronizando banco de dados...</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table brutal-table text-dark mb-0">
+                    <thead>
+                        <tr>
+                            <th>DATA CADASTRO</th>
+                            <th>TIPO</th>
+                            <th>NOME DO INSUMO</th>
+                            <th>COR / ACABAMENTO</th>
+                            <th>VOLUME ORIGINAL</th>
+                            <th>SALDO ATUAL</th>
+                            <th>VALOR PAGO</th>
+                            <th>PREÇO / ML</th>
+                            <th class="text-center">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (acabamentos == null)
+                        {
+                            <tr><td colspan="9" class="text-center text-muted py-4 font-headline fw-bold">Carregando o sistema...</td></tr>
+                        }
+                        else if (!acabamentos.Any())
+                        {
+                            <tr><td colspan="9" class="text-center text-muted py-4 font-headline fw-bold">Nenhum insumo de acabamento cadastrado no momento.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var a in acabamentos)
+                            {
+                                <tr>
+                                    <td><span class="font-body text-dark fw-semibold">@a.DataCadastro.ToString("dd/MM/yyyy")</span></td>
+                                    <td>
+                                        @switch (a.Tipo)
+                                        {
+                                            case "Primer":
+                                                <span class="badge bg-dark text-white brutal-border-2">PRIMER</span>
+                                                break;
+                                            case "Verniz":
+                                                <span class="badge bg-info text-dark brutal-border-2">VERNIZ</span>
+                                                break;
+                                            case "Solvente":
+                                                <span class="badge bg-secondary text-white brutal-border-2">SOLVENTE</span>
+                                                break;
+                                            case "Outro":
+                                                <span class="badge bg-light text-dark brutal-border-2">OUTRO</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-primary text-white brutal-border-2">TINTA</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td><strong class="font-headline text-dark fs-6">@a.NomeAcabamento</strong></td>
+                                    <td><span class="badge bg-white text-dark brutal-border-2">@(string.IsNullOrWhiteSpace(a.Cor) ? "Incolor" : a.Cor)</span></td>
+                                    <td><span class="font-body text-dark fw-bold">@a.PesoLitros.ToString("N2") L</span></td>
+                                    <td>
+                                        @if (a.SaldoMililitros <= (a.PesoLitros * 1000m * 0.2m))
+                                        {
+                                            <span class="badge bg-danger text-white">⚠ @a.SaldoMililitros.ToString("N2") ml</span>
+                                        }
+                                        else if (a.SaldoMililitros <= (a.PesoLitros * 1000m * 0.5m))
+                                        {
+                                            <span class="badge bg-warning text-dark">⚠ @a.SaldoMililitros.ToString("N2") ml</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-primary text-white">@a.SaldoMililitros.ToString("N2") ml</span>
+                                        }
+                                    </td>
+                                    <td><span class="font-body text-dark fw-semibold">@a.ValorPago.ToString("C2")</span></td>
+                                    <td><strong class="font-headline text-dark fs-6">@a.PrecoPorMl.ToString("C2") / ml</strong></td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <button class="btn btn-outline-warning btn-sm" @onclick="() => EditarAcabamento(a)">
+                                                <span class="material-symbols-outlined fs-6">edit</span>
+                                                Editar
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" @onclick="() => ExcluirAcabamento(a.Id)">
+                                                <span class="material-symbols-outlined fs-6">delete</span>
+                                                Excluir
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Acabamento> acabamentos = new();
+    private Acabamento formularioAcabamento = new();
+    private bool erroCarregamento = false;
+    private bool modoEdicao = false;
+    private bool carregando = false;
+    private int usuarioId = 0;
+
+    private string pesoFormatted = "";
+    private string saldoFormatted = "";
+    private string valorPagoFormatted = "";
+
+    private void UpdatePeso(ChangeEventArgs e)
+    {
+        var val = e.Value?.ToString() ?? "";
+        pesoFormatted = val;
+        var clean = val.Replace(".", "").Replace(",", ".");
+        if (decimal.TryParse(clean, System.Globalization.CultureInfo.InvariantCulture, out decimal res))
+            formularioAcabamento.PesoLitros = Math.Max(0, res);
+    }
+
+    private void UpdateSaldo(ChangeEventArgs e)
+    {
+        var val = e.Value?.ToString() ?? "";
+        saldoFormatted = val;
+        var clean = val.Replace(".", "").Replace(",", ".");
+        if (decimal.TryParse(clean, System.Globalization.CultureInfo.InvariantCulture, out decimal res))
+            formularioAcabamento.SaldoMililitros = Math.Max(0, res);
+    }
+
+    private void OnTipoChanged()
+    {
+        if ((formularioAcabamento.Tipo == "Verniz" || formularioAcabamento.Tipo == "Solvente") && string.IsNullOrWhiteSpace(formularioAcabamento.Cor))
+        {
+            formularioAcabamento.Cor = "Incolor";
+        }
+    }
+
+    private void UpdateValorPago(ChangeEventArgs e)
+    {
+        var val = e.Value?.ToString() ?? "";
+        valorPagoFormatted = val;
+        var clean = val.Replace(".", "").Replace(",", ".").Trim();
+        if (decimal.TryParse(clean, System.Globalization.CultureInfo.InvariantCulture, out decimal res))
+            formularioAcabamento.ValorPago = Math.Max(0, res);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuarioId = await UsuarioCtx.GetUsuarioIdAsync();
+        carregando = true;
+        try
+        {
+            await CarregarAcabamentos();
+        }
+        catch (Exception)
+        {
+            erroCarregamento = true;
+        }
+        finally
+        {
+            carregando = false;
+        }
+    }
+
+    private async Task SalvarAcabamento()
+    {
+        try
+        {
+            carregando = true;
+            if (modoEdicao && formularioAcabamento.Id > 0)
+            {
+                await AcabamentoRepo.UpdateAsync(formularioAcabamento);
+            }
+            else
+            {
+                if (formularioAcabamento.SaldoMililitros == 0)
+                    formularioAcabamento.SaldoMililitros = formularioAcabamento.PesoLitros * 1000m;
+
+                formularioAcabamento.UsuarioId = usuarioId;
+                formularioAcabamento.DataCadastro = DateTime.UtcNow;
+                await AcabamentoRepo.AddAsync(formularioAcabamento);
+            }
+            
+            formularioAcabamento = new Acabamento(); 
+            modoEdicao = false;
+            pesoFormatted = "";
+            saldoFormatted = "";
+            valorPagoFormatted = "";
+            await CarregarAcabamentos();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao salvar acabamento: {ex.Message}");
+            erroCarregamento = true;
+        }
+        finally 
+        {
+            carregando = false;
+            StateHasChanged();
+        }
+    }
+
+    private void EditarAcabamento(Acabamento a)
+    {
+        formularioAcabamento = new Acabamento
+        {
+            Id = a.Id,
+            Tipo = a.Tipo,
+            NomeAcabamento = a.NomeAcabamento,
+            Cor = a.Cor,
+            PesoLitros = a.PesoLitros,
+            ValorPago = a.ValorPago,
+            SaldoMililitros = a.SaldoMililitros,
+            DataCadastro = a.DataCadastro
+        };
+        pesoFormatted = a.PesoLitros.ToString("N2");
+        saldoFormatted = a.SaldoMililitros.ToString("N0");
+        valorPagoFormatted = a.ValorPago.ToString("C2");
+        modoEdicao = true;
+    }
+
+    private void CancelarEdicao()
+    {
+        formularioAcabamento = new Acabamento();
+        pesoFormatted = "";
+        saldoFormatted = "";
+        valorPagoFormatted = "";
+        modoEdicao = false;
+    }
+
+    private async Task ExcluirAcabamento(int id)
+    {
+        bool confirmado = await JS.InvokeAsync<bool>("confirm", "Você deseja realmente deletar esse registro?");
+        if (confirmado)
+        {
+            await AcabamentoRepo.DeleteAsync(id, usuarioId);
+            await CarregarAcabamentos();
+            StateHasChanged();
+        }
+    }
+
+    private async Task CarregarAcabamentos()
+    {
+        acabamentos = await AcabamentoRepo.GetAllAsync(usuarioId);
+        acabamentos = acabamentos.OrderByDescending(a => a.DataCadastro).ToList();
+    }
+}

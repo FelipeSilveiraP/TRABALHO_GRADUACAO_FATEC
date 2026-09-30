@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <!-- Fonts: Space Grotesk & Inter + Material Symbols Outlined -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
+    <link rel="stylesheet" href="@Assets["app.css"]" />
+    <link rel="stylesheet" href="@Assets["LucroImpresso.Web.styles.css"]" />
+    <ImportMap />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ffcc00' stroke='%231a1a1a' stroke-width='8'/><text x='50%' y='65%' font-size='60' font-weight='900' text-anchor='middle' fill='%231a1a1a' font-family='Space Grotesk, sans-serif'>π</text></svg>" />
+    <script>
+        (function() {
+            try {
+                if (localStorage.getItem('lucro_sidebar_collapsed') === 'true') {
+                    document.documentElement.classList.add('sidebar-collapsed');
+                }
+            } catch(e) {}
+
+            var isProgrammaticChange = false;
+            var sidebarObserver = new MutationObserver(function() {
+                if (isProgrammaticChange) return;
+                try {
+                    var shouldBeCollapsed = localStorage.getItem('lucro_sidebar_collapsed') === 'true';
+                    var hasClass = document.documentElement.classList.contains('sidebar-collapsed');
+                    if (shouldBeCollapsed && !hasClass) {
+                        isProgrammaticChange = true;
+                        document.documentElement.classList.add('sidebar-collapsed');
+                        isProgrammaticChange = false;
+                    }
+                } catch(e) {}
+            });
+
+            sidebarObserver.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        })();
+    </script>
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes />
+    <script src="lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="js/masks.js"></script>
+    <script src="_framework/blazor.web.js"></script>
+    
+    <script>
+        window.addEventListener('scroll', function(e) {
+            var scrollPosition = window.scrollY || document.documentElement.scrollTop || e.target.scrollTop || 0;
+            
+            // Botão Voltar ao Topo
+            var btn = document.getElementById('btn-back-to-top');
+            if (btn) {
+                var alturaGatilho = window.innerHeight / 2;
+                if (scrollPosition > alturaGatilho) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+            }
+        }, true);
+
+        function scrollAoTopo(e) {
+            if (e) e.preventDefault();
+            setTimeout(function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                var wrappers = document.querySelectorAll('.page-wrapper, main, .page');
+                wrappers.forEach(function(el) {
+                    el.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }, 100);
+        }
+
+        window.scrollAoTopoInstante = function() {
+            window.scrollTo({ top: 0 });
+            var wrappers = document.querySelectorAll('.page-wrapper, main, .page');
+            wrappers.forEach(function(el) {
+                el.scrollTo({ top: 0 });
+            });
+            setTimeout(function() {
+                window.scrollTo({ top: 0 });
+                var wrappers = document.querySelectorAll('.page-wrapper, main, .page');
+                wrappers.forEach(function(el) {
+                    el.scrollTo({ top: 0 });
+                });
+            }, 50);
+        };
+
+        window.handleNavClick = function(e, targetPath) {
+            var normalize = function(p) {
+                if (!p) return '/';
+                if (!p.startsWith('/')) p = '/' + p;
+                p = p.replace(/\/$/, '');
+                return p || '/';
+            };
+            var current = normalize(window.location.pathname);
+            var target = normalize(targetPath);
+            if (current === target) {
+                if (e) e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                var wrappers = document.querySelectorAll('.page-wrapper, main, .page');
+                wrappers.forEach(function(el) {
+                    el.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            } else {
+                window.scrollAoTopoInstante();
+            }
+        };
+
+        function confirmarSaida(e) {
+            if (e) e.preventDefault();
+            var certeza = confirm("Você tem certeza que quer sair do sistema?");
+            if (certeza) {
+                var form = document.querySelector('form[action="/auth/logout"]');
+                if (form) {
+                    form.submit();
+                } else {
+                    var f = document.createElement('form');
+                    f.method = 'POST';
+                    f.action = '/auth/logout';
+                    document.body.appendChild(f);
+                    f.submit();
+                }
+            }
+        }
+
+        function closeMenuMobile() {
+            var menu = document.getElementById('menuBrutal');
+            if (menu && menu.classList.contains('show')) {
+                var bsCollapse = bootstrap.Collapse.getInstance(menu);
+                if (bsCollapse) {
+                    bsCollapse.hide();
+                } else {
+                    menu.classList.remove('show');
+                }
+            }
+        }
+
+        window.toggleSidebar = function() {
+            var isCollapsed = !document.documentElement.classList.contains('sidebar-collapsed');
+            try {
+                localStorage.setItem('lucro_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+            } catch(e) {}
+            if (isCollapsed) {
+                document.documentElement.classList.add('sidebar-collapsed');
+            } else {
+                document.documentElement.classList.remove('sidebar-collapsed');
+            }
+        };
+
+        window.expandSidebar = function() {
+            try {
+                localStorage.setItem('lucro_sidebar_collapsed', 'false');
+            } catch(e) {}
+            document.documentElement.classList.remove('sidebar-collapsed');
+        };
+
+        window.onSidebarContaClick = function(e) {
+            var isCollapsed = document.documentElement.classList.contains('sidebar-collapsed');
+            if (isCollapsed) {
+                if (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                window.expandSidebar();
+                setTimeout(function() {
+                    var btn = document.getElementById('btn-sidebar-conta');
+                    if (btn && window.bootstrap) {
+                        var dd = bootstrap.Dropdown.getOrCreateInstance(btn);
+                        dd.show();
+                    }
+                }, 150);
+                return false;
+            }
+            return true;
+        };
+
+        window.restoreSidebarState = function() {
+            try {
+                var isCollapsed = localStorage.getItem('lucro_sidebar_collapsed') === 'true';
+                if (isCollapsed) {
+                    document.documentElement.classList.add('sidebar-collapsed');
+                } else {
+                    document.documentElement.classList.remove('sidebar-collapsed');
+                }
+            } catch(e) {}
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', window.restoreSidebarState);
+        } else {
+            window.restoreSidebarState();
+        }
+
+        if (window.Blazor) {
+            Blazor.addEventListener('enhancedload', window.restoreSidebarState);
+        } else {
+            window.addEventListener('load', function() {
+                if (window.Blazor) {
+                    Blazor.addEventListener('enhancedload', window.restoreSidebarState);
+                }
+            });
+        }
+
+        // Toggle de visibilidade de senha (botão de olho)
+        window.togglePasswordVisibility = function(buttonElement) {
+            var container = buttonElement.closest('.input-group-password');
+            if (!container) return;
+            var input = container.querySelector('input');
+            var icon = buttonElement.querySelector('.material-symbols-outlined');
+            if (!input || !icon) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility_off';
+                buttonElement.setAttribute('title', 'Ocultar senha');
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility';
+                buttonElement.setAttribute('title', 'Mostrar senha');
+            }
+        };
+    </script>
+</body>
+</html>

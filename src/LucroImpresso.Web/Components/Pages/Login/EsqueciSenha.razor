@@ -1,0 +1,122 @@
+@page "/esqueci-senha"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using LucroImpresso.Web.Services
+@attribute [AllowAnonymous]
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IWebHostEnvironment Env
+
+<PageTitle>LucroImpresso | Esqueci Minha Senha</PageTitle>
+
+@code {
+    [SupplyParameterFromQuery]
+    public bool? Enviado { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            Nav.NavigateTo("/dashboard", forceLoad: true);
+        }
+    }
+}
+
+<div class="login-container">
+    <div class="brutal-login-card bg-white brutal-border p-4 p-md-5 brutal-shadow-lg">
+        <!-- Topo com Ícone e Título -->
+        <div class="text-center mb-4 pb-3 brutal-border-b">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary-container brutal-border-2 p-2 mb-2" style="width: 56px; height: 56px;">
+                <span class="material-symbols-outlined fs-2 text-dark">lock_reset</span>
+            </div>
+            <h2 class="font-headline text-dark fw-black uppercase tracking-tight mb-1 fs-3">RECUPERAR ACESSO</h2>
+            <p class="font-body text-muted small fw-bold mb-0 text-uppercase">Redefinição segura de credenciais</p>
+        </div>
+
+        @if (Enviado == true)
+        {
+            <div class="alert alert-success d-flex flex-column gap-2 mb-4 brutal-border-2 p-3" style="background-color: #d4f7dc; color: #006622; border-color: #00aa44;">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="material-symbols-outlined fs-5">mark_email_read</span>
+                    <span class="font-headline small fw-bold">SOLICITAÇÃO PROCESSADA COM SUCESSO!</span>
+                </div>
+                <p class="font-body small mb-0" style="color: #004d1a; line-height: 1.4;">
+                    Se o e-mail informado estiver cadastrado em nossa base, você receberá um link de recuperação com validade de <strong>30 minutos</strong>. Verifique sua caixa de entrada e a pasta de spam.
+                </p>
+            </div>
+
+            @if (Env.IsDevelopment() && !string.IsNullOrEmpty(EmailService.UltimoLinkGeradoDev))
+            {
+                <div class="alert alert-warning brutal-border-2 p-3 mb-4" style="background-color: #fff9db; border-color: #e6b800;">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="material-symbols-outlined fs-5 text-dark">developer_mode</span>
+                        <span class="font-headline small fw-black text-dark text-uppercase">Ambiente Local (Desenvolvimento)</span>
+                    </div>
+                    <p class="font-body small text-dark mb-2">
+                        Como o envio de e-mail real depende de credenciais SMTP, você pode testar o fluxo acessando diretamente o link gerado:
+                    </p>
+                    <a href="@EmailService.UltimoLinkGeradoDev" class="btn btn-dark w-100 py-2 fs-6 brutal-border-2 fw-bold text-white font-headline text-uppercase text-decoration-none text-center d-block">
+                        <span class="material-symbols-outlined fs-6 align-middle me-1">open_in_new</span>
+                        ACESSAR TELA DE REDEFINIÇÃO
+                    </a>
+                </div>
+            }
+
+            <div class="text-center mt-3">
+                <a href="/login" class="btn btn-white w-100 py-2 fs-6 brutal-border-2 fw-bold text-dark font-headline text-uppercase">
+                    <span class="material-symbols-outlined fs-5 align-middle me-1">arrow_back</span>
+                    VOLTAR AO LOGIN
+                </a>
+            </div>
+        }
+        else
+        {
+            @if (!string.IsNullOrEmpty(Error))
+            {
+                <div class="alert alert-danger d-flex align-items-center gap-2 mb-4 brutal-border-2 p-3" style="background-color: #ffdad6; color: #990000; border-color: #cc0000;">
+                    <span class="material-symbols-outlined fs-5">error</span>
+                    <span class="font-headline small fw-bold">@Error</span>
+                </div>
+            }
+
+            <p class="font-body text-muted small mb-4">
+                Digite o endereço de e-mail associado à sua conta. Enviaremos um link seguro para que você possa definir uma nova senha.
+            </p>
+
+            <form action="/auth/esqueci-senha" method="post">
+                <AntiforgeryToken />
+
+                <div class="mb-4">
+                    <label class="form-label text-dark fw-black small">
+                        <span class="material-symbols-outlined fs-6 align-middle me-1">mail</span>
+                        E-MAIL CADASTRADO
+                    </label>
+                    <input type="email" name="email" class="form-control" placeholder="seuemail@exemplo.com" required maxlength="100" autocomplete="email" />
+                </div>
+
+                <button type="submit" class="btn btn-yellow w-100 py-3 fs-5 mt-2">
+                    <span class="material-symbols-outlined fs-4 align-middle me-1">send</span>
+                    ENVIAR INSTRUÇÕES
+                </button>
+            </form>
+
+            <div class="mt-4 pt-3 border-top text-center">
+                <p class="font-body text-muted small fw-semibold mb-2">Lembrou sua senha?</p>
+                <a href="/login" class="btn btn-white w-100 py-2 fs-6 brutal-border-2 fw-bold text-dark font-headline text-uppercase">
+                    <span class="material-symbols-outlined fs-5 align-middle me-1">login</span>
+                    VOLTAR PARA O LOGIN
+                </a>
+            </div>
+        }
+
+        <div class="text-center mt-3">
+            <a href="/" class="font-headline text-dark fw-bold text-decoration-none small uppercase">
+                ← Voltar para a Página Inicial
+            </a>
+        </div>
+    </div>
+</div>

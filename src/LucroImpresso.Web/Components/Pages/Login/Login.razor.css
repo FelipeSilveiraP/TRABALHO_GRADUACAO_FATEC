@@ -1,0 +1,25 @@
+.login-container {
+    min-height: calc(100vh - 86px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-main);
+    padding: 2.5rem 1.5rem;
+    width: 100%;
+}
+
+.brutal-login-card {
+    width: 100%;
+    max-width: 480px;
+    background-color: #ffffff;
+    margin: 0 auto;
+}
+
+@media (max-width: 576px) {
+    .login-container {
+        padding: 1.5rem 0.75rem;
+    }
+    .brutal-login-card {
+        max-width: 100%;
+    }
+}

@@ -1,0 +1,46 @@
+@page "/Error"
+@using System.Diagnostics
+@using Microsoft.AspNetCore.Authorization
+@attribute [AllowAnonymous]
+
+<PageTitle>Error</PageTitle>
+
+<div class="page-container" style="max-width: 800px; margin: 3rem auto; padding: 2rem;">
+    <div class="bg-white brutal-border p-5 brutal-shadow-lg text-center">
+        <div class="d-inline-flex align-items-center justify-content-center bg-danger brutal-border-2 p-3 mb-3">
+            <span class="material-symbols-outlined text-white fs-1">error</span>
+        </div>
+        <h1 class="font-headline text-dark fw-black uppercase display-6 mb-2">OCORREU UM ERRO</h1>
+        <p class="font-body text-muted fw-semibold mb-4">Houve uma falha inesperada durante o processamento da sua solicitação.</p>
+
+        @if (ShowRequestId)
+        {
+            <div class="p-3 bg-surface-container brutal-border-2 mb-4 text-start">
+                <span class="font-headline text-dark text-xs font-black uppercase d-block mb-1">CÓDIGO DA REQUISIÇÃO (REQUEST ID)</span>
+                <code class="text-dark fw-bold">@RequestId</code>
+            </div>
+        }
+
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/" class="btn btn-yellow px-4 py-3">
+                <span class="material-symbols-outlined fs-5">home</span>
+                PÁGINA INICIAL
+            </a>
+            <a href="/dashboard" class="btn btn-black px-4 py-3">
+                <span class="material-symbols-outlined fs-5">dashboard</span>
+                PAINEL OPERACIONAL
+            </a>
+        </div>
+    </div>
+</div>
+
+@code{
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    protected override void OnInitialized() =>
+        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}

@@ -1,0 +1,17 @@
+@inherits LayoutComponentBase
+
+<div class="page-wrapper" id="app-wrapper">
+    <NavMenu />
+
+    <div class="main-layout-container">
+        <main class="w-100 main-content-padded">
+            <article class="content px-0 pt-0 w-100">
+                @Body
+            </article>
+        </main>
+
+        <button id="btn-back-to-top" onclick="scrollAoTopo(event)" class="back-to-top" aria-label="Voltar ao topo">
+            <div class="chevron-up"></div>
+        </button>
+    </div>
+</div>

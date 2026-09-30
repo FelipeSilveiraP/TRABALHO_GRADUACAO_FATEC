@@ -1,0 +1,23 @@
+@startuml
+title Módulo 3: Gestão de Estoque e Materiais
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam monochrome false
+
+actor "Empreendedor" as Emp
+
+rectangle "Sistema LucroImpresso" {
+  usecase "UC15: Cadastrar Matéria-Prima\nde Impressão (Filamento/Resina)" as UC15
+  usecase "UC16: Cadastrar Insumo de Acabamento\n(Tintas, Primers, Vernizes)" as UC16
+  usecase "UC17: Consultar Estoque e\nAlertas Críticos" as UC17
+  usecase "UC18: Editar / Excluir\nInsumos de Estoque" as UC18
+}
+
+Emp --> UC15
+Emp --> UC16
+Emp --> UC17
+Emp --> UC18
+
+@enduml

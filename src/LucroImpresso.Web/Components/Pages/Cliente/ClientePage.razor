@@ -1,0 +1,564 @@
+@page "/clientes"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@using LucroImpresso.Web.Models
+@using LucroImpresso.Web.Interfaces
+@using LucroImpresso.Web.Services
+@inject IClienteRepository ClienteRepo
+@inject UsuarioContextService UsuarioCtx
+@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<PageTitle>LucroImpresso | Clientes</PageTitle>
+
+<div class="page-container" style="max-width: 1300px; margin: 0 auto; padding: 1.25rem 1.5rem;">
+    <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 pb-3 brutal-border-b">
+        <div>
+            <div class="d-inline-flex align-items-center gap-2 bg-white brutal-border-2 px-3 py-1 mb-2">
+                <span class="material-symbols-outlined text-dark fs-5">group</span>
+                <span class="font-headline text-xs font-black uppercase text-dark">CADASTRO COMERCIAL</span>
+            </div>
+            <h1 class="font-headline text-dark fw-black mb-0 display-6 uppercase tracking-tight">GESTÃO DE CLIENTES</h1>
+            <p class="font-body text-muted fs-6 mt-1 mb-0 fw-semibold">Cadastre clientes Pessoa Física ou Pessoa Jurídica para emissão de orçamentos.</p>
+        </div>
+    </header>
+
+    @if (erroCarregamento)
+    {
+        <div class="alert alert-danger mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">error</span>
+            Falha na conexão com o banco de dados. Verifique o serviço SQL.
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(mensagemSucesso))
+    {
+        <div class="alert alert-success mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">check_circle</span>
+            @mensagemSucesso
+        </div>
+    }
+
+    <!-- Formulário Master-Detail Neo-Brutalista -->
+    <div class="form-card-container">
+    <div class="bg-white brutal-border p-4 p-md-5 mb-5 brutal-shadow-lg">
+        <div class="d-flex align-items-center justify-content-between pb-3 border-bottom brutal-border-b mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <span class="material-symbols-outlined text-dark fs-3">person_add</span>
+                <h3 class="font-headline fw-black text-dark uppercase mb-0 fs-4">
+                    @(modoEdicao ? "EDITAR CLIENTE" : "CADASTRAR NOVO CLIENTE")
+                </h3>
+            </div>
+            @if (modoEdicao)
+            {
+                <span class="badge bg-warning text-dark">MODO EDIÇÃO</span>
+            }
+        </div>
+
+        <!-- Seleção do Tipo (PF / PJ) -->
+        <div class="mb-4 p-3 bg-surface-container brutal-border-2">
+            <label class="form-label text-dark fw-black mb-2 d-block">TIPO DE CADASTRO</label>
+            <div class="d-flex gap-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="tipoCliente" id="tipoPF"
+                           checked="@(tipoPF)"
+                           @onchange="() => { tipoPF = true; ResetFormulario(); }"
+                           disabled="@modoEdicao" />
+                    <label class="form-check-label text-dark fw-bold" for="tipoPF">
+                        PESSOA FÍSICA (PF)
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="tipoCliente" id="tipoPJ"
+                           checked="@(!tipoPF)"
+                           @onchange="() => { tipoPF = false; ResetFormulario(); }"
+                           disabled="@modoEdicao" />
+                    <label class="form-check-label text-dark fw-bold" for="tipoPJ">
+                        PESSOA JURÍDICA (PJ)
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        @if (tipoPF)
+        {
+            <EditForm Model="@formPF" OnValidSubmit="SalvarCliente" FormName="formClientePF">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger small mb-3 fw-bold font-headline" />
+
+                <!-- Linha 1: Dados pessoais -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label text-dark">CPF</label>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="000.000.000-00"
+                               oninput="window.masks.cpf(this)"
+                               @bind="formPF.Cpf"
+                               maxlength="14" />
+                        <ValidationMessage For="@(() => formPF.Cpf)" class="text-danger fw-bold small" />
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label text-dark">Nome Completo</label>
+                        <InputText @bind-Value="formPF.Nome" class="form-control" placeholder="Ex: João da Silva" maxlength="200" />
+                        <ValidationMessage For="@(() => formPF.Nome)" class="text-danger fw-bold small" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-dark">Celular</label>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="(11) 90000-0000"
+                               oninput="window.masks?.celular?.(this)"
+                               @bind="formCelular"
+                               maxlength="20" />
+                    </div>
+                </div>
+
+                <!-- Linha 2: Endereço -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-dark">Logradouro / Rua</label>
+                        <InputText @bind-Value="formEndereco.Logradouro" class="form-control" placeholder="Ex: Av. Paulista" maxlength="300" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-dark">Número</label>
+                        <input type="number"
+                               class="form-control"
+                               placeholder="1000"
+                               @bind="formEndereco.Numero" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-dark">Bairro</label>
+                        <InputText @bind-Value="formEndereco.Bairro" class="form-control" placeholder="Ex: Bela Vista" maxlength="200" />
+                    </div>
+                </div>
+
+                <!-- Linha 3: Cidade + CEP + Botão -->
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label text-dark">Cidade</label>
+                        <InputText @bind-Value="formEndereco.Cidade" class="form-control" placeholder="Ex: São Paulo" maxlength="200" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-dark">CEP</label>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="00000-000"
+                               oninput="window.masks?.cep?.(this)"
+                               @bind="formEndereco.Cep"
+                               maxlength="9" />
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-yellow w-100 py-3 fs-6" disabled="@carregando">
+                            @if (carregando)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>AGUARDE...</span>
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined fs-5">@(modoEdicao ? "save" : "add_circle")</span>
+                                @((modoEdicao ? "ATUALIZAR CLIENTE" : "SALVAR CLIENTE"))
+                            }
+                        </button>
+                    </div>
+                </div>
+
+                @if (modoEdicao)
+                {
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="button" class="btn btn-outline-danger py-2 px-4" @onclick="CancelarEdicao">
+                            ✕ CANCELAR EDIÇÃO
+                        </button>
+                    </div>
+                }
+            </EditForm>
+        }
+        else
+        {
+            <EditForm Model="@formPJ" OnValidSubmit="SalvarCliente" FormName="formClientePJ">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger small mb-3 fw-bold font-headline" />
+
+                <!-- Linha 1: Dados empresariais -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label text-dark">CNPJ</label>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="00.000.000/0000-00"
+                               oninput="window.masks.cnpj(this)"
+                               @bind="formPJ.Cnpj"
+                               maxlength="18" />
+                        <ValidationMessage For="@(() => formPJ.Cnpj)" class="text-danger fw-bold small" />
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label text-dark">Razão Social</label>
+                        <InputText @bind-Value="formPJ.RazaoSocial" class="form-control" placeholder="Ex: MakerTech LTDA" maxlength="300" />
+                        <ValidationMessage For="@(() => formPJ.RazaoSocial)" class="text-danger fw-bold small" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-dark">Celular</label>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="(11) 90000-0000"
+                               oninput="window.masks?.celular?.(this)"
+                               @bind="formCelular"
+                               maxlength="20" />
+                    </div>
+                </div>
+
+                <!-- Linha 2: Endereço -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-dark">Logradouro / Rua</label>
+                        <InputText @bind-Value="formEndereco.Logradouro" class="form-control" placeholder="Ex: Av. Industrial" maxlength="300" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-dark">Número</label>
+                        <input type="number"
+                               class="form-control"
+                               placeholder="500"
+                               @bind="formEndereco.Numero" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-dark">Bairro</label>
+                        <InputText @bind-Value="formEndereco.Bairro" class="form-control" placeholder="Ex: Centro Industrial" maxlength="200" />
+                    </div>
+                </div>
+
+                <!-- Linha 3: Cidade + CEP + Botão -->
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label text-dark">Cidade</label>
+                        <InputText @bind-Value="formEndereco.Cidade" class="form-control" placeholder="Ex: Campinas" maxlength="200" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-dark">CEP</label>
+                        <input type="text"
+                               class="form-control"
+                               placeholder="00000-000"
+                               oninput="window.masks?.cep?.(this)"
+                               @bind="formEndereco.Cep"
+                               maxlength="9" />
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-yellow w-100 py-3 fs-6" disabled="@carregando">
+                            @if (carregando)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>AGUARDE...</span>
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined fs-5">@(modoEdicao ? "save" : "add_circle")</span>
+                                @((modoEdicao ? "ATUALIZAR CLIENTE" : "SALVAR CLIENTE"))
+                            }
+                        </button>
+                    </div>
+                </div>
+
+                @if (modoEdicao)
+                {
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="button" class="btn btn-outline-danger py-2 px-4" @onclick="CancelarEdicao">
+                            ✕ CANCELAR EDIÇÃO
+                        </button>
+                    </div>
+                }
+            </EditForm>
+        }
+    </div>
+    </div>
+
+    <!-- Tabela de Clientes Neo-Brutalista -->
+    <div class="bg-white brutal-border p-4 brutal-shadow-lg">
+        <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom brutal-border-b">
+            <div class="d-flex align-items-center gap-2">
+                <span class="material-symbols-outlined text-dark fs-4">badge</span>
+                <h4 class="font-headline fw-black text-dark uppercase mb-0 fs-5">LISTA DE CLIENTES CADASTRADOS</h4>
+            </div>
+            <span class="badge bg-warning text-dark">@(clientes.Count) CLIENTES</span>
+        </div>
+
+        @if (carregando && !clientes.Any())
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border text-dark" role="status"></div>
+                <p class="font-headline text-dark fw-bold mt-2 uppercase">Sincronizando banco de dados...</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table brutal-table text-dark mb-0">
+                    <thead>
+                        <tr>
+                            <th>TIPO</th>
+                            <th>NOME / RAZÃO SOCIAL</th>
+                            <th>DOCUMENTO</th>
+                            <th>CELULAR</th>
+                            <th>CIDADE</th>
+                            <th class="text-center">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!clientes.Any())
+                        {
+                            <tr><td colspan="6" class="text-center text-muted py-4 font-headline fw-bold">Nenhum cliente cadastrado no momento.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var c in clientes)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (c.TipoExibicao == "PF")
+                                        {
+                                            <span class="badge bg-info text-dark">PF</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">PJ</span>
+                                        }
+                                    </td>
+                                    <td><strong class="font-headline text-dark fs-6">@c.NomeExibicao</strong></td>
+                                    <td><span class="font-body text-dark fw-semibold">@c.Documento</span></td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(c.CelularExibicao))
+                                        {
+                                            <span class="font-body text-dark fw-semibold">@c.CelularExibicao</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(c.Endereco?.Cidade))
+                                        {
+                                            <span class="font-body text-dark fw-semibold">@c.Endereco.Cidade</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <button class="btn btn-outline-warning btn-sm" @onclick="() => EditarCliente(c)">
+                                                <span class="material-symbols-outlined fs-6">edit</span>
+                                                Editar
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" @onclick="() => ExcluirCliente(c.Id)">
+                                                <span class="material-symbols-outlined fs-6">delete</span>
+                                                Excluir
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Cliente> clientes = new();
+    private PessoaFisica formPF = new();
+    private PessoaJuridica formPJ = new();
+    private Endereco formEndereco = new();
+    private string formCelular = string.Empty;
+    private bool tipoPF = true;
+    private bool modoEdicao = false;
+    private bool carregando = false;
+    private bool erroCarregamento = false;
+    private string? mensagemSucesso;
+    private int clienteEditandoId = 0;
+    private int usuarioId = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        usuarioId = await UsuarioCtx.GetUsuarioIdAsync();
+        carregando = true;
+        try
+        {
+            await CarregarClientes();
+        }
+        catch (Exception)
+        {
+            erroCarregamento = true;
+        }
+        finally
+        {
+            carregando = false;
+        }
+    }
+
+    private async Task CarregarClientes()
+    {
+        clientes = await ClienteRepo.GetAllAsync(usuarioId);
+    }
+
+    private void ResetFormulario()
+    {
+        formPF = new PessoaFisica();
+        formPJ = new PessoaJuridica();
+        formEndereco = new Endereco();
+        formCelular = string.Empty;
+    }
+
+    private async Task SalvarCliente()
+    {
+        carregando = true;
+        mensagemSucesso = null;
+        try
+        {
+            if (modoEdicao)
+            {
+                var clienteAtualizado = new Cliente
+                {
+                    Id = clienteEditandoId,
+                    UsuarioId = usuarioId,
+                    CelularUnico = formCelular,
+                    Endereco = new Endereco
+                    {
+                        Id = formEndereco.Id,
+                        UsuarioId = usuarioId,
+                        Logradouro = formEndereco.Logradouro,
+                        Numero = formEndereco.Numero,
+                        Bairro = formEndereco.Bairro,
+                        Cidade = formEndereco.Cidade,
+                        Cep = formEndereco.Cep
+                    },
+                    PessoaFisica = tipoPF ? new PessoaFisica
+                    {
+                        ClienteId = clienteEditandoId,
+                        UsuarioId = usuarioId,
+                        Nome      = formPF.Nome,
+                        Cpf       = formPF.Cpf
+                    } : null,
+                    PessoaJuridica = !tipoPF ? new PessoaJuridica
+                    {
+                        ClienteId   = clienteEditandoId,
+                        UsuarioId   = usuarioId,
+                        RazaoSocial = formPJ.RazaoSocial,
+                        Cnpj        = formPJ.Cnpj
+                    } : null
+                };
+                await ClienteRepo.UpdateAsync(clienteAtualizado);
+                mensagemSucesso = "Cliente atualizado com sucesso!";
+                modoEdicao = false;
+                clienteEditandoId = 0;
+            }
+            else
+            {
+                var novoCliente = new Cliente
+                {
+                    UsuarioId = usuarioId,
+                    CelularUnico = formCelular,
+                    Endereco = new Endereco
+                    {
+                        UsuarioId  = usuarioId,
+                        Logradouro = formEndereco.Logradouro,
+                        Numero     = formEndereco.Numero,
+                        Bairro     = formEndereco.Bairro,
+                        Cidade     = formEndereco.Cidade,
+                        Cep        = formEndereco.Cep
+                    },
+                    PessoaFisica = tipoPF ? new PessoaFisica
+                    {
+                        UsuarioId = usuarioId,
+                        Nome      = formPF.Nome,
+                        Cpf       = formPF.Cpf
+                    } : null,
+                    PessoaJuridica = !tipoPF ? new PessoaJuridica
+                    {
+                        UsuarioId   = usuarioId,
+                        RazaoSocial = formPJ.RazaoSocial,
+                        Cnpj        = formPJ.Cnpj
+                    } : null
+                };
+
+                await ClienteRepo.AddAsync(novoCliente);
+                mensagemSucesso = "Cliente cadastrado com sucesso!";
+            }
+
+            ResetFormulario();
+            await CarregarClientes();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao salvar cliente: {ex.Message}");
+            erroCarregamento = true;
+        }
+        finally
+        {
+            carregando = false;
+            StateHasChanged();
+        }
+    }
+
+    private void EditarCliente(Cliente c)
+    {
+        modoEdicao = true;
+        clienteEditandoId = c.Id;
+        mensagemSucesso = null;
+        formCelular = c.CelularUnico ?? string.Empty;
+
+        formEndereco = c.Endereco != null ? new Endereco
+        {
+            Id         = c.Endereco.Id,
+            UsuarioId  = c.UsuarioId,
+            Logradouro = c.Endereco.Logradouro,
+            Numero     = c.Endereco.Numero,
+            Bairro     = c.Endereco.Bairro,
+            Cidade     = c.Endereco.Cidade,
+            Cep        = c.Endereco.Cep
+        } : new Endereco();
+
+        if (c.PessoaFisica != null)
+        {
+            tipoPF = true;
+            formPF = new PessoaFisica
+            {
+                ClienteId = c.Id,
+                UsuarioId = c.UsuarioId,
+                Nome      = c.PessoaFisica.Nome,
+                Cpf       = c.PessoaFisica.Cpf
+            };
+        }
+        else
+        {
+            tipoPF = false;
+            formPJ = new PessoaJuridica
+            {
+                ClienteId   = c.Id,
+                UsuarioId   = c.UsuarioId,
+                RazaoSocial = c.PessoaJuridica?.RazaoSocial ?? string.Empty,
+                Cnpj        = c.PessoaJuridica?.Cnpj ?? string.Empty
+            };
+        }
+    }
+
+    private void CancelarEdicao()
+    {
+        modoEdicao = false;
+        clienteEditandoId = 0;
+        ResetFormulario();
+    }
+
+    private async Task ExcluirCliente(int id)
+    {
+        bool confirmado = await JS.InvokeAsync<bool>("confirm", "Você deseja realmente excluir este cliente? Esta ação não pode ser desfeita.");
+        if (confirmado)
+        {
+            await ClienteRepo.DeleteAsync(id, usuarioId);
+            await CarregarClientes();
+            StateHasChanged();
+        }
+    }
+}

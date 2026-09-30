@@ -1,0 +1,52 @@
+MODELO LÓGICO
+
+Esquema: SISTEMA_LUCROIMPRESSO
+
+Usuario (*id_usuario, nome_usuario, email, senha, token_redefinicao_senha, token_redefinicao_expiracao, data_cadastro)
+
+Maquina (*id_maquina, fk_usuario, nome_maquina, consumo_watts, custo_kwh, data_cadastro)
+	fk_usuario referencia Usuario
+
+Peca (*id_peca, fk_usuario, nome_peca, link_arquivo_stl, data_cadastro)
+	fk_usuario referencia Usuario
+
+Material (*id_material, fk_usuario, nome_material, cor, peso_rolo_gramas, valor_pago, saldo_gramas, data_cadastro)
+	fk_usuario referencia Usuario
+
+Endereco (*id_endereco, fk_usuario, fk_cliente, logradouro, numero, bairro, cidade, cep, data_cadastro)
+	fk_usuario referencia Usuario
+	fk_cliente referencia Cliente
+
+Cliente (*id_cliente, fk_usuario, data_cadastro, telefone_unico)
+	fk_usuario referencia Usuario
+
+Pessoa_Fisica (*fk_cliente, fk_usuario, cpf, nome)
+	fk_cliente referencia Cliente
+	fk_usuario referencia Usuario
+
+Pessoa_Juridica (*fk_cliente, fk_usuario, cnpj, razao_social)
+	fk_cliente referencia Cliente
+	fk_usuario referencia Usuario
+
+Orcamento (*id_orcamento, fk_usuario, nome_projeto, peso_gramas, tempo_hrs_impressao, tempo_hrs_pintura_lixamento, tempo_total, status, data_criacao, custo_mao_de_obra_hora, fk_maquina, fk_material, fk_peca, fk_cliente)
+	fk_usuario referencia Usuario
+	fk_maquina referencia Maquina
+	fk_material referencia Material
+	fk_peca referencia Peca
+	fk_cliente referencia Cliente
+
+Acabamento (*id_acabamento, fk_usuario, tipo, nome_acabamento, cor, peso_litros, valor_pago, saldo_mililitros, data_cadastro)
+	fk_usuario referencia Usuario
+
+ORC_ACABAMENTO (*fk_orcamento, *fk_acabamento, fk_usuario, quantidade_ml)
+	fk_orcamento referencia Orcamento
+	fk_acabamento referencia Acabamento
+	fk_usuario referencia Usuario
+
+Historico_Financeiro (*id_historico_financeiro, fk_usuario, receitas_acumuladas, despesas_material_acumuladas, despesas_energia_acumuladas, despesas_acabamento_acumuladas, data)
+	fk_usuario referencia Usuario
+
+
+SGBD: MariaDB 10.11 (LTS) — Driver Pomelo MariaDB via EF Core 9 Code-First.
+
+Arquitetura Multi-Tenant (Multilocatário): todas as tabelas principais são amarradas ao USUARIO, garantindo isolamento estrito de dados entre locatários (Anti-IDOR / RN008).
