@@ -2,7 +2,8 @@
 
 ### Trabalho de Graduação (TG) - Análise e Desenvolvimento de Sistemas (Fatec)
 **Aluno:** Felipe Silveira Pessoa  
-**Orientador:** Prof. Leonardo  
+**Orientador:** Prof. Leonardo Henrique Raiz  
+**Período:** fevereiro a novembro de 2026  
 **Instituição:** Fatec Franca “Dr. Thomaz Novelino” — Centro Paula Souza  
 **Natureza:** projeto acadêmico, sem fins lucrativos (custo de desenvolvimento: R$ 0,00, apenas ferramentas gratuitas)  
 

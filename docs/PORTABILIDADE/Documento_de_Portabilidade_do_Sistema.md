@@ -3,7 +3,7 @@
 ### Trabalho de Graduação (TG) — Análise e Desenvolvimento de Sistemas (FATEC)
 **Aluno:** Felipe Silveira Pessoa  
 **Projeto:** LucroImpresso — Sistema Especializado de Gestão de Custos, Controle de Estoque e Precificação para Manufatura Aditiva (Impressão 3D)  
-**Orientador:** [Nome do Orientador]  
+**Orientador:** Prof. Leonardo Henrique Raiz  
 **Norma de Referência:** ISO/IEC 25010:2011 — Engenharia de Software e Qualidade de Produto de Software (*SQuaRE*)  
 **Stack Tecnológica:** C# .NET 9 | ASP.NET Core Blazor Server | Entity Framework Core 9 | Pomelo MariaDB | Bootstrap 5 / CSS3 Vanilla  
 

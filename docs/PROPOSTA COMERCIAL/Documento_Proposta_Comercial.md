@@ -134,11 +134,11 @@ gantt
     title Cronograma de Entrega por Marcos (Milestones)
     dateFormat  YYYY-MM-DD
     section Marco 1 (40%)
-    Setup, Arquitetura C#, MariaDB e Cadastros Base :done, m1, 2026-02-01, 2026-02-28
+    Setup, Arquitetura C#, MariaDB e Cadastros Base :done, m1, 2026-02-01, 2026-04-30
     section Marco 2 (30%)
-    Motor de Custos, Acabamentos e Fila de Produção :done, m2, 2026-03-01, 2026-03-31
+    Motor de Custos, Acabamentos e Fila de Produção :done, m2, 2026-05-01, 2026-08-31
     section Marco 3 (30%)
-    Dashboard, Background Job, Segurança, QA 95 Testes :done, m3, 2026-04-01, 2026-04-30
+    Dashboard, Background Job, Segurança, QA 95 Testes :done, m3, 2026-09-01, 2026-11-11
 ```
 
 | Marco de Entrega | Descrição dos Entregáveis do Marco | Percentual | Valor Nominal | Condição de Faturamento |

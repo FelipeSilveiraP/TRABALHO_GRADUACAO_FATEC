@@ -4,8 +4,9 @@
 **Trabalho de Graduação (TG):** Faculdade de Tecnologia de Franca “Dr. Thomaz Novelino” (Fatec Franca — Centro Paula Souza)  
 **Curso:** Curso Superior de Tecnologia em Análise e Desenvolvimento de Sistemas  
 **Aluno / Gerente do Projeto:** Felipe Silveira Pessoa  
-**Orientador:** Prof. Leonardo  
+**Orientador:** Prof. Leonardo Henrique Raiz  
 **Natureza do Projeto:** Acadêmica, sem fins lucrativos  
+**Período do Projeto:** Fevereiro a Novembro de 2026  
 **Versão:** 3.1 (Alinhada à implementação final entregue)  
 **Data:** 11 de Novembro de 2026  
 **Localidade:** Franca - SP  
@@ -154,18 +155,18 @@ gantt
     title Cronograma de Entrega por Marcos
     dateFormat  YYYY-MM-DD
     section Marco 1
-    Arquitetura, MariaDB e Cadastros Base :done, m1, 2026-02-01, 2026-02-28
+    Planejamento, Arquitetura, MariaDB e Cadastros Base :done, m1, 2026-02-01, 2026-04-30
     section Marco 2
-    Motor de Custos, Acabamentos e Produção :done, m2, 2026-03-01, 2026-03-31
+    Motor de Custos, Acabamentos e Produção :done, m2, 2026-05-01, 2026-08-31
     section Marco 3
-    Dashboard, QA (95 Testes) e Documentação :done, m3, 2026-04-01, 2026-04-30
+    Dashboard, QA (95 Testes), Documentação e Apresentação :done, m3, 2026-09-01, 2026-11-11
 ```
 
-| Marco | Entregáveis | Peso no Escopo | Status |
-| :---: | :--- | :---: | :---: |
-| **Marco 1** | Arquitetura .NET 9 / EF Core, MariaDB, cadastros de Materiais, Máquinas e Clientes | 40% | ✅ Concluído |
-| **Marco 2** | Motor de Precificação, módulo de Acabamentos (mL), Fila de Produção com baixa de estoque | 30% | ✅ Concluído |
-| **Marco 3** | Dashboard analítico, Background Job (expurgo 180 dias), suíte de 95 testes, Docker, documentação | 30% | ✅ Concluído |
+| Marco | Período | Entregáveis | Peso no Escopo | Status |
+| :---: | :---: | :--- | :---: | :---: |
+| **Marco 1** | Fev – Abr/2026 | Arquitetura .NET 9 / EF Core, MariaDB, cadastros de Materiais, Máquinas e Clientes | 40% | ✅ Concluído |
+| **Marco 2** | Mai – Ago/2026 | Motor de Precificação, módulo de Acabamentos (mL), Fila de Produção com baixa de estoque | 30% | ✅ Concluído |
+| **Marco 3** | Set – Nov/2026 | Dashboard analítico, Background Job (expurgo 180 dias), suíte de 95 testes, Docker, documentação e apresentação | 30% | ✅ Concluído |
 
 ---
 
@@ -190,7 +191,7 @@ O LucroImpresso é um **projeto acadêmico sem fins lucrativos**. Não houve gas
 | Stakeholder | Papel | Responsabilidade |
 | :--- | :--- | :--- |
 | **Felipe Silveira Pessoa** | Aluno / Engenheiro de Software | Desenvolvimento, testes, documentação e apresentação do TG. |
-| **Prof. Leonardo** | Orientador Acadêmico | Orientação técnica e metodológica durante o desenvolvimento. |
+| **Prof. Leonardo Henrique Raiz** | Orientador Acadêmico | Orientação técnica e metodológica durante o desenvolvimento. |
 | **Banca Examinadora (FATEC)** | Avaliadores | Avaliação formal do sistema, documentação e defesa do TG. |
 | **Empreendedores Makers** | Público-alvo (usuários finais) | Utilização do sistema para precificação e gestão de custos. |
 
@@ -213,4 +214,4 @@ O LucroImpresso é um **projeto acadêmico sem fins lucrativos**. Não houve gas
 | Papel | Nome | Assinatura | Data |
 | :--- | :--- | :--- | :---: |
 | **Aluno / Gerente do Projeto** | Felipe Silveira Pessoa | __________________________ | ___/___/2026 |
-| **Orientador Acadêmico** | Prof. Leonardo | __________________________ | ___/___/2026 |
+| **Orientador Acadêmico** | Prof. Leonardo Henrique Raiz | __________________________ | ___/___/2026 |
