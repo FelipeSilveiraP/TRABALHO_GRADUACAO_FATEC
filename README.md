@@ -2,7 +2,9 @@
 
 ### Trabalho de Graduação (TG) - Análise e Desenvolvimento de Sistemas (Fatec)
 **Aluno:** Felipe Silveira Pessoa  
-**Orientador:** [Nome do Orientador]  
+**Orientador:** Prof. Leonardo  
+**Instituição:** Fatec Franca “Dr. Thomaz Novelino” — Centro Paula Souza  
+**Natureza:** projeto acadêmico, sem fins lucrativos (custo de desenvolvimento: R$ 0,00, apenas ferramentas gratuitas)  
 
 ---
 
@@ -16,23 +18,42 @@ O **LucroImpresso** é um sistema web especializado em gestão de custos, contro
 * **Framework Web:** ASP.NET Core Blazor (Componentização Reativa)
 * **Persistência de Dados:** Entity Framework Core (Code-First)
 * **Banco de Dados:** MariaDB
-* **Estilização & UI:** Bootstrap 5 / CSS3 Vanilla
+* **Estilização & UI:** Bootstrap 5 / CSS3 Vanilla (Neo-Brutalismo)
+* **Segurança e Qualidade:** BCrypt.Net (senhas), FluentValidation, logging estruturado com Serilog
 
 ---
 
 ## 📂 Estrutura do Repositório
 A organização do repositório segue os padrões de governança de TI e rigor acadêmico:
-* **`/docs`**: Contém todos os artefatos de engenharia de software e modelagem de negócios aprovados (BPMN, Caso de Uso, Elicitação de Requisitos, EAP, TAP, Matriz SWOT e 5W2H).
+* **`/docs`**: Contém todos os artefatos de engenharia de software e modelagem de negócios aprovados (BPMN, Caso de Uso, Elicitação de Requisitos, EAP, TAP, Matriz SWOT e 5W2H) e o material de apresentação (`/docs/APRESENTACAO`).
 * **`/src`**: Código-fonte da aplicação desenvolvido em C#.
   * `LucroImpresso.Web/`: Projeto principal Blazor contendo as Camadas de Models, Interfaces, Repositories e Services.
+* **`/tests`**: Suíte de testes automatizados (xUnit).
+
+---
+
+## ▶️ Como Executar Localmente
+Pré-requisitos: .NET 9 SDK e MariaDB 10.11 em execução (no ambiente do autor, MariaDB no Debian/WSL, porta `3308`).
+1. Copie `src/LucroImpresso.Web/appsettings.Example.json` para `appsettings.json` (este arquivo não é versionado) e ajuste a connection string (`Server=localhost;Port=3308;Database=LucroImpressoDB`) e a senha do administrador em `AdminSettings:SenhaPadrao`.
+2. Execute a aplicação — as migrations do EF Core são aplicadas automaticamente na inicialização:
+```powershell
+dotnet run --project src/LucroImpresso.Web
+```
 
 ---
 
 ## 💼 Proposta Comercial e Orçamentária (APF / IFPUG)
-Proposta comercial formal de desenvolvimento de software em regime de Preço Fixo (*Turnkey*), baseada em **Análise de Pontos de Função (ISO/IEC 20926)** conforme métricas acadêmicas homologadas pela FATEC:
+Exercício acadêmico de estimativa de esforço baseado em **Análise de Pontos de Função (ISO/IEC 20926)**, no formato de uma proposta comercial simulada. Os valores são **ilustrativos**: o projeto não tem fins lucrativos e não houve gasto real com o desenvolvimento.
 * **[Documento Detalhado da Proposta Comercial](docs/PROPOSTA%20COMERCIAL/Documento_Proposta_Comercial.md)**: Justificativa econômica, escopo dos 9 módulos, matriz métrica de APF (278,1 FP ajustados / 5.562 LOC), cronograma de marcos de entrega e SLA de 90 dias.
 * **[Proposta Comercial em PDF para Impressão](docs/PROPOSTA%20COMERCIAL/PROPOSTA%20COMERCIAL.pdf)**: Versão formatada em alta fidelidade com campos de assinatura formal do proponente e contratante.
-* **[Layout Visual em HTML5](docs/PROPOSTA%20COMERCIAL/Documento_Proposta_Comercial.html)**: Visualização responsiva com cards de resumo financeiro (R$ 4.449,60 / R$ 20,00/h / 222,48h / R$ 0,00 de licenças).
+* **[Layout Visual em HTML5](docs/PROPOSTA%20COMERCIAL/Documento_Proposta_Comercial.html)**: Visualização responsiva com cards de resumo financeiro simulado (R$ 4.449,60 / R$ 20,00/h / 222,48h / R$ 0,00 de licenças).
+
+---
+
+## 🎤 Apresentação dos CRUDs (Clientes, Máquinas e Materiais)
+Slides no modelo oficial da Fatec, com prints reais do sistema (dados fictícios de demonstração) e roteiro de fala por slide:
+* **[Slides (PowerPoint .pptx)](docs/APRESENTACAO/Apresentacao_CRUDs_LucroImpresso.pptx)** — também em [.ppt](docs/APRESENTACAO/Apresentacao_CRUDs_LucroImpresso.ppt) e [PDF](docs/APRESENTACAO/Apresentacao_CRUDs_LucroImpresso.pdf).
+* **[Roteiro de Apresentação (Word)](docs/APRESENTACAO/Roteiro_Apresentacao_CRUDs.docx)** — também em [PDF](docs/APRESENTACAO/Roteiro_Apresentacao_CRUDs.pdf).
 
 ---
 
@@ -57,14 +78,14 @@ Especificação formal de portabilidade segundo a norma internacional **ISO/IEC 
 * **[Documento Formal de Portabilidade do Sistema](docs/PORTABILIDADE/Documento_de_Portabilidade_do_Sistema.md)**: Matrizes completas de SOs (Windows, Linux, macOS), navegadores (Chrome, Edge, Firefox, Safari), viewports responsivos, diretrizes de caminhos e fusos horários (`DateTimeKind.Utc`).
 * **[Documento de Portabilidade em PDF para Impressão](docs/PORTABILIDADE/Documento_de_Portabilidade_do_Sistema.pdf)**: Versão formatada em alta fidelidade com tipografia técnica para monografia acadêmica da FATEC.
 * **[Multi-stage Dockerfile](Dockerfile)**: Construção conteinerizada otimizada (.NET 9 SDK + ASP.NET 9 Runtime) para orquestração portátil em qualquer nuvem ou servidor local.
-* **[Docker Compose Multi-serviço](docker-compose.yml)**: Subida declarativa de ambiente completo de produção contendo a aplicação Blazor Server e banco de dados MariaDB 10.11 com saúde automatizada (`healthcheck`).
+* **[Docker Compose Multi-serviço](docker-compose.yml)**: Subida declarativa de ambiente completo de produção contendo a aplicação Blazor Server e banco de dados MariaDB 10.11. Opcional — usado apenas para empacotamento/deploy; o desenvolvimento local não exige Docker.
 
 ---
 
 ## 📋 Matriz de Rastreabilidade de Requisitos (RTM - ISO/IEC/IEEE 29148)
 Mapeamento bidirecional estrito (*Forward & Backward Traceability*) conectando 100% dos requisitos elicitados, regras de negócio, casos de uso UML, pacotes da EAP, código-fonte C# e testes automatizados:
 * **[Documento Técnico Completo da Matriz de Rastreabilidade](docs/MATRIZ%20DE%20RASTREABILIDADE/Documento_Matriz_de_Rastreabilidade.md)**: Matrizes analíticas cobrindo os 35 Requisitos Funcionais (RF001 a RF035), 8 Requisitos Não-Funcionais (RNF001 a RNF008), 8 Regras de Negócio e cruzamento com a suíte de QA.
-* **[Matriz de Rastreabilidade em PDF para Impressão](docs/MATRIZ%20DE%20RASTREABILIDADE/Documento_Matriz_de_Rastreabilidade.pdf)**: Versão em alta fidelidade tipográfica (699 KB) formatada para a banca examinadora do Trabalho de Graduação.
+* **[Matriz de Rastreabilidade em PDF para Impressão](docs/MATRIZ%20DE%20RASTREABILIDADE/Documento_Matriz_de_Rastreabilidade.pdf)**: Versão em alta fidelidade tipográfica formatada para a banca examinadora do Trabalho de Graduação.
 * **[Layout Interativo em HTML5](docs/MATRIZ%20DE%20RASTREABILIDADE/Documento_Matriz_de_Rastreabilidade.html)**: Visualização estruturada com métricas executivas de cobertura (100% de cobertura de requisitos, 0 requisitos órfãos, 0 código órfão).
 
 ---
@@ -86,7 +107,7 @@ Para fins de auditoria da banca avaliadora, as regras de negócio cruciais descr
 ---
 
 ## 🧪 Garantia da Qualidade (QA)
-A integridade dos cálculos, validadores de domínio (anti-XSS em links STL, dígitos verificadores de CPF/CNPJ) e isolamento multi-tenant é assegurada por suíte automatizada de testes com **xUnit** e **FluentValidation**:
+A integridade dos cálculos, validadores de domínio (anti-XSS em links STL, dígitos verificadores de CPF/CNPJ) e isolamento multi-tenant é assegurada por suíte automatizada de **95 testes** com **xUnit** e **FluentValidation**:
 ```powershell
 dotnet test tests/LucroImpresso.Tests/LucroImpresso.Tests.csproj
 ```

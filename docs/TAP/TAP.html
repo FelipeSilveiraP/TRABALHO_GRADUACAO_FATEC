@@ -64,8 +64,10 @@
       width: 100%;
       border-collapse: collapse;
       margin: 12px 0 18px 0;
-      page-break-inside: avoid;
       border: 1.5px solid #1e293b;
+    }
+    tr {
+      page-break-inside: avoid;
       font-size: 9.5pt;
     }
     th, td {
@@ -105,14 +107,15 @@
     <h1>Termo de Abertura do Projeto (TAP)</h1>
     <div style="font-size: 11pt; color: #2563eb; font-weight: 600;">Sistema Especializado de Gestão de Custos, Controle de Estoque e Precificação para Manufatura Aditiva (Impressão 3D)</div>
     <div style="margin-top: 8px; font-size: 9.5pt; border-top: 1px solid #cbd5e1; padding-top: 8px;">
-      <strong>Projeto:</strong> LucroImpresso &bull; <strong>Trabalho de Graduação (TG):</strong> FATEC &bull; <strong>Aluno:</strong> Felipe Silveira Pessoa
+      <strong>Projeto:</strong> LucroImpresso &bull; <strong>Trabalho de Graduação (TG):</strong> Fatec Franca “Dr. Thomaz Novelino” &bull; <strong>Aluno:</strong> Felipe Silveira Pessoa
     </div>
   </div>
   <p><strong>Curso:</strong> Curso Superior de Tecnologia em Análise e Desenvolvimento de Sistemas</p>
   <p><strong>Aluno / Gerente do Projeto:</strong> Felipe Silveira Pessoa</p>
-  <p><strong>Orientador:</strong> [Nome do Orientador]</p>
-  <p><strong>Versão:</strong> 3.0 (Alinhada à implementação final entregue)</p>
-  <p><strong>Data:</strong> 25 de Setembro de 2026</p>
+  <p><strong>Orientador:</strong> Prof. Leonardo</p>
+  <p><strong>Natureza do Projeto:</strong> Acadêmica, sem fins lucrativos</p>
+  <p><strong>Versão:</strong> 3.1 (Alinhada à implementação final entregue)</p>
+  <p><strong>Data:</strong> 11 de Novembro de 2026</p>
   <p><strong>Localidade:</strong> Franca - SP</p>
   <h2>1. Justificativa do Projeto</h2>
   <p>O setor de manufatura aditiva (impressão 3D) no Brasil apresenta crescimento acelerado, porém sofre com elevado índice de mortalidade empresarial precoce. A principal causa é a <strong>precificação amadora</strong> baseada em estimativas intuitivas ("chutômetro"), na qual os empreendedores multiplicam o peso do plástico por uma constante arbitrária, ignorando despesas críticas como:</p>
@@ -123,7 +126,7 @@
   <p>O <strong>LucroImpresso</strong> foi concebido para resolver esse problema fornecendo uma ferramenta científica de custeio cruzado para o empreendedor maker.</p>
   <h2>2. Objetivos do Projeto</h2>
   <h3>2.1 Objetivo Geral</h3>
-  <p>Desenvolver e entregar um sistema web completo de gestão de custos, controle de estoque e precificação científica para oficinas de impressão 3D, utilizando arquitetura corporativa moderna e stack 100% open-source.</p>
+  <p>Desenvolver, como Trabalho de Graduação sem fins lucrativos, um sistema web completo de gestão de custos, controle de estoque e precificação científica para oficinas de impressão 3D, utilizando arquitetura moderna e ferramentas 100% gratuitas e open-source.</p>
   <h3>2.2 Objetivos Específicos</h3>
   <p>1. Implementar um motor de precificação que calcule custos reais por grama (filamentos) e por mililitro (insumos de acabamento);</p>
   <p>2. Automatizar o cálculo de consumo energético com base na potência da impressora (Watts), tempo de impressão e tarifa de kWh;</p>
@@ -143,62 +146,62 @@
     <tbody>
     <tr>
       <td>1</td>
-      <td><strong>Autenticação e Segurança<strong></td>
+      <td><strong>Autenticação e Segurança</strong></td>
       <td>Login/Cadastro com Cookies seguros, BCrypt, recuperação por e-mail com token de 30 min (armazenado como hash), Rate Limiting, sanitização XSS.</td>
     </tr>
     <tr>
       <td>2</td>
-      <td><strong>Gestão de Matérias-Primas<strong></td>
+      <td><strong>Gestão de Matérias-Primas</strong></td>
       <td>CRUD de filamentos e resinas com cálculo automático de custo por grama (RN001).</td>
     </tr>
     <tr>
       <td>3</td>
-      <td><strong>Insumos de Acabamento<strong></td>
+      <td><strong>Insumos de Acabamento</strong></td>
       <td>CRUD de tintas, primers, vernizes e solventes com precificação por mL (RN002).</td>
     </tr>
     <tr>
       <td>4</td>
-      <td><strong>Parque de Máquinas e Energia<strong></td>
+      <td><strong>Parque de Máquinas e Energia</strong></td>
       <td>CRUD de impressoras 3D com potência (Watts) e tarifa de kWh. Cálculo de energia (RN003).</td>
     </tr>
     <tr>
       <td>5</td>
-      <td><strong>Gestão de Clientes<strong></td>
+      <td><strong>Gestão de Clientes</strong></td>
       <td>Cadastro PF/PJ com herança disjunta, validação de CPF/CNPJ e endereço completo.</td>
     </tr>
     <tr>
       <td>6</td>
-      <td><strong>Catálogo de Peças 3D<strong></td>
+      <td><strong>Catálogo de Peças 3D</strong></td>
       <td>Repositório de modelos recorrentes com links STL sanitizados (anti-XSS).</td>
     </tr>
     <tr>
       <td>7</td>
-      <td><strong>Motor de Precificação<strong></td>
+      <td><strong>Motor de Precificação</strong></td>
       <td>Formulário de orçamentos com custos diretos discriminados e margem de lucro real.</td>
     </tr>
     <tr>
       <td>8</td>
-      <td><strong>Fila de Produção<strong></td>
+      <td><strong>Fila de Produção</strong></td>
       <td>Gestão de ciclo de vida com baixa de estoque em Concluído/Falha (RN004).</td>
     </tr>
     <tr>
       <td>9</td>
-      <td><strong>Dashboard e Cofre Histórico<strong></td>
+      <td><strong>Dashboard e Cofre Histórico</strong></td>
       <td>KPIs em tempo real, Background Job de expurgo de 180 dias (RN006), cofre perpétuo (RN007).</td>
     </tr>
     <tr>
       <td>10</td>
-      <td><strong>Documentação de Engenharia<strong></td>
-      <td>EAP, Diagramas UML, Matriz de Rastreabilidade (ISO 29148), Portabilidade (ISO 25010), Proposta Comercial (APF).</td>
+      <td><strong>Documentação de Engenharia</strong></td>
+      <td>EAP, Diagramas UML, Matriz de Rastreabilidade (ISO 29148), Portabilidade (ISO 25010), Estimativa de Esforço por Pontos de Função (APF — exercício acadêmico).</td>
     </tr>
     <tr>
       <td>11</td>
-      <td><strong>Suíte de Testes (QA)<strong></td>
+      <td><strong>Suíte de Testes (QA)</strong></td>
       <td>95 testes unitários e de integração em xUnit cobrindo validadores, máquina de estados e segurança.</td>
     </tr>
     <tr>
       <td>12</td>
-      <td><strong>Conteinerização Docker<strong></td>
+      <td><strong>Conteinerização Docker</strong></td>
       <td>Dockerfile multi-estágio e docker-compose.yml para implantação com 1 comando.</td>
     </tr>
     </tbody>
@@ -207,7 +210,8 @@
   <ul><li>Comunicação direta com impressoras via USB/Serial (Marlin/Klipper);</li></ul>
   <ul><li>Emissão fiscal automatizada (NF-e / NFS-e);</li></ul>
   <ul><li>Gateways de pagamento (PIX API, cartão);</li></ul>
-  <ul><li>Aplicativo mobile nativo (Google Play / App Store).</li></ul>
+  <ul><li>Aplicativo mobile nativo (Google Play / App Store);</li></ul>
+  <ul><li>Comercialização, hospedagem paga ou suporte comercial do sistema (projeto acadêmico sem fins lucrativos).</li></ul>
   <h2>4. Stack Tecnológica Implementada</h2>
   <table>
     <thead><tr>
@@ -217,77 +221,77 @@
     </tr></thead>
     <tbody>
     <tr>
-      <td><strong>Runtime<strong></td>
+      <td><strong>Runtime</strong></td>
       <td>.NET</td>
       <td>9.0</td>
     </tr>
     <tr>
-      <td><strong>Linguagem<strong></td>
+      <td><strong>Linguagem</strong></td>
       <td>C#</td>
       <td>13</td>
     </tr>
     <tr>
-      <td><strong>Framework Web<strong></td>
+      <td><strong>Framework Web</strong></td>
       <td>ASP.NET Core Blazor Interactive Server</td>
       <td>9.0</td>
     </tr>
     <tr>
-      <td><strong>ORM<strong></td>
+      <td><strong>ORM</strong></td>
       <td>Entity Framework Core (Code-First)</td>
       <td>9.0</td>
     </tr>
     <tr>
-      <td><strong>Banco de Dados<strong></td>
+      <td><strong>Banco de Dados</strong></td>
       <td>MariaDB (via Pomelo MariaDB Driver)</td>
       <td>10.11 LTS</td>
     </tr>
     <tr>
-      <td><strong>Validação<strong></td>
+      <td><strong>Validação</strong></td>
       <td>FluentValidation</td>
       <td>12.x</td>
     </tr>
     <tr>
-      <td><strong>Hashing<strong></td>
+      <td><strong>Hashing</strong></td>
       <td>BCrypt.Net-Next</td>
       <td>4.1.0</td>
     </tr>
     <tr>
-      <td><strong>E-mail<strong></td>
+      <td><strong>E-mail</strong></td>
       <td>MailKit</td>
       <td>4.17.0</td>
     </tr>
     <tr>
-      <td><strong>Sanitização<strong></td>
+      <td><strong>Sanitização</strong></td>
       <td>HtmlSanitizer (Ganss.Xss)</td>
       <td>9.x</td>
     </tr>
     <tr>
-      <td><strong>Logging<strong></td>
+      <td><strong>Logging</strong></td>
       <td>Serilog</td>
       <td>10.x</td>
     </tr>
     <tr>
-      <td><strong>Segurança HTTP<strong></td>
+      <td><strong>Segurança HTTP</strong></td>
       <td>NetEscapades.AspNetCore.SecurityHeaders</td>
       <td>1.3.1</td>
     </tr>
     <tr>
-      <td><strong>Testes<strong></td>
+      <td><strong>Testes</strong></td>
       <td>xUnit + FluentValidation</td>
       <td>—</td>
     </tr>
     <tr>
-      <td><strong>Contêineres<strong></td>
+      <td><strong>Contêineres</strong></td>
       <td>Docker + Docker Compose</td>
       <td>—</td>
     </tr>
     <tr>
-      <td><strong>Estilização<strong></td>
+      <td><strong>Estilização</strong></td>
       <td>Bootstrap 5 + CSS3 Vanilla (Neo-Brutalismo)</td>
       <td>5.3</td>
     </tr>
     <tr>
-      <td><strong>Servidor Web<strong></td>
+      <td><strong>Servidor Web</strong></td>
       <td>Kestrel (embutido no .NET)</td>
       <td>9.0</td>
     </tr>
@@ -302,27 +306,27 @@
     </tr></thead>
     <tbody>
     <tr>
-      <td><strong>Requisitos Funcionais<strong></td>
+      <td><strong>Requisitos Funcionais</strong></td>
       <td>35</td>
       <td>RF001 a RF035</td>
     </tr>
     <tr>
-      <td><strong>Requisitos Não-Funcionais<strong></td>
+      <td><strong>Requisitos Não-Funcionais</strong></td>
       <td>8</td>
       <td>RNF001 a RNF008</td>
     </tr>
     <tr>
-      <td><strong>Regras de Negócio<strong></td>
+      <td><strong>Regras de Negócio</strong></td>
       <td>8</td>
       <td>RN001 a RN008</td>
     </tr>
     <tr>
-      <td><strong>Casos de Uso<strong></td>
+      <td><strong>Casos de Uso</strong></td>
       <td>28</td>
       <td>UC01 a UC28</td>
     </tr>
     <tr>
-      <td><strong>Testes Automatizados<strong></td>
+      <td><strong>Testes Automatizados</strong></td>
       <td>95</td>
       <td>4 classes xUnit</td>
     </tr>
@@ -336,45 +340,45 @@
     </tr></thead>
     <tbody>
     <tr>
-      <td><strong>RN001<strong></td>
+      <td><strong>RN001</strong></td>
       <td>Custo do material calculado por grama (Preço / Peso).</td>
     </tr>
     <tr>
-      <td><strong>RN002<strong></td>
+      <td><strong>RN002</strong></td>
       <td>Insumos de acabamento precificados por mililitro (Preço / Volume).</td>
     </tr>
     <tr>
-      <td><strong>RN003<strong></td>
+      <td><strong>RN003</strong></td>
       <td>Energia elétrica = (Watts / 1000) × Horas × Tarifa kWh.</td>
     </tr>
     <tr>
-      <td><strong>RN004<strong></td>
+      <td><strong>RN004</strong></td>
       <td>Baixa física de estoque restrita a transição para "Concluído" ou "Falha".</td>
     </tr>
     <tr>
-      <td><strong>RN005<strong></td>
+      <td><strong>RN005</strong></td>
       <td>Exclusões e desfechos críticos exigem confirmação explícita em modal.</td>
     </tr>
     <tr>
-      <td><strong>RN006<strong></td>
+      <td><strong>RN006</strong></td>
       <td>Expurgo automático diário de orçamentos inativos há mais de 180 dias.</td>
     </tr>
     <tr>
-      <td><strong>RN007<strong></td>
+      <td><strong>RN007</strong></td>
       <td>Preservação contábil perpétua no cofre acumulador <code>HistoricoFinanceiro</code>.</td>
     </tr>
     <tr>
-      <td><strong>RN008<strong></td>
+      <td><strong>RN008</strong></td>
       <td>Isolamento Multi-Tenant estrito (Anti-IDOR) por <code>UsuarioId</code>.</td>
     </tr>
     </tbody>
   </table>
   <h2>6. Premissas</h2>
-  <p>1. O ambiente de desenvolvimento e produção utiliza .NET 9 SDK e MariaDB 10.11;</p>
-  <p>2. O servidor de produção opera em Debian Linux com MariaDB instalado localmente;</p>
+  <p>1. O ambiente de desenvolvimento utiliza .NET 9 SDK e MariaDB 10.11;</p>
+  <p>2. O sistema é executado localmente, com o MariaDB instalado no Debian Linux (WSL) do computador do aluno, sem servidor ou hospedagem paga;</p>
   <p>3. Os dados de peso (g) e tempo de impressão (HH:MM) são informados pelo operador a partir do software fatiador (Cura, PrusaSlicer, Bambu Studio);</p>
   <p>4. O sistema não se conecta diretamente às impressoras 3D;</p>
-  <p>5. O custo de licenciamento de software é R$ 0,00 (stack 100% open-source).</p>
+  <p>5. O projeto não gera custos: todas as ferramentas são gratuitas/open-source, o equipamento utilizado é pessoal e já existente e o desenvolvimento é realizado pelo próprio aluno, sem remuneração.</p>
   <h2>7. Restrições</h2>
   <p>1. O sistema opera exclusivamente como aplicação web acessível por navegador moderno com suporte a WebSockets (SignalR);</p>
   <p>2. A baixa de estoque usa o peso (g) e o volume (mL) estimados no orçamento — não há pesagem do consumo real após a impressão;</p>
@@ -393,10 +397,10 @@
     <tbody>
     <tr>
       <td>1</td>
-      <td>Indisponibilidade do servidor MariaDB no Debian</td>
+      <td>Indisponibilidade do MariaDB local (Debian/WSL)</td>
       <td>Baixa</td>
       <td>Alto</td>
-      <td>Docker Compose como backup; documentação de restauração.</td>
+      <td>Backup do banco (<code>mariadb-dump</code>); Docker Compose como alternativa de execução.</td>
     </tr>
     <tr>
       <td>2</td>
@@ -422,39 +426,28 @@
     </tbody>
   </table>
   <h2>9. Cronograma de Marcos</h2>
-  <p>```mermaid</p>
-  <p>gantt</p>
-  <p>title Cronograma de Entrega por Marcos</p>
-  <p>dateFormat  YYYY-MM-DD</p>
-  <p>section Marco 1 (40%)</p>
-  <p>Arquitetura, MariaDB e Cadastros Base :done, m1, 2026-02-01, 2026-02-28</p>
-  <p>section Marco 2 (30%)</p>
-  <p>Motor de Custos, Acabamentos e Produção :done, m2, 2026-03-01, 2026-03-31</p>
-  <p>section Marco 3 (30%)</p>
-  <p>Dashboard, QA (95 Testes) e Documentação :done, m3, 2026-04-01, 2026-04-30</p>
-  <p>```</p>
   <table>
     <thead><tr>
       <th>Marco</th>
       <th>Entregáveis</th>
-      <th>Percentual</th>
+      <th>Peso no Escopo</th>
       <th>Status</th>
     </tr></thead>
     <tbody>
     <tr>
-      <td><strong>Marco 1<strong></td>
+      <td><strong>Marco 1</strong></td>
       <td>Arquitetura .NET 9 / EF Core, MariaDB, cadastros de Materiais, Máquinas e Clientes</td>
       <td>40%</td>
       <td>✅ Concluído</td>
     </tr>
     <tr>
-      <td><strong>Marco 2<strong></td>
+      <td><strong>Marco 2</strong></td>
       <td>Motor de Precificação, módulo de Acabamentos (mL), Fila de Produção com baixa de estoque</td>
       <td>30%</td>
       <td>✅ Concluído</td>
     </tr>
     <tr>
-      <td><strong>Marco 3<strong></td>
+      <td><strong>Marco 3</strong></td>
       <td>Dashboard analítico, Background Job (expurgo 180 dias), suíte de 95 testes, Docker, documentação</td>
       <td>30%</td>
       <td>✅ Concluído</td>
@@ -462,34 +455,36 @@
     </tbody>
   </table>
   <h2>10. Orçamento e Investimento</h2>
+  <p>O LucroImpresso é um <strong>projeto acadêmico sem fins lucrativos</strong>. Não houve gasto financeiro em nenhuma etapa:</p>
   <table>
     <thead><tr>
-      <th>Parâmetro</th>
-      <th>Valor</th>
+      <th>Item</th>
+      <th>Custo</th>
     </tr></thead>
     <tbody>
     <tr>
-      <td><strong>Horas Técnicas (APF)<strong></td>
-      <td>222,48 h</td>
-    </tr>
-    <tr>
-      <td><strong>Valor da Hora Técnica<strong></td>
-      <td>R$ 20,00</td>
-    </tr>
-    <tr>
-      <td><strong>Investimento Total (Preço Fixo)<strong></td>
-      <td><strong>R$ 4.449,60<strong></td>
-    </tr>
-    <tr>
-      <td><strong>Custo de Licenciamento<strong></td>
+      <td><strong>Desenvolvimento (horas do próprio aluno, sem remuneração)</strong></td>
       <td>R$ 0,00</td>
     </tr>
     <tr>
-      <td><strong>Custo de Infraestrutura (Protótipo)<strong></td>
+      <td><strong>Licenças de Software (.NET, MariaDB, Visual Studio Code e bibliotecas open-source)</strong></td>
       <td>R$ 0,00</td>
+    </tr>
+    <tr>
+      <td><strong>Infraestrutura (execução local, sem hospedagem ou nuvem)</strong></td>
+      <td>R$ 0,00</td>
+    </tr>
+    <tr>
+      <td><strong>Equipamentos (computador pessoal já existente)</strong></td>
+      <td>R$ 0,00</td>
+    </tr>
+    <tr>
+      <td><strong>Custo Total do Projeto</strong></td>
+      <td><strong>R$ 0,00</strong></td>
     </tr>
     </tbody>
   </table>
+  <p><em>A estimativa por Pontos de Função (222,48 h × R$ 20,00/h = R$ 4.449,60) presente no documento de Proposta Comercial é um <strong>exercício acadêmico de métricas de software (APF)</strong>. Ela não representa valor cobrado, recebido ou gasto.</em></p>
   <h2>11. Partes Interessadas (Stakeholders)</h2>
   <table>
     <thead><tr>
@@ -499,23 +494,23 @@
     </tr></thead>
     <tbody>
     <tr>
-      <td><strong>Felipe Silveira Pessoa<strong></td>
+      <td><strong>Felipe Silveira Pessoa</strong></td>
       <td>Aluno / Engenheiro de Software</td>
       <td>Desenvolvimento, testes, documentação e apresentação do TG.</td>
     </tr>
     <tr>
-      <td><strong>[Nome do Orientador]<strong></td>
+      <td><strong>Prof. Leonardo</strong></td>
       <td>Orientador Acadêmico</td>
       <td>Orientação técnica e metodológica durante o desenvolvimento.</td>
     </tr>
     <tr>
-      <td><strong>Banca Examinadora (FATEC)<strong></td>
+      <td><strong>Banca Examinadora (FATEC)</strong></td>
       <td>Avaliadores</td>
       <td>Avaliação formal do sistema, documentação e defesa do TG.</td>
     </tr>
     <tr>
-      <td><strong>Empreendedores Makers<strong></td>
-      <td>Usuários Finais</td>
+      <td><strong>Empreendedores Makers</strong></td>
+      <td>Público-alvo (usuários finais)</td>
       <td>Utilização do sistema para precificação e gestão de custos.</td>
     </tr>
     </tbody>
@@ -525,9 +520,9 @@
   <p>2. Todas as 8 Regras de Negócio (RN001 a RN008) aplicadas e rastreáveis no código-fonte;</p>
   <p>3. Suíte de 95 testes automatizados aprovados com 0 falhas (<code>dotnet test</code>);</p>
   <p>4. Sistema executável via <code>dotnet run</code> (bare-metal) ou <code>docker compose up -d</code> (contêiner);</p>
-  <p>5. Documentação de engenharia completa: EAP, Máquina de Estados, Portabilidade (ISO 25010), Matriz de Rastreabilidade (ISO 29148), Proposta Comercial (APF);</p>
+  <p>5. Documentação de engenharia completa: EAP, Máquina de Estados, Portabilidade (ISO 25010), Matriz de Rastreabilidade (ISO 29148), Estimativa APF (exercício acadêmico);</p>
   <p>6. Isolamento Multi-Tenant (Anti-IDOR) validado por testes automatizados;</p>
-  <p>7. Custo total de licenciamento de software: R$ 0,00.</p>
+  <p>7. Custo total do projeto: R$ 0,00 (projeto acadêmico sem fins lucrativos).</p>
   <h2>13. Aprovação</h2>
   <table>
     <thead><tr>
@@ -538,14 +533,14 @@
     </tr></thead>
     <tbody>
     <tr>
-      <td><strong>Aluno / Gerente do Projeto<strong></td>
+      <td><strong>Aluno / Gerente do Projeto</strong></td>
       <td>Felipe Silveira Pessoa</td>
       <td>__________________________</td>
       <td>___/___/2026</td>
     </tr>
     <tr>
-      <td><strong>Orientador Acadêmico<strong></td>
-      <td>[Nome do Orientador]</td>
+      <td><strong>Orientador Acadêmico</strong></td>
+      <td>Prof. Leonardo</td>
       <td>__________________________</td>
       <td>___/___/2026</td>
     </tr>

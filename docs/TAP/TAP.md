@@ -1,12 +1,13 @@
 # Termo de Abertura do Projeto (TAP) — Sistema LucroImpresso
 
 **Projeto:** LucroImpresso — Sistema Especializado de Gestão de Custos, Controle de Estoque e Precificação para Manufatura Aditiva (Impressão 3D)  
-**Trabalho de Graduação (TG):** Faculdade de Tecnologia do Estado de São Paulo (FATEC)  
+**Trabalho de Graduação (TG):** Faculdade de Tecnologia de Franca “Dr. Thomaz Novelino” (Fatec Franca — Centro Paula Souza)  
 **Curso:** Curso Superior de Tecnologia em Análise e Desenvolvimento de Sistemas  
 **Aluno / Gerente do Projeto:** Felipe Silveira Pessoa  
-**Orientador:** [Nome do Orientador]  
-**Versão:** 3.0 (Alinhada à implementação final entregue)  
-**Data:** 25 de Setembro de 2026  
+**Orientador:** Prof. Leonardo  
+**Natureza do Projeto:** Acadêmica, sem fins lucrativos  
+**Versão:** 3.1 (Alinhada à implementação final entregue)  
+**Data:** 11 de Novembro de 2026  
 **Localidade:** Franca - SP  
 
 ---
@@ -27,7 +28,7 @@ O **LucroImpresso** foi concebido para resolver esse problema fornecendo uma fer
 ## 2. Objetivos do Projeto
 
 ### 2.1 Objetivo Geral
-Desenvolver e entregar um sistema web completo de gestão de custos, controle de estoque e precificação científica para oficinas de impressão 3D, utilizando arquitetura corporativa moderna e stack 100% open-source.
+Desenvolver, como Trabalho de Graduação sem fins lucrativos, um sistema web completo de gestão de custos, controle de estoque e precificação científica para oficinas de impressão 3D, utilizando arquitetura moderna e ferramentas 100% gratuitas e open-source.
 
 ### 2.2 Objetivos Específicos
 1. Implementar um motor de precificação que calcule custos reais por grama (filamentos) e por mililitro (insumos de acabamento);
@@ -55,7 +56,7 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 | 7 | **Motor de Precificação** | Formulário de orçamentos com custos diretos discriminados e margem de lucro real. |
 | 8 | **Fila de Produção** | Gestão de ciclo de vida com baixa de estoque em Concluído/Falha (RN004). |
 | 9 | **Dashboard e Cofre Histórico** | KPIs em tempo real, Background Job de expurgo de 180 dias (RN006), cofre perpétuo (RN007). |
-| 10 | **Documentação de Engenharia** | EAP, Diagramas UML, Matriz de Rastreabilidade (ISO 29148), Portabilidade (ISO 25010), Proposta Comercial (APF). |
+| 10 | **Documentação de Engenharia** | EAP, Diagramas UML, Matriz de Rastreabilidade (ISO 29148), Portabilidade (ISO 25010), Estimativa de Esforço por Pontos de Função (APF — exercício acadêmico). |
 | 11 | **Suíte de Testes (QA)** | 95 testes unitários e de integração em xUnit cobrindo validadores, máquina de estados e segurança. |
 | 12 | **Conteinerização Docker** | Dockerfile multi-estágio e docker-compose.yml para implantação com 1 comando. |
 
@@ -63,7 +64,8 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 - Comunicação direta com impressoras via USB/Serial (Marlin/Klipper);
 - Emissão fiscal automatizada (NF-e / NFS-e);
 - Gateways de pagamento (PIX API, cartão);
-- Aplicativo mobile nativo (Google Play / App Store).
+- Aplicativo mobile nativo (Google Play / App Store);
+- Comercialização, hospedagem paga ou suporte comercial do sistema (projeto acadêmico sem fins lucrativos).
 
 ---
 
@@ -116,11 +118,11 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 
 ## 6. Premissas
 
-1. O ambiente de desenvolvimento e produção utiliza .NET 9 SDK e MariaDB 10.11;
-2. O servidor de produção opera em Debian Linux com MariaDB instalado localmente;
+1. O ambiente de desenvolvimento utiliza .NET 9 SDK e MariaDB 10.11;
+2. O sistema é executado localmente, com o MariaDB instalado no Debian Linux (WSL) do computador do aluno, sem servidor ou hospedagem paga;
 3. Os dados de peso (g) e tempo de impressão (HH:MM) são informados pelo operador a partir do software fatiador (Cura, PrusaSlicer, Bambu Studio);
 4. O sistema não se conecta diretamente às impressoras 3D;
-5. O custo de licenciamento de software é R$ 0,00 (stack 100% open-source).
+5. O projeto não gera custos: todas as ferramentas são gratuitas/open-source, o equipamento utilizado é pessoal e já existente e o desenvolvimento é realizado pelo próprio aluno, sem remuneração.
 
 ---
 
@@ -138,7 +140,7 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 
 | # | Risco | Probabilidade | Impacto | Mitigação |
 | :---: | :--- | :---: | :---: | :--- |
-| 1 | Indisponibilidade do servidor MariaDB no Debian | Baixa | Alto | Docker Compose como backup; documentação de restauração. |
+| 1 | Indisponibilidade do MariaDB local (Debian/WSL) | Baixa | Alto | Backup do banco (`mariadb-dump`); Docker Compose como alternativa de execução. |
 | 2 | Perda de dados por expurgo indevido | Baixa | Alto | Cofre `HistoricoFinanceiro` preserva totais contábeis antes do expurgo. |
 | 3 | Inconsistência na baixa de estoque entre material e acabamentos | Baixa | Médio | Baixa em transação única (`OrcamentoRepository.FinalizarProducaoAsync`) com clamp em zero e transições validadas pela `OrcamentoStateMachine`. |
 | 4 | Atraso no cronograma acadêmico | Média | Alto | Metodologia iterativa com marcos de entrega parciais. |
@@ -151,15 +153,15 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 gantt
     title Cronograma de Entrega por Marcos
     dateFormat  YYYY-MM-DD
-    section Marco 1 (40%)
+    section Marco 1
     Arquitetura, MariaDB e Cadastros Base :done, m1, 2026-02-01, 2026-02-28
-    section Marco 2 (30%)
+    section Marco 2
     Motor de Custos, Acabamentos e Produção :done, m2, 2026-03-01, 2026-03-31
-    section Marco 3 (30%)
+    section Marco 3
     Dashboard, QA (95 Testes) e Documentação :done, m3, 2026-04-01, 2026-04-30
 ```
 
-| Marco | Entregáveis | Percentual | Status |
+| Marco | Entregáveis | Peso no Escopo | Status |
 | :---: | :--- | :---: | :---: |
 | **Marco 1** | Arquitetura .NET 9 / EF Core, MariaDB, cadastros de Materiais, Máquinas e Clientes | 40% | ✅ Concluído |
 | **Marco 2** | Motor de Precificação, módulo de Acabamentos (mL), Fila de Produção com baixa de estoque | 30% | ✅ Concluído |
@@ -169,13 +171,17 @@ gantt
 
 ## 10. Orçamento e Investimento
 
-| Parâmetro | Valor |
+O LucroImpresso é um **projeto acadêmico sem fins lucrativos**. Não houve gasto financeiro em nenhuma etapa:
+
+| Item | Custo |
 | :--- | :---: |
-| **Horas Técnicas (APF)** | 222,48 h |
-| **Valor da Hora Técnica** | R$ 20,00 |
-| **Investimento Total (Preço Fixo)** | **R$ 4.449,60** |
-| **Custo de Licenciamento** | R$ 0,00 |
-| **Custo de Infraestrutura (Protótipo)** | R$ 0,00 |
+| **Desenvolvimento (horas do próprio aluno, sem remuneração)** | R$ 0,00 |
+| **Licenças de Software (.NET, MariaDB, Visual Studio Code e bibliotecas open-source)** | R$ 0,00 |
+| **Infraestrutura (execução local, sem hospedagem ou nuvem)** | R$ 0,00 |
+| **Equipamentos (computador pessoal já existente)** | R$ 0,00 |
+| **Custo Total do Projeto** | **R$ 0,00** |
+
+> A estimativa por Pontos de Função (222,48 h × R$ 20,00/h = R$ 4.449,60) presente no documento de Proposta Comercial é um **exercício acadêmico de métricas de software (APF)**. Ela não representa valor cobrado, recebido ou gasto.
 
 ---
 
@@ -184,9 +190,9 @@ gantt
 | Stakeholder | Papel | Responsabilidade |
 | :--- | :--- | :--- |
 | **Felipe Silveira Pessoa** | Aluno / Engenheiro de Software | Desenvolvimento, testes, documentação e apresentação do TG. |
-| **[Nome do Orientador]** | Orientador Acadêmico | Orientação técnica e metodológica durante o desenvolvimento. |
+| **Prof. Leonardo** | Orientador Acadêmico | Orientação técnica e metodológica durante o desenvolvimento. |
 | **Banca Examinadora (FATEC)** | Avaliadores | Avaliação formal do sistema, documentação e defesa do TG. |
-| **Empreendedores Makers** | Usuários Finais | Utilização do sistema para precificação e gestão de custos. |
+| **Empreendedores Makers** | Público-alvo (usuários finais) | Utilização do sistema para precificação e gestão de custos. |
 
 ---
 
@@ -196,9 +202,9 @@ gantt
 2. Todas as 8 Regras de Negócio (RN001 a RN008) aplicadas e rastreáveis no código-fonte;
 3. Suíte de 95 testes automatizados aprovados com 0 falhas (`dotnet test`);
 4. Sistema executável via `dotnet run` (bare-metal) ou `docker compose up -d` (contêiner);
-5. Documentação de engenharia completa: EAP, Máquina de Estados, Portabilidade (ISO 25010), Matriz de Rastreabilidade (ISO 29148), Proposta Comercial (APF);
+5. Documentação de engenharia completa: EAP, Máquina de Estados, Portabilidade (ISO 25010), Matriz de Rastreabilidade (ISO 29148), Estimativa APF (exercício acadêmico);
 6. Isolamento Multi-Tenant (Anti-IDOR) validado por testes automatizados;
-7. Custo total de licenciamento de software: R$ 0,00.
+7. Custo total do projeto: R$ 0,00 (projeto acadêmico sem fins lucrativos).
 
 ---
 
@@ -207,4 +213,4 @@ gantt
 | Papel | Nome | Assinatura | Data |
 | :--- | :--- | :--- | :---: |
 | **Aluno / Gerente do Projeto** | Felipe Silveira Pessoa | __________________________ | ___/___/2026 |
-| **Orientador Acadêmico** | [Nome do Orientador] | __________________________ | ___/___/2026 |
+| **Orientador Acadêmico** | Prof. Leonardo | __________________________ | ___/___/2026 |
