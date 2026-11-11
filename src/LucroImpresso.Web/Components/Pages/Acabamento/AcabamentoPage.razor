@@ -31,6 +31,14 @@
         </div>
     }
 
+    @if (!string.IsNullOrEmpty(mensagemExclusao))
+    {
+        <div class="alert alert-danger mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">error</span>
+            @mensagemExclusao
+        </div>
+    }
+
     <!-- Topo: Master-Detail Form Neo-Brutalista -->
     <div class="bg-white brutal-border p-4 p-md-5 mb-5 brutal-shadow-lg">
         <div class="d-flex align-items-center justify-content-between pb-3 border-bottom brutal-border-b mb-4">
@@ -80,7 +88,7 @@
                     <div class="input-group">
                         <input type="text" 
                                class="form-control" 
-                               placeholder="Ex: 1" 
+                               placeholder="Ex: 1,00" 
                                oninput="window.masks.weightUnit(this)"
                                @onchange="UpdatePeso"
                                value="@pesoFormatted"
@@ -94,7 +102,7 @@
                     <div class="input-group">
                         <input type="text" 
                                class="form-control" 
-                               placeholder="Ex: 850" 
+                               placeholder="Ex: 850,00" 
                                oninput="window.masks.weightUnit(this)"
                                @onchange="UpdateSaldo"
                                value="@saldoFormatted"
@@ -254,6 +262,7 @@
 </div>
 
 @code {
+    private string? mensagemExclusao;
     private List<Acabamento> acabamentos = new();
     private Acabamento formularioAcabamento = new();
     private bool erroCarregamento = false;
@@ -325,6 +334,7 @@
             carregando = true;
             if (modoEdicao && formularioAcabamento.Id > 0)
             {
+                formularioAcabamento.UsuarioId = usuarioId;
                 await AcabamentoRepo.UpdateAsync(formularioAcabamento);
             }
             else
@@ -370,8 +380,8 @@
             DataCadastro = a.DataCadastro
         };
         pesoFormatted = a.PesoLitros.ToString("N2");
-        saldoFormatted = a.SaldoMililitros.ToString("N0");
-        valorPagoFormatted = a.ValorPago.ToString("C2");
+        saldoFormatted = a.SaldoMililitros.ToString("N2");
+        valorPagoFormatted = a.ValorPago.ToString("N2");
         modoEdicao = true;
     }
 
@@ -389,7 +399,16 @@
         bool confirmado = await JS.InvokeAsync<bool>("confirm", "Você deseja realmente deletar esse registro?");
         if (confirmado)
         {
-            await AcabamentoRepo.DeleteAsync(id, usuarioId);
+            mensagemExclusao = null;
+            try
+            {
+                await AcabamentoRepo.DeleteAsync(id, usuarioId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Insumo em uso por orçamentos (FK RESTRICT): exibe aviso em vez de derrubar a tela
+                mensagemExclusao = ex.Message;
+            }
             await CarregarAcabamentos();
             StateHasChanged();
         }

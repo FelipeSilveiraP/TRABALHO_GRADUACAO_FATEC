@@ -5,7 +5,7 @@ namespace LucroImpresso.Web.Services
     /// <summary>
     /// Serviço de Domínio responsável por gerenciar e governar o Ciclo de Vida e a Máquina de Estados
     /// da entidade Orcamento / Ordem de Produção no LucroImpresso, aplicando as Regras de Negócio
-    /// (RN001 a RN009) para transições válidas, condições de guarda e efeitos colaterais de estoque.
+    /// (RN001 a RN008) para transições válidas, condições de guarda e efeitos colaterais de estoque.
     /// </summary>
     public class OrcamentoStateMachine
     {
@@ -38,7 +38,7 @@ namespace LucroImpresso.Web.Services
         }
 
         /// <summary>
-        /// Indica se a transição de estado exige confirmação explícita em tela do usuário (RN006).
+        /// Indica se a transição de estado exige confirmação explícita em tela do usuário (RN005).
         /// </summary>
         public bool ExigeConfirmacaoExplicita(StatusOrcamento novoStatus)
         {
@@ -46,7 +46,7 @@ namespace LucroImpresso.Web.Services
         }
 
         /// <summary>
-        /// Indica se a transição para o novo status dispara o gatilho de dedução atômica no estoque físico (RN005).
+        /// Indica se a transição para o novo status dispara o gatilho de dedução atômica no estoque físico (RN004).
         /// </summary>
         public bool DisparaBaixaEstoque(StatusOrcamento novoStatus)
         {
@@ -70,7 +70,7 @@ namespace LucroImpresso.Web.Services
         }
 
         /// <summary>
-        /// Executa a transição do orçamento para Concluído com sucesso (RN003, RN005).
+        /// Executa a transição do orçamento para Concluído com sucesso (RN004).
         /// Aplica a baixa física de matéria-prima (g) e de insumos de acabamento (mL).
         /// </summary>
         public void TransitarParaConcluido(Orcamento orcamento, Material? material, IEnumerable<OrcamentoAcabamento>? acabamentos)
@@ -82,14 +82,14 @@ namespace LucroImpresso.Web.Services
                 throw new InvalidOperationException($"Transição inválida: Não é possível concluir um orçamento em status '{orcamento.Status}'.");
             }
 
-            // RN005: Gatilho de Baixa Física de Estoque de Material
+            // RN004: Gatilho de Baixa Física de Estoque de Material
             if (material != null)
             {
-                material.SaldoGramas -= (decimal)orcamento.PesoGramas;
+                material.SaldoGramas -= orcamento.PesoGramas;
                 if (material.SaldoGramas < 0) material.SaldoGramas = 0;
             }
 
-            // RN005: Gatilho de Baixa Física de Estoque de Insumos de Acabamento (mL)
+            // RN004: Gatilho de Baixa Física de Estoque de Insumos de Acabamento (mL)
             if (acabamentos != null)
             {
                 foreach (var oa in acabamentos)
@@ -106,7 +106,7 @@ namespace LucroImpresso.Web.Services
         }
 
         /// <summary>
-        /// Executa a transição do orçamento para Falha de Impressão ("Espaguete") (RN005).
+        /// Executa a transição do orçamento para Falha de Impressão ("Espaguete") (RN004).
         /// Aplica a dedução dos materiais desperdiçados no sinistro.
         /// </summary>
         public void TransitarParaFalha(Orcamento orcamento, Material? material, IEnumerable<OrcamentoAcabamento>? acabamentos)
@@ -118,10 +118,10 @@ namespace LucroImpresso.Web.Services
                 throw new InvalidOperationException($"Transição inválida: Não é possível registrar falha em um orçamento com status '{orcamento.Status}'.");
             }
 
-            // RN005: Baixa de perda física no estoque
+            // RN004: Baixa de perda física no estoque
             if (material != null)
             {
-                material.SaldoGramas -= (decimal)orcamento.PesoGramas;
+                material.SaldoGramas -= orcamento.PesoGramas;
                 if (material.SaldoGramas < 0) material.SaldoGramas = 0;
             }
 
@@ -141,7 +141,7 @@ namespace LucroImpresso.Web.Services
         }
 
         /// <summary>
-        /// Avalia se um orçamento está elegível para a rotina diária de expurgo por tempo de inatividade (RN007).
+        /// Avalia se um orçamento está elegível para a rotina diária de expurgo por tempo de inatividade (RN006).
         /// </summary>
         public bool PodeSerExpurgado(Orcamento orcamento, int diasLimite = 180)
         {

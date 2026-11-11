@@ -31,6 +31,14 @@
         </div>
     }
 
+    @if (!string.IsNullOrEmpty(mensagemExclusao))
+    {
+        <div class="alert alert-danger mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">error</span>
+            @mensagemExclusao
+        </div>
+    }
+
     <!-- Topo: Master-Detail Form Neo-Brutalista -->
     <div class="bg-white brutal-border p-4 p-md-5 mb-5 brutal-shadow-lg">
         <div class="d-flex align-items-center justify-content-between pb-3 border-bottom brutal-border-b mb-4">
@@ -62,7 +70,7 @@
                         <input type="text" 
                                class="form-control" 
                                placeholder="Ex: 350" 
-                               oninput="window.masks.weightUnit(this)"
+                               oninput="window.masks.weight(this)"
                                @onchange="UpdatePotencia"
                                value="@potenciaFormatted"
                                maxlength="7" />
@@ -181,6 +189,7 @@
 </div>
 
 @code {
+    private string? mensagemExclusao;
     private List<Maquina> maquinas = new();
     private Maquina formularioMaquina = new();
     private bool erroCarregamento = false;
@@ -234,6 +243,7 @@
             carregando = true;
             if (modoEdicao && formularioMaquina.Id > 0)
             {
+                formularioMaquina.UsuarioId = usuarioId;
                 await MaquinaRepo.UpdateAsync(formularioMaquina);
             }
             else
@@ -272,7 +282,7 @@
             DataCadastro = maq.DataCadastro
         };
         potenciaFormatted = maq.ConsumoWatts.ToString("N0");
-        kwhFormatted = maq.CustoKwh.ToString("C2");
+        kwhFormatted = maq.CustoKwh.ToString("N2");
         modoEdicao = true;
     }
 
@@ -289,7 +299,16 @@
         bool confirmado = await JS.InvokeAsync<bool>("confirm", "Você deseja realmente deletar esse registro?");
         if (confirmado)
         {
-            await MaquinaRepo.DeleteAsync(id, usuarioId);
+            mensagemExclusao = null;
+            try
+            {
+                await MaquinaRepo.DeleteAsync(id, usuarioId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Máquina em uso por orçamentos (FK RESTRICT): exibe aviso em vez de derrubar a tela
+                mensagemExclusao = ex.Message;
+            }
             await CarregarMaquinas();
             StateHasChanged();
         }

@@ -35,11 +35,9 @@ namespace LucroImpresso.Web.Repositories
         public async Task UpdateAsync(Material material)
         {
             _context.ChangeTracker.Clear();
-            var existente = await _context.Materiais.AsNoTracking().FirstOrDefaultAsync(m => m.Id == material.Id);
-            if (existente == null) return;
-
-            // Segurança Multi-Tenant (Anti-IDOR): Preserva o tenant proprietário do registro
-            material.UsuarioId = existente.UsuarioId;
+            // Segurança Multi-Tenant (Anti-IDOR): só atualiza se o registro pertencer ao usuário logado
+            var pertenceAoUsuario = await _context.Materiais.AsNoTracking().AnyAsync(m => m.Id == material.Id && m.UsuarioId == material.UsuarioId);
+            if (!pertenceAoUsuario) return;
             _context.Materiais.Update(material);
             await _context.SaveChangesAsync();
         }
@@ -50,6 +48,9 @@ namespace LucroImpresso.Web.Repositories
 
             var material = await _context.Materiais
                 .FirstOrDefaultAsync(m => m.Id == id && m.UsuarioId == usuarioId);
+
+            if (material != null && await _context.Orcamentos.AnyAsync(o => o.MaterialId == id && o.UsuarioId == usuarioId))
+                throw new InvalidOperationException("Este material está vinculado a orçamentos e não pode ser excluído. Exclua os orçamentos que o utilizam primeiro.");
 
             if (material != null)
             {

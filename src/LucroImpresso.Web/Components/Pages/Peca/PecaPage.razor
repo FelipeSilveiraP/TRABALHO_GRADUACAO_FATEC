@@ -236,6 +236,7 @@
         {
             if (modoEdicao && formularioPeca.Id > 0)
             {
+                formularioPeca.UsuarioId = usuarioId;
                 await PecaRepo.UpdateAsync(formularioPeca);
                 mensagemSucesso = "Peça atualizada com sucesso!";
             }
@@ -286,7 +287,17 @@
         bool confirmado = await JS.InvokeAsync<bool>("confirm", "Você deseja realmente excluir esta peça?");
         if (confirmado)
         {
-            await PecaRepo.DeleteAsync(id, usuarioId);
+            mensagemErro = null;
+            mensagemSucesso = null;
+            try
+            {
+                await PecaRepo.DeleteAsync(id, usuarioId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Peça em uso por orçamentos (FK RESTRICT): exibe aviso em vez de derrubar a tela
+                mensagemErro = ex.Message;
+            }
             await CarregarPecas();
             StateHasChanged();
         }

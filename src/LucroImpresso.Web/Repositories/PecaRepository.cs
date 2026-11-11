@@ -35,11 +35,9 @@ namespace LucroImpresso.Web.Repositories
         public async Task UpdateAsync(Peca peca)
         {
             _context.ChangeTracker.Clear();
-            var existente = await _context.Pecas.AsNoTracking().FirstOrDefaultAsync(p => p.Id == peca.Id);
-            if (existente == null) return;
-
-            // Segurança Multi-Tenant (Anti-IDOR): Preserva o tenant proprietário do registro
-            peca.UsuarioId = existente.UsuarioId;
+            // Segurança Multi-Tenant (Anti-IDOR): só atualiza se o registro pertencer ao usuário logado
+            var pertenceAoUsuario = await _context.Pecas.AsNoTracking().AnyAsync(p => p.Id == peca.Id && p.UsuarioId == peca.UsuarioId);
+            if (!pertenceAoUsuario) return;
             _context.Pecas.Update(peca);
             await _context.SaveChangesAsync();
         }
@@ -49,6 +47,9 @@ namespace LucroImpresso.Web.Repositories
             _context.ChangeTracker.Clear();
             var peca = await _context.Pecas
                 .FirstOrDefaultAsync(p => p.Id == id && p.UsuarioId == usuarioId);
+
+            if (peca != null && await _context.Orcamentos.AnyAsync(o => o.PecaId == id && o.UsuarioId == usuarioId))
+                throw new InvalidOperationException("Esta peça está vinculada a orçamentos e não pode ser excluída. Exclua os orçamentos que a utilizam primeiro.");
 
             if (peca != null)
             {

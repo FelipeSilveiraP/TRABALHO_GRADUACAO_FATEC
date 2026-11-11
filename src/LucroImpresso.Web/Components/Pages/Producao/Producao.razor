@@ -5,8 +5,7 @@
 @using LucroImpresso.Web.Interfaces
 @using LucroImpresso.Web.Services
 @inject IOrcamentoRepository OrcamentoRepo
-@inject IMaterialRepository MaterialRepo
-@inject IAcabamentoRepository AcabamentoRepo
+@inject OrcamentoStateMachine StateMachine
 @inject UsuarioContextService UsuarioCtx
 @inject NavigationManager Nav
 @inject IJSRuntime JS
@@ -187,7 +186,14 @@
                                                     INICIAR IMPRESSÃO
                                                 </button>
                                             }
-                                            @if (p.Status == StatusOrcamento.EmImpressao || p.Status == StatusOrcamento.Pendente)
+                                            @if (p.Status == StatusOrcamento.Falha && StateMachine.PodeTransitar(p.Status, StatusOrcamento.EmImpressao))
+                                            {
+                                                <button class="btn btn-blue btn-sm w-100" @onclick="() => MudarStatus(p, StatusOrcamento.EmImpressao)">
+                                                    <span class="material-symbols-outlined fs-6">replay</span>
+                                                    REIMPRIMIR
+                                                </button>
+                                            }
+                                            @if (StateMachine.PodeTransitar(p.Status, StatusOrcamento.Concluido) && p.Status != StatusOrcamento.Concluido)
                                             {
                                                 <div class="d-flex gap-2 w-100">
                                                     <button class="btn btn-yellow btn-sm flex-grow-1" @onclick="() => FinalizarProducao(p, true)">
@@ -291,8 +297,14 @@
 
     private async Task MudarStatus(Orcamento p, StatusOrcamento novoStatus)
     {
-        p.Status = novoStatus;
-        await OrcamentoRepo.UpdateAsync(p);
+        mensagemFeedback = null;
+
+        // Única transição sem baixa de estoque: Pendente/Falha → EmImpressao
+        if (novoStatus != StatusOrcamento.EmImpressao) return;
+
+        var (ok, erro) = await OrcamentoRepo.IniciarImpressaoAsync(p.Id, usuarioId);
+        if (!ok) mensagemFeedback = erro;
+
         await CarregarFila();
     }
 
@@ -310,29 +322,15 @@
         bool confirmado = await JS.InvokeAsync<bool>("confirm", msgConfirmacao);
         if (!confirmado) return;
 
-        // RN003: BAIXA DE ESTOQUE MATERIAL E ACABAMENTO
-        if (p.Material != null)
+        // RN004: baixa de estoque (material + acabamentos) e mudança de status
+        // feitas pela Máquina de Estados em uma única transação no banco.
+        var (ok, erro) = await OrcamentoRepo.FinalizarProducaoAsync(p.Id, usuarioId, sucesso);
+        if (!ok)
         {
-            p.Material.SaldoGramas -= (decimal)p.PesoGramas;
-            if (p.Material.SaldoGramas < 0) p.Material.SaldoGramas = 0;
-            await MaterialRepo.UpdateAsync(p.Material);
+            mensagemFeedback = erro;
+            await CarregarFila();
+            return;
         }
-
-        if (p.OrcamentoAcabamentos != null && p.OrcamentoAcabamentos.Any())
-        {
-            foreach(var oa in p.OrcamentoAcabamentos)
-            {
-                if (oa.Acabamento != null)
-                {
-                    oa.Acabamento.SaldoMililitros -= oa.QuantidadeMl;
-                    if (oa.Acabamento.SaldoMililitros < 0) oa.Acabamento.SaldoMililitros = 0;
-                    await AcabamentoRepo.UpdateAsync(oa.Acabamento);
-                }
-            }
-        }
-
-        p.Status = sucesso ? StatusOrcamento.Concluido : StatusOrcamento.Falha;
-        await OrcamentoRepo.UpdateAsync(p);
 
         mensagemFeedback = sucesso
             ? $"Impressão concluída. {p.PesoGramas.ToString("N2")}g debitadas do estoque com sucesso!"

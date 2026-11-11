@@ -13,6 +13,7 @@
 @inject IAcabamentoRepository AcabamentoRepo
 @inject IUsuarioRepository UsuarioRepo
 @inject UsuarioContextService UsuarioCtx
+@inject OrcamentoStateMachine StateMachine
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 @rendermode InteractiveServer
@@ -229,10 +230,12 @@
                 <div class="col-md-6 col-12">
                     <label class="form-label text-dark">Status Inicial</label>
                     <InputSelect @bind-Value="orcamento.Status" class="form-select fw-bold">
-                        <option value="@StatusOrcamento.Pendente">🟡 PENDENTE</option>
-                        <option value="@StatusOrcamento.EmImpressao">🔵 IMPRIMINDO</option>
-                        <option value="@StatusOrcamento.Concluido">🟢 CONCLUÍDO</option>
-                        <option value="@StatusOrcamento.Falha">🔴 FALHA</option>
+                        @* Somente estados permitidos pela Máquina de Estados. Concluído/Falha
+                           são registrados na Linha de Produção (com baixa de estoque). *@
+                        @foreach (var st in StatusPermitidosNoFormulario)
+                        {
+                            <option value="@st">@RotuloStatus(st)</option>
+                        }
                     </InputSelect>
                 </div>
 
@@ -379,6 +382,23 @@
     private ElementReference tempoPinturaInputRef;
     private ElementReference maoDeObraInputRef;
 
+    private StatusOrcamento statusOriginal = StatusOrcamento.Pendente;
+
+    private IEnumerable<StatusOrcamento> StatusPermitidosNoFormulario =>
+        new[] { statusOriginal }
+            .Concat(StateMachine.ObterProximosStatusValidos(statusOriginal)
+                .Where(s => !StateMachine.DisparaBaixaEstoque(s)))
+            .Distinct();
+
+    private static string RotuloStatus(StatusOrcamento status) => status switch
+    {
+        StatusOrcamento.Pendente => "🟡 PENDENTE",
+        StatusOrcamento.EmImpressao => "🔵 IMPRIMINDO",
+        StatusOrcamento.Concluido => "🟢 CONCLUÍDO",
+        StatusOrcamento.Falha => "🔴 FALHA",
+        _ => status.ToString()
+    };
+
     private string FormatarHorasMinutos(decimal horas)
     {
         int totalMinutos = (int)Math.Round(horas * 60m);
@@ -419,7 +439,7 @@
         if (!string.IsNullOrEmpty(pesoStr))
         {
             var clean = pesoStr.Replace(".", "").Replace(",", ".").Trim();
-            if (double.TryParse(clean, System.Globalization.CultureInfo.InvariantCulture, out double peso))
+            if (decimal.TryParse(clean, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out decimal peso))
                 orcamento.PesoGramas = peso;
         }
 
@@ -523,6 +543,7 @@
                     return;
                 }
                 orcamento = target;
+                statusOriginal = target.Status;
                 orcamento.Material = materiais.FirstOrDefault(m => m.Id == orcamento.MaterialId);
                 orcamento.Maquina = maquinas.FirstOrDefault(m => m.Id == orcamento.MaquinaId);
                 orcamentoAcabamentosTemp = orcamento.OrcamentoAcabamentos.ToList();
@@ -592,16 +613,10 @@
 
         var material = materiais.FirstOrDefault(m => m.Id == orcamento.MaterialId);
 
-        if (material != null && (decimal)orcamento.PesoGramas > material.SaldoGramas)
+        if (material != null && orcamento.PesoGramas > material.SaldoGramas)
         {
             alertaEstoque = "Erro: Material insuficiente. O saldo atual é de " + material.SaldoGramas.ToString("N2") + "g.";
             return;
-        }
-
-        if (orcamento.Status == StatusOrcamento.Concluido)
-        {
-            bool confirmado = await JS.InvokeAsync<bool>("confirm", "Você quer realmente Concluir aquela peça? Após isso a edição não ficará mais disponível.");
-            if (!confirmado) return;
         }
 
         // Valida saldos de acabamentos e associa
@@ -623,14 +638,23 @@
         orcamento.OrcamentoAcabamentos = acabamentosValidos;
         orcamento.UsuarioId = usuarioId;
 
-        if (Id.HasValue)
+        try
         {
-            await OrcamentoRepo.UpdateAsync(orcamento);
+            if (Id.HasValue)
+            {
+                await OrcamentoRepo.UpdateAsync(orcamento);
+            }
+            else
+            {
+                orcamento.DataCriacao = DateTime.UtcNow;
+                await OrcamentoRepo.AddAsync(orcamento);
+            }
         }
-        else
+        catch (InvalidOperationException ex)
         {
-            orcamento.DataCriacao = DateTime.UtcNow;
-            await OrcamentoRepo.AddAsync(orcamento);
+            // Regras de negócio violadas (máquina de estados / multi-tenant) — exibidas no alerta existente
+            alertaEstoque = ex.Message;
+            return;
         }
 
         Nav.NavigateTo("/producao");

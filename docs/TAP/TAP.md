@@ -36,7 +36,7 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 4. Executar baixa física atômica de estoque (gramas e mL) no encerramento de produção;
 5. Preservar histórico contábil perpétuo via cofre acumulador (`HistoricoFinanceiro`);
 6. Garantir isolamento Multi-Tenant estrito (Anti-IDOR) por `UsuarioId`;
-7. Validar a integridade do sistema com suíte de 82 testes automatizados (xUnit).
+7. Validar a integridade do sistema com suíte de 95 testes automatizados (xUnit).
 
 ---
 
@@ -46,7 +46,7 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 
 | # | Módulo / Entregável | Descrição |
 | :---: | :--- | :--- |
-| 1 | **Autenticação e Segurança** | Login/Cadastro com Cookies seguros, BCrypt, recuperação por e-mail com token de 2h, Rate Limiting, sanitização XSS. |
+| 1 | **Autenticação e Segurança** | Login/Cadastro com Cookies seguros, BCrypt, recuperação por e-mail com token de 30 min (armazenado como hash), Rate Limiting, sanitização XSS. |
 | 2 | **Gestão de Matérias-Primas** | CRUD de filamentos e resinas com cálculo automático de custo por grama (RN001). |
 | 3 | **Insumos de Acabamento** | CRUD de tintas, primers, vernizes e solventes com precificação por mL (RN002). |
 | 4 | **Parque de Máquinas e Energia** | CRUD de impressoras 3D com potência (Watts) e tarifa de kWh. Cálculo de energia (RN003). |
@@ -56,7 +56,7 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 | 8 | **Fila de Produção** | Gestão de ciclo de vida com baixa de estoque em Concluído/Falha (RN004). |
 | 9 | **Dashboard e Cofre Histórico** | KPIs em tempo real, Background Job de expurgo de 180 dias (RN006), cofre perpétuo (RN007). |
 | 10 | **Documentação de Engenharia** | EAP, Diagramas UML, Matriz de Rastreabilidade (ISO 29148), Portabilidade (ISO 25010), Proposta Comercial (APF). |
-| 11 | **Suíte de Testes (QA)** | 82 testes unitários e de integração em xUnit cobrindo validadores, máquina de estados e segurança. |
+| 11 | **Suíte de Testes (QA)** | 95 testes unitários e de integração em xUnit cobrindo validadores, máquina de estados e segurança. |
 | 12 | **Conteinerização Docker** | Dockerfile multi-estágio e docker-compose.yml para implantação com 1 comando. |
 
 ### 3.2 Exclusões de Escopo (Out-of-Scope)
@@ -97,7 +97,7 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 | **Requisitos Não-Funcionais** | 8 | RNF001 a RNF008 |
 | **Regras de Negócio** | 8 | RN001 a RN008 |
 | **Casos de Uso** | 28 | UC01 a UC28 |
-| **Testes Automatizados** | 82 | 4 classes xUnit |
+| **Testes Automatizados** | 95 | 4 classes xUnit |
 
 ### 5.1 Regras de Negócio Implementadas
 
@@ -127,9 +127,9 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 ## 7. Restrições
 
 1. O sistema opera exclusivamente como aplicação web acessível por navegador moderno com suporte a WebSockets (SignalR);
-2. A baixa de estoque é executada na camada de visão (`Producao.razor`), não em transação de banco de dados;
+2. A baixa de estoque usa o peso (g) e o volume (mL) estimados no orçamento — não há pesagem do consumo real após a impressão;
 3. O expurgo automático apaga orçamentos pela data de criação, independentemente do status;
-4. O `UpdateAsync` do repositório de orçamentos não filtra por `UsuarioId` na busca (proteção parcial Anti-IDOR);
+4. O saldo de estoque não é reservado na criação do orçamento: dois orçamentos pendentes podem contar com o mesmo material até que um deles seja concluído;
 5. O prazo de entrega está vinculado ao calendário acadêmico da FATEC.
 
 ---
@@ -140,7 +140,7 @@ Desenvolver e entregar um sistema web completo de gestão de custos, controle de
 | :---: | :--- | :---: | :---: | :--- |
 | 1 | Indisponibilidade do servidor MariaDB no Debian | Baixa | Alto | Docker Compose como backup; documentação de restauração. |
 | 2 | Perda de dados por expurgo indevido | Baixa | Alto | Cofre `HistoricoFinanceiro` preserva totais contábeis antes do expurgo. |
-| 3 | Falha na baixa de estoque (operações não transacionais) | Média | Médio | Limitação documentada; baixa executada item a item com clamp em zero. |
+| 3 | Inconsistência na baixa de estoque entre material e acabamentos | Baixa | Médio | Baixa em transação única (`OrcamentoRepository.FinalizarProducaoAsync`) com clamp em zero e transições validadas pela `OrcamentoStateMachine`. |
 | 4 | Atraso no cronograma acadêmico | Média | Alto | Metodologia iterativa com marcos de entrega parciais. |
 
 ---
@@ -156,14 +156,14 @@ gantt
     section Marco 2 (30%)
     Motor de Custos, Acabamentos e Produção :done, m2, 2026-03-01, 2026-03-31
     section Marco 3 (30%)
-    Dashboard, QA (82 Testes) e Documentação :done, m3, 2026-04-01, 2026-04-30
+    Dashboard, QA (95 Testes) e Documentação :done, m3, 2026-04-01, 2026-04-30
 ```
 
 | Marco | Entregáveis | Percentual | Status |
 | :---: | :--- | :---: | :---: |
 | **Marco 1** | Arquitetura .NET 9 / EF Core, MariaDB, cadastros de Materiais, Máquinas e Clientes | 40% | ✅ Concluído |
 | **Marco 2** | Motor de Precificação, módulo de Acabamentos (mL), Fila de Produção com baixa de estoque | 30% | ✅ Concluído |
-| **Marco 3** | Dashboard analítico, Background Job (expurgo 180 dias), suíte de 82 testes, Docker, documentação | 30% | ✅ Concluído |
+| **Marco 3** | Dashboard analítico, Background Job (expurgo 180 dias), suíte de 95 testes, Docker, documentação | 30% | ✅ Concluído |
 
 ---
 
@@ -194,7 +194,7 @@ gantt
 
 1. Todos os 35 Requisitos Funcionais (RF001 a RF035) implementados e operacionais;
 2. Todas as 8 Regras de Negócio (RN001 a RN008) aplicadas e rastreáveis no código-fonte;
-3. Suíte de 82 testes automatizados aprovados com 0 falhas (`dotnet test`);
+3. Suíte de 95 testes automatizados aprovados com 0 falhas (`dotnet test`);
 4. Sistema executável via `dotnet run` (bare-metal) ou `docker compose up -d` (contêiner);
 5. Documentação de engenharia completa: EAP, Máquina de Estados, Portabilidade (ISO 25010), Matriz de Rastreabilidade (ISO 29148), Proposta Comercial (APF);
 6. Isolamento Multi-Tenant (Anti-IDOR) validado por testes automatizados;

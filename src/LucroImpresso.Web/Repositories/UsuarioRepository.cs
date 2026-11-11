@@ -58,9 +58,22 @@ namespace LucroImpresso.Web.Repositories
         public async Task CriarUsuarioPadraoAsync()
         {
             var admin = await _context.Usuarios.FirstOrDefaultAsync(u => u.NomeUsuario == "admin");
-            // SEGURANÇA V3: Senha lida de configuração (appsettings.json, que NÃO é versionado).
-            // Nunca mais hardcoded no código-fonte.
-            var senhaAdmin = _configuration["AdminSettings:SenhaPadrao"] ?? "Admin@LucroImpresso#2026!";
+            // SEGURANÇA V3: Senha lida EXCLUSIVAMENTE da configuração (appsettings.json, que NÃO é versionado).
+            // Sem fallback hardcoded: se a chave não existir, o admin padrão não é criado/alterado.
+            var senhaAdmin = _configuration["AdminSettings:SenhaPadrao"];
+            if (string.IsNullOrWhiteSpace(senhaAdmin))
+            {
+                if (admin == null)
+                    _logger.LogWarning("AdminSettings:SenhaPadrao não configurada — usuário admin padrão não foi criado. Use a tela de cadastro ou configure a chave no appsettings.json.");
+                return;
+            }
+
+            if (ValidarForcaSenhaStatic(senhaAdmin) is { } erroSenhaAdmin)
+            {
+                _logger.LogWarning("AdminSettings:SenhaPadrao ignorada por não atender à política de senha: {Erro}", erroSenhaAdmin);
+                return;
+            }
+
             string hashSenhaForte = BCrypt.Net.BCrypt.HashPassword(senhaAdmin);
 
             if (admin == null)
@@ -254,6 +267,13 @@ namespace LucroImpresso.Web.Repositories
         // ══════════════════════════════════════════════════════════════════
         //  RECUPERAÇÃO DE SENHA (OWASP ANTI-ENUMERAÇÃO + TOKENS CRIPTOGRÁFICOS)
         // ══════════════════════════════════════════════════════════════════
+        /// <summary>
+        /// Hash SHA-256 (hex minúsculo) do token de recuperação. Se o banco vazar,
+        /// os tokens armazenados não podem ser usados para redefinir senhas.
+        /// </summary>
+        public static string HashToken(string token) =>
+            Convert.ToHexString(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(token))).ToLower();
+
         public async Task<(bool Sucesso, string? Token, string? NomeUsuario)> GerarTokenRecuperacaoAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -274,7 +294,8 @@ namespace LucroImpresso.Web.Repositories
             RandomNumberGenerator.Fill(bytesAleatorios);
             string token = Convert.ToHexString(bytesAleatorios).ToLower();
 
-            usuario.TokenRedefinicaoSenha = token;
+            // O banco guarda apenas o hash SHA-256 do token; o token puro só existe no link enviado por e-mail.
+            usuario.TokenRedefinicaoSenha = HashToken(token);
             usuario.TokenRedefinicaoExpiracao = DateTime.UtcNow.AddMinutes(30);
 
             _context.Usuarios.Update(usuario);
@@ -289,9 +310,9 @@ namespace LucroImpresso.Web.Repositories
             if (string.IsNullOrWhiteSpace(token))
                 return null;
 
-            var tokenSanitizado = token.Trim().ToLower();
+            var tokenHash = HashToken(token.Trim().ToLower());
             var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.TokenRedefinicaoSenha == tokenSanitizado);
+                .FirstOrDefaultAsync(u => u.TokenRedefinicaoSenha == tokenHash);
 
             if (usuario == null)
                 return null;

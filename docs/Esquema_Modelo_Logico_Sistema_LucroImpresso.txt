@@ -17,7 +17,7 @@ Endereco (*id_endereco, fk_usuario, fk_cliente, logradouro, numero, bairro, cida
 	fk_usuario referencia Usuario
 	fk_cliente referencia Cliente
 
-Cliente (*id_cliente, fk_usuario, data_cadastro, telefone_unico)
+Cliente (*id_cliente, fk_usuario, data_cadastro, celular_unico)
 	fk_usuario referencia Usuario
 
 Pessoa_Fisica (*fk_cliente, fk_usuario, cpf, nome)

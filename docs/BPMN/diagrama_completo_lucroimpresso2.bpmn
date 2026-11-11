@@ -79,7 +79,7 @@
       <bpmn:outgoing>Flow_0bckvhs</bpmn:outgoing>
       <bpmn:outgoing>Flow_0bgnpc9</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:task id="Activity_1slcdx0" name="Atualiza para Rejeitado">
+    <bpmn:task id="Activity_1slcdx0" name="Exclui orçamento">
       <bpmn:incoming>Flow_1dnj8t3</bpmn:incoming>
       <bpmn:outgoing>Flow_0bslf7z</bpmn:outgoing>
     </bpmn:task>

@@ -32,6 +32,30 @@ namespace LucroImpresso.Tests
         }
 
         [Fact]
+        public void TransitarParaConcluido_DePendente_DeveLancarExcecaoSemBaixarEstoque()
+        {
+            // Linha de Produção: não é possível concluir sem antes iniciar a impressão
+            var material = new Material { SaldoGramas = 500 };
+            var orcamento = new Orcamento { Status = StatusOrcamento.Pendente, PesoGramas = 100 };
+
+            Assert.Throws<InvalidOperationException>(() =>
+                _stateMachine.TransitarParaConcluido(orcamento, material, null));
+
+            Assert.Equal(StatusOrcamento.Pendente, orcamento.Status);
+            Assert.Equal(500, material.SaldoGramas);
+        }
+
+        [Fact]
+        public void TransitarParaImpressao_DeFalha_DevePermitirReimpressao()
+        {
+            var orcamento = new Orcamento { Status = StatusOrcamento.Falha };
+
+            _stateMachine.TransitarParaImpressao(orcamento);
+
+            Assert.Equal(StatusOrcamento.EmImpressao, orcamento.Status);
+        }
+
+        [Fact]
         public void TransitarParaImpressao_DePendente_DeveAlterarStatusComSucesso()
         {
             var orcamento = new Orcamento { Status = StatusOrcamento.Pendente };
@@ -111,7 +135,7 @@ namespace LucroImpresso.Tests
         [InlineData(StatusOrcamento.Falha, true)]
         [InlineData(StatusOrcamento.Pendente, false)]
         [InlineData(StatusOrcamento.EmImpressao, false)]
-        public void ExigeConfirmacaoExplicita_StatusCriticos_DeveValidarRN006(StatusOrcamento status, bool esperado)
+        public void ExigeConfirmacaoExplicita_StatusCriticos_DeveValidarRN005(StatusOrcamento status, bool esperado)
         {
             Assert.Equal(esperado, _stateMachine.ExigeConfirmacaoExplicita(status));
             Assert.Equal(esperado, _stateMachine.DisparaBaixaEstoque(status));

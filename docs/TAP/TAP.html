@@ -131,7 +131,7 @@
   <p>4. Executar baixa física atômica de estoque (gramas e mL) no encerramento de produção;</p>
   <p>5. Preservar histórico contábil perpétuo via cofre acumulador (<code>HistoricoFinanceiro</code>);</p>
   <p>6. Garantir isolamento Multi-Tenant estrito (Anti-IDOR) por <code>UsuarioId</code>;</p>
-  <p>7. Validar a integridade do sistema com suíte de 82 testes automatizados (xUnit).</p>
+  <p>7. Validar a integridade do sistema com suíte de 95 testes automatizados (xUnit).</p>
   <h2>3. Escopo do Projeto</h2>
   <h3>3.1 Entregas Inclusas (In-Scope)</h3>
   <table>
@@ -144,7 +144,7 @@
     <tr>
       <td>1</td>
       <td><strong>Autenticação e Segurança<strong></td>
-      <td>Login/Cadastro com Cookies seguros, BCrypt, recuperação por e-mail com token de 2h, Rate Limiting, sanitização XSS.</td>
+      <td>Login/Cadastro com Cookies seguros, BCrypt, recuperação por e-mail com token de 30 min (armazenado como hash), Rate Limiting, sanitização XSS.</td>
     </tr>
     <tr>
       <td>2</td>
@@ -194,7 +194,7 @@
     <tr>
       <td>11</td>
       <td><strong>Suíte de Testes (QA)<strong></td>
-      <td>82 testes unitários e de integração em xUnit cobrindo validadores, máquina de estados e segurança.</td>
+      <td>95 testes unitários e de integração em xUnit cobrindo validadores, máquina de estados e segurança.</td>
     </tr>
     <tr>
       <td>12</td>
@@ -323,7 +323,7 @@
     </tr>
     <tr>
       <td><strong>Testes Automatizados<strong></td>
-      <td>82</td>
+      <td>95</td>
       <td>4 classes xUnit</td>
     </tr>
     </tbody>
@@ -377,9 +377,9 @@
   <p>5. O custo de licenciamento de software é R$ 0,00 (stack 100% open-source).</p>
   <h2>7. Restrições</h2>
   <p>1. O sistema opera exclusivamente como aplicação web acessível por navegador moderno com suporte a WebSockets (SignalR);</p>
-  <p>2. A baixa de estoque é executada na camada de visão (<code>Producao.razor</code>), não em transação de banco de dados;</p>
+  <p>2. A baixa de estoque usa o peso (g) e o volume (mL) estimados no orçamento — não há pesagem do consumo real após a impressão;</p>
   <p>3. O expurgo automático apaga orçamentos pela data de criação, independentemente do status;</p>
-  <p>4. O <code>UpdateAsync</code> do repositório de orçamentos não filtra por <code>UsuarioId</code> na busca (proteção parcial Anti-IDOR);</p>
+  <p>4. O saldo de estoque não é reservado na criação do orçamento: dois orçamentos pendentes podem contar com o mesmo material até que um deles seja concluído;</p>
   <p>5. O prazo de entrega está vinculado ao calendário acadêmico da FATEC.</p>
   <h2>8. Riscos Identificados</h2>
   <table>
@@ -407,10 +407,10 @@
     </tr>
     <tr>
       <td>3</td>
-      <td>Falha na baixa de estoque (operações não transacionais)</td>
-      <td>Média</td>
+      <td>Inconsistência na baixa de estoque entre material e acabamentos</td>
+      <td>Baixa</td>
       <td>Médio</td>
-      <td>Limitação documentada; baixa executada item a item com clamp em zero.</td>
+      <td>Baixa em transação única (<code>OrcamentoRepository.FinalizarProducaoAsync</code>) com clamp em zero e transições validadas pela <code>OrcamentoStateMachine</code>.</td>
     </tr>
     <tr>
       <td>4</td>
@@ -431,7 +431,7 @@
   <p>section Marco 2 (30%)</p>
   <p>Motor de Custos, Acabamentos e Produção :done, m2, 2026-03-01, 2026-03-31</p>
   <p>section Marco 3 (30%)</p>
-  <p>Dashboard, QA (82 Testes) e Documentação :done, m3, 2026-04-01, 2026-04-30</p>
+  <p>Dashboard, QA (95 Testes) e Documentação :done, m3, 2026-04-01, 2026-04-30</p>
   <p>```</p>
   <table>
     <thead><tr>
@@ -455,7 +455,7 @@
     </tr>
     <tr>
       <td><strong>Marco 3<strong></td>
-      <td>Dashboard analítico, Background Job (expurgo 180 dias), suíte de 82 testes, Docker, documentação</td>
+      <td>Dashboard analítico, Background Job (expurgo 180 dias), suíte de 95 testes, Docker, documentação</td>
       <td>30%</td>
       <td>✅ Concluído</td>
     </tr>
@@ -523,7 +523,7 @@
   <h2>12. Critérios de Aceitação</h2>
   <p>1. Todos os 35 Requisitos Funcionais (RF001 a RF035) implementados e operacionais;</p>
   <p>2. Todas as 8 Regras de Negócio (RN001 a RN008) aplicadas e rastreáveis no código-fonte;</p>
-  <p>3. Suíte de 82 testes automatizados aprovados com 0 falhas (<code>dotnet test</code>);</p>
+  <p>3. Suíte de 95 testes automatizados aprovados com 0 falhas (<code>dotnet test</code>);</p>
   <p>4. Sistema executável via <code>dotnet run</code> (bare-metal) ou <code>docker compose up -d</code> (contêiner);</p>
   <p>5. Documentação de engenharia completa: EAP, Máquina de Estados, Portabilidade (ISO 25010), Matriz de Rastreabilidade (ISO 29148), Proposta Comercial (APF);</p>
   <p>6. Isolamento Multi-Tenant (Anti-IDOR) validado por testes automatizados;</p>

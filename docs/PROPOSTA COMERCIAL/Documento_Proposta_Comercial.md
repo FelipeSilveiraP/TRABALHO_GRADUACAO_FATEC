@@ -20,7 +20,7 @@ O setor de manufatura aditiva no Brasil apresenta rápido crescimento, porém so
 
 O **LucroImpresso** foi concebido e implementado para transformar a gestão financeira das oficinas de impressão 3D, fornecendo um motor científico de custeio cruzado capaz de calcular a margem de lucro real sobre a mão de obra, gerenciar inventário com baixas físicas automatizadas e salvaguardar perpetuamente os registros contábeis.
 
-A solução é entregue com arquitetura corporativa moderna na stack **C# 13 / .NET 9 / ASP.NET Core Blazor Server**, persistência relacional **MariaDB 10.11 / Entity Framework Core 9**, identidade visual **Neo-Brutalista** de alto contraste, conteinerização **Docker** pronta para produção e **82 testes automatizados** de integridade funcional.
+A solução é entregue com arquitetura corporativa moderna na stack **C# 13 / .NET 9 / ASP.NET Core Blazor Server**, persistência relacional **MariaDB 10.11 / Entity Framework Core 9**, identidade visual **Neo-Brutalista** de alto contraste, conteinerização **Docker** pronta para produção e **95 testes automatizados** de integridade funcional.
 
 ---
 
@@ -64,11 +64,11 @@ O escopo do projeto contempla o fornecimento de **9 Módulos Funcionais** operac
 
 | Módulo do Sistema | Código de Requisitos | Entregáveis Técnicos e Funcionalidades Inclusas |
 | :--- | :---: | :--- |
-| **1. Autenticação e Segurança Multi-Tenant** | RF032 a RF035, RNF005, RNF006, RNF007 | * Autenticação via Cookies criptografados e Claims.<br>* Hashing de senhas com algoritmo BCrypt e salt dinâmico.<br>* Recuperação de senha por e-mail com token temporário (expiração em 2 horas).<br>* Isolamento de locatários em nível de banco de dados (`UsuarioId`).<br>* Proteção contra força bruta (Rate Limiting). |
+| **1. Autenticação e Segurança Multi-Tenant** | RF032 a RF035, RNF005, RNF006, RNF007 | * Autenticação via Cookies criptografados e Claims.<br>* Hashing de senhas com algoritmo BCrypt e salt dinâmico.<br>* Recuperação de senha por e-mail com token temporário (expiração em 30 minutos, armazenado como hash).<br>* Isolamento de locatários em nível de banco de dados (`UsuarioId`).<br>* Proteção contra força bruta (Rate Limiting). |
 | **2. Gestão de Matérias-Primas** | RF001, RF003, RF004, RF005, RF006, RN001 | * Cadastro de filamentos (PLA, ABS, PETG, TPU) e resinas fotopolimerizáveis.<br>* Cálculo automático do custo por grama ($\text{R\$} / \text{g}$).<br>* Controle de saldo em gramas com alerta de estoque crítico. |
 | **3. Insumos de Acabamento e Pós-Processamento** | RF002, RF005, RF006, RN002 | * Módulo exclusivo para primers, tintas acrílicas, vernizes protetores e solventes.<br>* Precificação analítica por mililitro ($\text{R\$} / \text{mL}$).<br>* Controle volumétrico de estoque e cálculo de mão de obra de lixamento/pintura. |
 | **4. Parque de Máquinas e Energia** | RF025, RF026, RN003 | * Cadastro de impressoras 3D com potência nominal em Watts e tarifa de kWh.<br>* Cálculo do consumo energético em kWh conforme tarifa da concessionária. |
-| **5. Gestão de Clientes e Validações** | RF021 a RF024, RN008 | * Cadastro de clientes com especialização disjunta (Pessoa Física ou Pessoa Jurídica).<br>* Algoritmos de validação matemática de dígitos verificadores de CPF e CNPJ.<br>* Registro de múltiplos contatos e endereçamento completo. |
+| **5. Gestão de Clientes e Validações** | RF021 a RF024, RN008 | * Cadastro de clientes com especialização disjunta (Pessoa Física ou Pessoa Jurídica).<br>* Algoritmos de validação matemática de dígitos verificadores de CPF e CNPJ.<br>* Registro de celular de contato e endereçamento completo. |
 | **6. Catálogo de Peças 3D e STL** | RF027, RF028, RNF007 | * Repositório interno de modelos impressos com recorrência.<br>* Armazenamento de links de repositórios 3D (Thingiverse, Printables, MakerWorld).<br>* Sanitização estrita anti-XSS em links externos. |
 | **7. Motor de Precificação e Orçamentos** | RF007 a RF014, RN001 a RN003 | * Formulação ágil de orçamentos com custos diretos e indiretos discriminados.<br>* Validação de saldo de materiais e insumos no formulário de orçamento.<br>* Parametrização de margem de lucro real sobre a mão de obra. |
 | **8. Fila de Produção e Baixa de Estoque** | RF015 a RF018, RN004, RN005 | * Gestão do ciclo de vida: Pendente $\rightarrow$ Em Impressão $\rightarrow$ Concluído / Falha.<br>* Baixa física atômica de gramas e mililitros estritamente no encerramento.<br>* Rastreamento de perda operacional decorrente de sinistro de impressão (espaguete). |
@@ -77,7 +77,7 @@ O escopo do projeto contempla o fornecimento de **9 Módulos Funcionais** operac
 ### 3.1. Entregáveis de Engenharia, Infraestrutura e Qualidade
 1. **Design System Neo-Brutalista (RNF002):** Interface responsiva de alto contraste, testada em viewports desde dispositivos móveis compactos (360px) até monitores 4K.
 2. **Conteinerização Universal (RNF008):** `Dockerfile` multi-estágio e arquivo orquestrador `docker-compose.yml` para subida instantânea de banco e aplicação.
-3. **Garantia de Qualidade (QA):** Suíte automatizada em xUnit contendo **82 testes de unidade e integração aprovados** cobrindo regras de negócio, validadores e segurança.
+3. **Garantia de Qualidade (QA):** Suíte automatizada em xUnit contendo **95 testes de unidade e integração aprovados** cobrindo regras de negócio, validadores e segurança.
 4. **Documentação de Engenharia de Software:** EAP (WBS), Diagramas de Máquinas de Estado UML, Especificação de Portabilidade (ISO/IEC 25010), Matriz de Rastreabilidade (ISO/IEC/IEEE 29148) e Manual Operacional.
 
 ---
@@ -138,14 +138,14 @@ gantt
     section Marco 2 (30%)
     Motor de Custos, Acabamentos e Fila de Produção :done, m2, 2026-03-01, 2026-03-31
     section Marco 3 (30%)
-    Dashboard, Background Job, Segurança, QA 82 Testes :done, m3, 2026-04-01, 2026-04-30
+    Dashboard, Background Job, Segurança, QA 95 Testes :done, m3, 2026-04-01, 2026-04-30
 ```
 
 | Marco de Entrega | Descrição dos Entregáveis do Marco | Percentual | Valor Nominal | Condição de Faturamento |
 | :---: | :--- | :---: | :---: | :--- |
 | **Marco 1 (Início)** | Assinatura da proposta, homologação do ambiente de desenvolvimento, arquitetura .NET 9 / EF Core e entrega dos cadastros base (Materiais, Máquinas e Clientes). | **40%** | **R$ 1.779,84** | Na assinatura do contrato e aceite de requisitos. |
 | **Marco 2 (Intermediário)** | Conclusão do Motor de Precificação Científica, módulo de Insumos de Acabamento em mL e controle operacional da Linha de Produção com baixa de estoque. | **30%** | **R$ 1.334,88** | Na apresentação e aprovação do fluxo de orçamentos e produção. |
-| **Marco 3 (Conclusão)** | Painel Dashboard analítico, serviço em background de expurgo e cofre financeiro, conteinerização Docker, aprovação da suíte de 82 testes e implantação final. | **30%** | **R$ 1.334,88** | Na homologação final e entrega do código-fonte e documentação. |
+| **Marco 3 (Conclusão)** | Painel Dashboard analítico, serviço em background de expurgo e cofre financeiro, conteinerização Docker, aprovação da suíte de 95 testes e implantação final. | **30%** | **R$ 1.334,88** | Na homologação final e entrega do código-fonte e documentação. |
 | **TOTAL** | **Escopo Completo Entregue e Validado** | **100%** | **R$ 4.449,60** | **Quitação Integral** |
 
 ---

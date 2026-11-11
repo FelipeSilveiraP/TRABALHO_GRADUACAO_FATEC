@@ -63,6 +63,24 @@ namespace LucroImpresso.Tests
         }
 
         [Fact]
+        public void HashToken_DeveSerDeterministicoEDiferenteDoTokenOriginal()
+        {
+            string token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLower();
+
+            string hash1 = UsuarioRepository.HashToken(token);
+            string hash2 = UsuarioRepository.HashToken(token);
+
+            // Mesmo token → mesmo hash (permite a busca no banco)
+            Assert.Equal(hash1, hash2);
+            // O banco nunca guarda o token puro
+            Assert.NotEqual(token, hash1);
+            // SHA-256 em hexadecimal = 64 caracteres
+            Assert.Equal(64, hash1.Length);
+            // Tokens diferentes → hashes diferentes
+            Assert.NotEqual(hash1, UsuarioRepository.HashToken(token + "x"));
+        }
+
+        [Fact]
         public void GeracaoTokenCriptografico_DeveTerAltaEntropiaEFormatoValido()
         {
             // Arrange & Act

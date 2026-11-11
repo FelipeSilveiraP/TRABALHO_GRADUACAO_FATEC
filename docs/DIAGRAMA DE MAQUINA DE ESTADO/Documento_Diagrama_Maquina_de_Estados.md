@@ -37,6 +37,7 @@ stateDiagram-v2
     }
 
     EmElaboracao --> Pendente : SalvarOrcamento() [Formulário Válido] / Persistir no BD com Status = Pendente
+    EmElaboracao --> EmImpressao : SalvarOrcamento() [Formulário Válido E Status inicial = Imprimindo] / Persistir no BD já na fila de produção
 
     state Pendente {
         [*] --> DisponivelParaEdicao
@@ -93,7 +94,7 @@ stateDiagram-v2
 | :--- | :--- | :--- | :--- |
 | **ST01** | `EmElaboracao` | O usuário está na tela de orçamentos inserindo os parâmetros operacionais ou importando dados do fatiador. | **entry /** Carregar listas relacionais de clientes, peças, impressoras, materiais e insumos de acabamento.<br>**do /** Calcular reativamente custos parciais e preço sugerido.<br>**exit /** Validar integridade via `OrcamentoValidator`. |
 | **ST02** | `Pendente` | Orçamento gravado no banco de dados com chave do locatário (`UsuarioId`). Aguarda decisão comercial ou alocação na oficina. | **entry /** Habilitar edição completa de campos e exclusão.<br>**do /** Permitir ajustes nos parâmetros de custo e margem. |
-| **ST03** | `EmImpressao` | Pedido autorizado e enviado para execução na oficina maker. A impressora 3D selecionada está em processo de fabricação mecânica da peça. | **entry /** Travar alteração de parâmetros de custo para preservar histórico do lote.<br>**do /** Acompanhar tempo decorrido de máquina na fila de produção (`/producao`). |
+| **ST03** | `EmImpressao` | Pedido autorizado e enviado para execução na oficina maker. A impressora 3D selecionada está em processo de fabricação mecânica da peça. | **entry /** Habilitar as ações CONCLUIR e FALHA na Linha de Produção (os parâmetros ainda podem ser corrigidos, sem baixa de estoque).<br>**do /** Acompanhar tempo decorrido de máquina na fila de produção (`/producao`). |
 | **ST04** | `Concluido` | A peça 3D foi impressa com perfeição e o acabamento manual/químico (lixamento, pintura, verniz) foi finalizado com sucesso. | **entry /** Efetuar baixa física atômica de estoque (`RN004`) e disponibilizar valores para apuração de lucro líquido no Dashboard.<br>**do /** Permitir entrega ao cliente e exclusão com preservação contábil. |
 | **ST05** | `Falha` | Ocorreu sinistro irrecuperável durante a impressão 3D (descolamento da mesa aquecida, perda de passos, bico entupido ou formação de "espaguete"). | **entry /** Efetuar baixa física do filamento desperdiçado (`RN004`) e registrar custos elétricos da máquina perdida.<br>**do /** Permitir descarte com salvaguarda contábil ou reinicialização da impressão. |
 | **ST06** | `CofreHistoricoFinanceiro` | Estado terminal contábil no qual os valores de faturamento e custos são salvaguardados na entidade `HistoricoFinanceiro` e o registro transacional é purgado. | **entry /** Incrementar `ReceitasAcumuladas` e `DespesasEnergiaAcumuladas` no cofre acumulador (`RN007`).<br>**exit /** Executar `DbSet.Remove()` e `SaveChangesAsync()`. |
@@ -106,12 +107,13 @@ stateDiagram-v2
 | :--- | :--- | :--- | :--- | :--- | :---: |
 | `[*]` | Acesso a `/orcamentos` | Usuário autenticado | Inicializar instância vazia | `EmElaboracao` | `RN008` |
 | `EmElaboracao` | `SalvarOrcamento()` | `[OrcamentoValidator.IsValid == true]` | Gravar no banco de dados com `Status = StatusOrcamento.Pendente`. | `Pendente` | `RN008` |
+| `EmElaboracao` | `SalvarOrcamento()` | `[OrcamentoValidator.IsValid == true E Status inicial == EmImpressao]` | Gravar no banco de dados com `Status = StatusOrcamento.EmImpressao` (peça já colocada na impressora). Concluído e Falha nunca são aceitos na criação. | `EmImpressao` | `RN004`, `RN008` |
 | `Pendente` | `EditarParametros()` | `[DadosValidos == true]` | Recalcular custo total e margem; atualizar registro via `OrcamentoRepository.UpdateAsync()`. | `Pendente` | `RN001`, `RN002`, `RN003` |
 | `Pendente` | `IniciarProducao()` | Nenhuma restrição | Atualizar `Status = StatusOrcamento.EmImpressao`. Inserir na fila operacional da oficina. | `EmImpressao` | — |
 | `Pendente` | `Excluir()` | `[ConfirmadoEmTela == true]` | Excluir registro do banco sem gerar receitas (não houve produção). | `[*]` (Excluído) | `RN005` |
-| `EmImpressao` | `ConcluirProducao()` | `[ConfirmadoEmTela == true]` | **1.** `Material.SaldoGramas -= PesoGramas`<br>**2.** `Acabamento.SaldoMililitros -= QuantidadeMl`<br>**3.** `Status = StatusOrcamento.Concluido`<br>**4.** Gravar alterações atômicas no banco. | `Concluido` | `RN004`, `RN005` |
+| `EmImpressao` | `ConcluirProducao()` | `[ConfirmadoEmTela == true]` | **1.** `Material.SaldoGramas -= PesoGramas`<br>**2.** `Acabamento.SaldoMililitros -= QuantidadeMl`<br>**3.** `Status = StatusOrcamento.Concluido`<br>**4.** Gravar alterações atômicas no banco (um único `SaveChangesAsync`). | `Concluido` | `RN004`, `RN005` |
 | `EmImpressao` | `RegistrarFalha()` | `[ConfirmadoEmTela == true]` | **1.** `Material.SaldoGramas -= PesoGramas`<br>**2.** `Acabamento.SaldoMililitros -= QuantidadeMl`<br>**3.** `Status = StatusOrcamento.Falha`<br>**4.** Registrar perda contábil. | `Falha` | `RN004`, `RN005` |
-| `Falha` | `ReiniciarImpressao()` | Maker opta por reimprimir lote | Atualizar `Status = StatusOrcamento.EmImpressao`. Retornar para fila da impressora. | `EmImpressao` | — |
+| `Falha` | `ReiniciarImpressao()` | Maker opta por reimprimir lote | **1.** `HistoricoFinanceiro.DespesasEnergiaAcumuladas += CustoEnergia` da tentativa que falhou<br>**2.** Atualizar `Status = StatusOrcamento.EmImpressao`. Retornar para fila da impressora. | `EmImpressao` | — |
 | `Concluido` | `ExcluirManual()` | `[ConfirmadoEmTela == true]` | **1.** `HistoricoFinanceiro.ReceitasAcumuladas += CustoFinal`<br>**2.** `HistoricoFinanceiro.DespesasEnergiaAcumuladas += CustoEnergia`<br>**3.** Remover da tabela `Orcamento`. | `CofreHistoricoFinanceiro` | `RN005`, `RN007` |
 | `Falha` | `ExcluirManual()` | `[ConfirmadoEmTela == true]` | **1.** `HistoricoFinanceiro.DespesasEnergiaAcumuladas += CustoEnergia`<br>**2.** Remover da tabela `Orcamento`. | `CofreHistoricoFinanceiro` | `RN005`, `RN007` |
 | `Concluido` | `TimerDiarioExpurgo()` | `[DataCriacao < UtcNow - 180 dias]` | Execução por `DatabaseCleanupService`. Transferir receita para `HistoricoFinanceiro` e expurgar. | `CofreHistoricoFinanceiro` | `RN006`, `RN007` |
@@ -123,7 +125,7 @@ stateDiagram-v2
 
 ### 3.1 Ciclo de Vida do Token de Recuperação de Senha (`Usuario`)
 
-Este diagrama detalha o comportamento dos campos de segurança `TokenRedefinicaoSenha` e `TokenRedefinicaoExpiracao` mapeados na entidade `Usuario` (`RF034`, `RF035`, `RNF002`).
+Este diagrama detalha o comportamento dos campos de segurança `TokenRedefinicaoSenha` e `TokenRedefinicaoExpiracao` mapeados na entidade `Usuario` (`RF034`, `RNF006`).
 
 ```mermaid
 stateDiagram-v2
@@ -135,12 +137,12 @@ stateDiagram-v2
         SemToken : TokenRedefinicaoExpiracao = null
     }
 
-    Inativo --> TokenGerado : SolicitarRecuperacao(email)\n[Email existe na base]\n/ Gerar GUID criptográfico seguro\n/ TokenRedefinicaoExpiracao = UtcNow + 2 Horas\n/ Disparar e-mail assíncrono via EmailService
+    Inativo --> TokenGerado : SolicitarRecuperacao(email)\n[Email existe na base]\n/ Gerar token criptográfico de 256 bits (RandomNumberGenerator)\n/ Gravar somente o hash SHA-256 do token\n/ TokenRedefinicaoExpiracao = UtcNow + 30 Minutos\n/ Disparar e-mail assíncrono via EmailService
 
     state TokenGerado {
         [*] --> AguardandoAcesso
-        AguardandoAcesso : Token gravado no banco de dados
-        AguardandoAcesso : Janela de segurança de 120 minutos ativa
+        AguardandoAcesso : Hash SHA-256 do token gravado no banco de dados
+        AguardandoAcesso : Janela de segurança de 30 minutos ativa
     }
 
     TokenGerado --> SenhaRedefinida : SubmeterNovaSenha(token, novaSenha)\n[UtcNow <= TokenRedefinicaoExpiracao E SenhaAtendePoliticaForte]\n/ Gerar hash BCrypt com salt dinâmico\n/ Limpar token e timestamp de expiração
@@ -149,10 +151,10 @@ stateDiagram-v2
 
     state Expirado {
         [*] --> TokenInvalido
-        TokenInvalido : Token ultrapassou limite temporal de 2 horas
+        TokenInvalido : Token ultrapassou limite temporal de 30 minutos
     }
 
-    Expirado --> TokenGerado : SolicitarRecuperacao(email)\n/ Gerar novo token e renovar expiração para +2h
+    Expirado --> TokenGerado : SolicitarRecuperacao(email)\n/ Gerar novo token e renovar expiração para +30min
 
     state SenhaRedefinida {
         [*] --> CredenciaisAtualizadas
@@ -170,7 +172,7 @@ Mapeia a transição dos insumos de produção (filamentos, resinas, primers, ti
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Disponivel : CadastrarInsumo(saldoInicial)\n[saldoInicial > MargemSeguranca]
+    [*] --> Disponivel : CadastrarInsumo(saldoInicial)\n[saldoInicial > 50% da capacidade original]
 
     state Disponivel {
         [*] --> NivelNormal
@@ -178,11 +180,11 @@ stateDiagram-v2
         NivelNormal : Permite orçar e fabricar sem advertências
     }
 
-    Disponivel --> Critico : BaixarEstoqueProducao(g ou mL)\n[Saldo <= MargemSeguranca E Saldo > 0]\n/ Exibir badge amarelo de alerta no Dashboard (RF004, RF031)
+    Disponivel --> Critico : BaixarEstoqueProducao(g ou mL)\n[Saldo <= 50% da capacidade original E Saldo > 0]\n/ Exibir badge amarelo de alerta no Dashboard (RF004, RF031)
 
     state Critico {
         [*] --> NivelDeAlerta
-        NivelDeAlerta : Saldo abaixo da margem de segurança configurada
+        NivelDeAlerta : Saldo igual ou abaixo de 50% da capacidade original (vermelho a partir de 20%)
         NivelDeAlerta : Notifica o empreendedor sobre iminência de ruptura
     }
 
@@ -193,9 +195,9 @@ stateDiagram-v2
         SemInsumoFisico : Saldo zerado no estoque
     }
 
-    Esgotado --> Critico : RegistrarCompraLote()\n[NovoSaldo <= MargemSeguranca]
-    Esgotado --> Disponivel : RegistrarCompraLote()\n[NovoSaldo > MargemSeguranca]\n/ Atualizar custo ponderado por grama ou por mL (RN001, RN002)
-    Critico --> Disponivel : RegistrarCompraLote()\n[NovoSaldo > MargemSeguranca]\n/ Normalizar indicador visual no painel
+    Esgotado --> Critico : AtualizarCadastro()\n[NovoSaldo <= 50% da capacidade]
+    Esgotado --> Disponivel : AtualizarCadastro()\n[NovoSaldo > 50% da capacidade]\n/ Recalcular custo por grama ou por mL com o novo valor pago (RN001, RN002)
+    Critico --> Disponivel : AtualizarCadastro()\n[NovoSaldo > 50% da capacidade]\n/ Normalizar indicador visual no painel
 ```
 
 ---
@@ -206,17 +208,17 @@ A tabela abaixo estabelece a ponte formal de rastreabilidade entre as transiçõ
 
 | Transição de Estado | Camada de Implementação | Arquivo de Código / Método | Regra Aplicada |
 | :--- | :--- | :--- | :---: |
-| `[*] -> EmElaboracao -> Pendente` | Visão Blazor / Repositório | `Components/Pages/Orcamentos/Orcamentos.razor`<br>`Repositories/OrcamentoRepository.cs` (`AddAsync`) | `RN008` |
-| `Pendente -> EmImpressao` | Visão Blazor / Repositório | `Components/Pages/Producao/Producao.razor` (`MudarStatus`) | — |
-| `EmImpressao -> Concluido` | Visão Blazor / Repositórios | `Components/Pages/Producao/Producao.razor` (`FinalizarProducao(true)`)<br>`MaterialRepository.cs`<br>`AcabamentoRepository.cs` | `RN004`, `RN005` |
-| `EmImpressao -> Falha` | Visão Blazor / Repositórios | `Components/Pages/Producao/Producao.razor` (`FinalizarProducao(false)`) | `RN004`, `RN005` |
+| `[*] -> EmElaboracao -> Pendente` | Visão Blazor / Repositório | `Components/Pages/Orcamentos/Orcamentos.razor`<br>`Repositories/OrcamentoRepository.cs` (`AddAsync`, `UpdateAsync`) | `RN008` |
+| `Pendente -> EmImpressao`<br>`Falha -> EmImpressao` | Visão Blazor / Repositório | `Components/Pages/Producao/Producao.razor` (`MudarStatus`)<br>`Repositories/OrcamentoRepository.cs` (`IniciarImpressaoAsync`) | — |
+| `EmImpressao -> Concluido` | Visão Blazor / Repositório / Domínio | `Components/Pages/Producao/Producao.razor` (`FinalizarProducao(true)`)<br>`Repositories/OrcamentoRepository.cs` (`FinalizarProducaoAsync`)<br>`Services/OrcamentoStateMachine.cs` (`TransitarParaConcluido`) | `RN004`, `RN005` |
+| `EmImpressao -> Falha` | Visão Blazor / Repositório / Domínio | `Components/Pages/Producao/Producao.razor` (`FinalizarProducao(false)`)<br>`Repositories/OrcamentoRepository.cs` (`FinalizarProducaoAsync`)<br>`Services/OrcamentoStateMachine.cs` (`TransitarParaFalha`) | `RN004`, `RN005` |
 | `Concluido -> CofreHistorico` | Repositório | `Repositories/OrcamentoRepository.cs` (`DeleteAsync`) | `RN005`, `RN007` |
 | `Falha -> CofreHistorico` | Repositório | `Repositories/OrcamentoRepository.cs` (`DeleteAsync`) | `RN005`, `RN007` |
 | `Expurgo Diário (180 dias)` | Serviço de Segundo Plano / Repositório | `Services/DatabaseCleanupService.cs` (`DoCleanup`)<br>`Repositories/OrcamentoRepository.cs` (`DeleteAntigosAsync`) | `RN006`, `RN007` |
-| `Token: Inativo -> Gerado -> Consumido` | Serviços / Repositório | `Services/EmailService.cs`<br>`Repositories/UsuarioRepository.cs`<br>`Components/Pages/Login/RedefinirSenha.razor` | `RF034`, `RF035`, `RNF002` |
+| `Token: Inativo -> Gerado -> Consumido` | Serviços / Repositório | `Services/EmailService.cs`<br>`Repositories/UsuarioRepository.cs` (`GerarTokenRecuperacaoAsync`, `HashToken`)<br>`Components/Pages/Login/RedefinirSenha.razor` | `RF034`, `RNF006` |
 
 ---
 
 ## 5. Formalização Arquitetural: `OrcamentoStateMachine`
 
-Para garantir desacoplamento, testabilidade unitária e aderência aos princípios do SOLID (*Single Responsibility Principle* e *Open/Closed Principle*), a lógica de validação de transições de estado, condições de guarda e efeitos colaterais de estoque está encapsulada no serviço de domínio `OrcamentoStateMachine.cs` (`src/LucroImpresso.Web/Services/OrcamentoStateMachine.cs`), permitindo que a camada Blazor e os serviços de background invoquem transições protegidas por regras de validação estritas.
+Para garantir desacoplamento, testabilidade unitária e aderência aos princípios do SOLID (*Single Responsibility Principle* e *Open/Closed Principle*), a lógica de validação de transições de estado, condições de guarda e efeitos colaterais de estoque está encapsulada no serviço de domínio `OrcamentoStateMachine.cs` (`src/LucroImpresso.Web/Services/OrcamentoStateMachine.cs`), permitindo que a camada Blazor e os serviços de background invoquem transições protegidas por regras de validação estritas. A Linha de Produção (`Producao.razor`) e o repositório de orçamentos (`OrcamentoRepository.IniciarImpressaoAsync` / `FinalizarProducaoAsync` / `UpdateAsync`) delegam toda mudança de status a esse serviço, de modo que transições inválidas (ex.: `Pendente → Concluido`) são recusadas tanto na interface quanto no servidor.

@@ -80,7 +80,7 @@ namespace LucroImpresso.Tests
                 PecaId = 1,
                 MaquinaId = 1,
                 MaterialId = 1,
-                PesoGramas = 150.5,
+                PesoGramas = 150.5m,
                 TempoHrsImpressao = 6.5m,
                 TempoHrsPinturaLixamento = 1.0m,
                 CustoMaoDeObraHora = 35.00m,
@@ -94,7 +94,7 @@ namespace LucroImpresso.Tests
         [Theory]
         [InlineData(0)]
         [InlineData(-10)]
-        public void OrcamentoValidator_PesoInvalido_DeveFalhar(double pesoInvalido)
+        public void OrcamentoValidator_PesoInvalido_DeveFalhar(int pesoInvalido)
         {
             var orcamento = new Orcamento { PesoGramas = pesoInvalido };
             _orcamentoValidator.TestValidate(orcamento).ShouldHaveValidationErrorFor(o => o.PesoGramas);
@@ -138,7 +138,7 @@ namespace LucroImpresso.Tests
             {
                 UsuarioId = 1,
                 CelularUnico = "(11) 98765-4321",
-                PessoaFisica = new PessoaFisica { Nome = "Maria Silva", Cpf = "123.456.789-00" }
+                PessoaFisica = new PessoaFisica { Nome = "Maria Silva", Cpf = "529.982.247-25" }
             };
 
             var resultado = _clienteValidator.TestValidate(cliente);
@@ -152,7 +152,7 @@ namespace LucroImpresso.Tests
             {
                 UsuarioId = 1,
                 CelularUnico = "11987654321",
-                PessoaJuridica = new PessoaJuridica { RazaoSocial = "Empresa ABC Ltda", Cnpj = "12.345.678/0001-90" }
+                PessoaJuridica = new PessoaJuridica { RazaoSocial = "Empresa ABC Ltda", Cnpj = "11.222.333/0001-81" }
             };
 
             var resultado = _clienteValidator.TestValidate(cliente);
@@ -203,6 +203,39 @@ namespace LucroImpresso.Tests
 
             var resultado = _clienteValidator.TestValidate(cliente);
             resultado.ShouldHaveValidationErrorFor(c => c.CelularUnico);
+        }
+
+        [Theory]
+        [InlineData("529.982.247-25", true)]   // CPF válido (com máscara)
+        [InlineData("52998224725", true)]      // CPF válido (sem máscara)
+        [InlineData("123.456.789-00", false)]  // Dígitos verificadores errados
+        [InlineData("111.111.111-11", false)]  // Sequência repetida
+        [InlineData("529.982.247", false)]     // Incompleto
+        public void DocumentoValidador_Cpf_RF022(string cpf, bool esperado)
+        {
+            Assert.Equal(esperado, DocumentoValidador.CpfValido(cpf));
+        }
+
+        [Theory]
+        [InlineData("11.222.333/0001-81", true)]   // CNPJ válido (com máscara)
+        [InlineData("11222333000181", true)]       // CNPJ válido (sem máscara)
+        [InlineData("12.345.678/0001-90", false)]  // Dígitos verificadores errados
+        [InlineData("00.000.000/0000-00", false)]  // Sequência repetida
+        public void DocumentoValidador_Cnpj_RF022(string cnpj, bool esperado)
+        {
+            Assert.Equal(esperado, DocumentoValidador.CnpjValido(cnpj));
+        }
+
+        [Fact]
+        public void ClienteValidator_CpfInvalido_DeveFalhar()
+        {
+            var cliente = new Cliente
+            {
+                UsuarioId = 1,
+                PessoaFisica = new PessoaFisica { Nome = "Maria Silva", Cpf = "123.456.789-00" }
+            };
+
+            Assert.False(_clienteValidator.TestValidate(cliente).IsValid);
         }
 
         #endregion

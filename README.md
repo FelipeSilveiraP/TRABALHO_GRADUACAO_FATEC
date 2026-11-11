@@ -38,7 +38,6 @@ Proposta comercial formal de desenvolvimento de software em regime de Preço Fix
 
 ## 📊 Estrutura Analítica do Projeto (EAP / WBS)
 O escopo total do **LucroImpresso** foi decomposto hierarquicamente em 6 fases de nível 2 e 36 pacotes de trabalho de nível 3, abrangendo desde o planejamento estratégico maker até a suíte de testes automatizados e encerramento acadêmico:
-* **[Documento Detalhado da EAP (com WBS Dictionary e Mermaid)](docs/EAP/EAP_Documento_Detalhado.md)**
 * **[Diagrama Gráfico da EAP em Alta Resolução (PNG)](docs/EAP/EAP.png)**
 * **[Diagrama da EAP Vetorial para Impressão (PDF)](docs/EAP/EAP.pdf)**
 
@@ -78,7 +77,7 @@ Para fins de auditoria da banca avaliadora, as regras de negócio cruciais descr
 | **RN001** | O preço do material é calculado estritamente por grama (`Preço do Rolo / Peso Total em Gramas`). | `Models/Material.cs` e `MaterialPage.razor` |
 | **RN002** | Insumos químicos de acabamento (tintas, primers, vernizes, solventes) são dosados e precificados por mililitro (`mL`). | `Models/Acabamento.cs` e `AcabamentoPage.razor` |
 | **RN003** | Cálculo do consumo de energia elétrica proporcional à potência da impressora (Watts), tempo de impressão (horas) e tarifa de kWh. | `Models/Maquina.cs` e `Orcamentos.razor` |
-| **RN004** | Gatilho de baixa física de estoque ocorre estritamente quando o orçamento transita para "Concluído" ou "Falha de Impressão" (Espaguete). | `Components/Pages/Producao/Producao.razor` |
+| **RN004** | Gatilho de baixa física de estoque ocorre estritamente quando o orçamento transita para "Concluído" ou "Falha de Impressão" (Espaguete). | `Services/OrcamentoStateMachine.cs` e `Repositories/OrcamentoRepository.cs` (`FinalizarProducaoAsync`) |
 | **RN005** | Exclusões manuais de registros exigem confirmação explícita em tela do usuário para prevenção de destruição de dados. | Camada de Visão Blazor (`Components/Pages/`) |
 | **RN006** | Rotina automática de expurgo via *Timer* para exclusão de registros de orçamentos inativos há mais de 180 dias (6 meses). | `Services/DatabaseCleanupService.cs` |
 | **RN007** | Preservação contábil perpétua: valores totais de orçamentos expurgados são salvaguardados no cofre acumulador de Histórico Financeiro. | `Repositories/HistoricoFinanceiroRepository.cs` e `Dashboard.razor` |

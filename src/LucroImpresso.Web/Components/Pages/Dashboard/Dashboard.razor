@@ -199,7 +199,7 @@
                                         <td><strong class="font-headline fs-6 text-dark">R$ @orc.CustoFinal.ToString("F2")</strong></td>
                                         <td>
                                             <span class="badge @GetStatusClass(orc.Status) text-dark fw-bold">
-                                                @(orc.Status == StatusOrcamento.EmImpressao ? "IMPRIMINDO" : orc.Status.ToString().ToUpper())
+                                                @(orc.Status switch { StatusOrcamento.EmImpressao => "IMPRIMINDO", StatusOrcamento.Concluido => "CONCLUÍDO", _ => orc.Status.ToString().ToUpper() })
                                             </span>
                                         </td>
                                     </tr>

@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Diagrama de Máquina de Estados — LucroImpresso</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{width:2560px;height:1440px;background:#f8fafc;font-family:Arial,Helvetica,sans-serif;color:#1e293b;position:relative;overflow:hidden}
+  .a{position:absolute}
+  svg.fios{position:absolute;left:0;top:0;width:2560px;height:1440px;z-index:1}
+  .card,.lbl,.titulo,.painel,.badge{z-index:2}
+  /* Cabeçalho */
+  .titulo{left:60px;top:26px;width:2442px;height:80px;background:#fff;border:3px solid #0f172a;border-radius:12px;box-shadow:7px 7px 0 #1e293b;padding:12px 34px}
+  .titulo h1{margin:0;font-family:"Arial Black",Arial,sans-serif;font-size:30px;letter-spacing:.3px;color:#0f172a}
+  .titulo p{margin:3px 0 0;font-size:16px;font-weight:700;color:#475569}
+  .badge{top:52px;height:28px;border:2px solid;border-radius:14px;font-size:13px;font-weight:700;padding:5px 14px;white-space:nowrap}
+  /* Estados */
+  .card{background:#fff;border:3px solid #0f172a;border-radius:12px;box-shadow:6px 6px 0 #1e293b;overflow:hidden}
+  .hdr{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 16px;border-bottom:2px solid #0f172a;font-size:21px;font-weight:700}
+  .hdr small{font-size:12px;font-weight:700;opacity:.85}
+  .corpo{padding:10px 14px 8px;font-size:14.5px;line-height:1.32}
+  .lin{display:grid;grid-template-columns:64px 1fr;margin:2px 0 5px}
+  .lin b{color:#0f172a}
+  /* Rótulos de transição */
+  .lbl{background:#fff;border:1.5px solid #475569;border-radius:8px;box-shadow:2px 2px 0 #94a3b8;padding:6px 10px;font-size:13px;font-weight:700;line-height:1.32}
+  .ev{color:#0b5394}.gd{color:#c2410c}.ac{color:#047857}
+  .rn{display:inline-block;margin-top:4px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:4px;padding:2px 6px;color:#1e293b;font-size:12px}
+  .pilula{border-radius:14px;padding:3px 10px}
+  /* Painéis complementares */
+  .painel{background:#fff;border:3px solid #0f172a;border-radius:12px;box-shadow:7px 7px 0 #1e293b;padding:22px 26px}
+  .painel h2{margin:0;font-size:19px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:10px}
+  .painel h2 i{width:13px;height:13px;border-radius:50%;display:inline-block}
+  .painel .sub{margin:8px 0 0;font-size:14.5px;color:#475569}
+  code{font-family:Consolas,"Courier New",monospace;font-size:13.5px}
+  .mini{width:318px;height:124px}
+  .mini .hdr{height:36px;font-size:17px}
+  .mini .corpo{font-size:13.5px}
+  .seta{font-size:13px;font-weight:700;line-height:1.35;text-align:center}
+  .nota{border:2px solid;border-radius:6px;padding:14px 20px;font-size:14px;line-height:1.45;display:flex;justify-content:space-between;align-items:center;gap:20px}
+  .nota .tag{border:2px solid;border-radius:16px;padding:6px 16px;font-size:12px;font-weight:700;white-space:nowrap}
+  .rodape{left:60px;top:1404px;width:2442px;border-top:1px solid #cbd5e1;padding-top:8px;font-size:13px;font-weight:700;color:#64748b;display:flex;justify-content:space-between}
+  .rodape span:last-child{color:#1e293b}
+</style></head>
+<body>
+
+<!-- ===================== LIGAÇÕES (SVG) ===================== -->
+<svg class="fios" viewBox="0 0 2560 1440">
+  <defs>
+    <marker id="pt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0f172a"/></marker>
+    <marker id="vd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#15803d"/></marker>
+    <marker id="vm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b91c1c"/></marker>
+    <marker id="rx" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#6b21a8"/></marker>
+    <marker id="az" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0369a1"/></marker>
+  </defs>
+  <!-- início -->
+  <circle cx="36" cy="320" r="17" fill="#0f172a"/>
+  <line x1="53" y1="320" x2="78" y2="320" stroke="#0f172a" stroke-width="2.5" marker-end="url(#pt)"/>
+  <!-- EmElaboracao -> Pendente -->
+  <line x1="404" y1="320" x2="560" y2="320" stroke="#0f172a" stroke-width="2.5" marker-end="url(#pt)"/>
+  <!-- EmElaboracao -> EmImpressao (status inicial Imprimindo) -->
+  <path d="M240,452 L240,628 L1120,628 L1120,456" fill="none" stroke="#0f172a" stroke-width="2.5" marker-end="url(#pt)"/>
+  <!-- Pendente: autotransição Editar() -->
+  <path d="M680,246 C680,196 760,196 760,244" fill="none" stroke="#0f172a" stroke-width="2.5" marker-end="url(#pt)"/>
+  <!-- Pendente -> EmImpressao -->
+  <line x1="881" y1="320" x2="1039" y2="320" stroke="#0f172a" stroke-width="2.5" marker-end="url(#pt)"/>
+  <!-- Pendente -> Excluído -->
+  <line x1="720" y1="412" x2="720" y2="462" stroke="#b91c1c" stroke-width="2.5" marker-end="url(#vm)"/>
+  <circle cx="720" cy="483" r="18" fill="#fff" stroke="#0f172a" stroke-width="3"/><circle cx="720" cy="483" r="11" fill="#0f172a"/>
+  <!-- EmImpressao -> Concluido -->
+  <path d="M1360,272 L1440,272 L1440,216 L1548,216" fill="none" stroke="#15803d" stroke-width="2.5" marker-end="url(#vd)"/>
+  <!-- EmImpressao -> Falha -->
+  <path d="M1360,368 L1440,368 L1440,436 L1548,436" fill="none" stroke="#b91c1c" stroke-width="2.5" marker-end="url(#vm)"/>
+  <!-- Falha -> EmImpressao (reimpressão) -->
+  <path d="M1716,548 L1716,592 L1200,592 L1200,456" fill="none" stroke="#0369a1" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#az)"/>
+  <!-- Concluido -> Cofre / Falha -> Cofre -->
+  <path d="M1884,262 L1966,262 L1966,292 L2059,292" fill="none" stroke="#6b21a8" stroke-width="2.5" marker-end="url(#rx)"/>
+  <path d="M1884,436 L1966,436 L1966,352 L2059,352" fill="none" stroke="#6b21a8" stroke-width="2.5" marker-end="url(#rx)"/>
+  <!-- Cofre -> fim -->
+  <line x1="2414" y1="320" x2="2462" y2="320" stroke="#0f172a" stroke-width="2.5" marker-end="url(#pt)"/>
+  <circle cx="2483" cy="320" r="18" fill="#fff" stroke="#0f172a" stroke-width="3"/><circle cx="2483" cy="320" r="11" fill="#0f172a"/>
+</svg>
+
+<!-- ===================== CABEÇALHO ===================== -->
+<div class="a titulo">
+  <h1>DIAGRAMA DE MÁQUINA DE ESTADOS • CICLO DE VIDA DO ORÇAMENTO E PRODUÇÃO</h1>
+  <p>Sistema LucroImpresso • Trabalho de Graduação (TG) • FATEC ADS</p>
+</div>
+<div class="a badge" style="left:2036px;color:#1e3a8a;border-color:#1e3a8a;background:#dbeafe">UML 2.5 STATECHART</div>
+<div class="a badge" style="left:2216px;color:#713f12;border-color:#713f12;background:#fef9c3">RASTREABILIDADE RN001 — RN008</div>
+
+<!-- ===================== ESTADOS ===================== -->
+<div class="a card" style="left:80px;top:247px;width:324px">
+  <div class="hdr" style="background:#dbeafe;color:#1e3a8a">EmElaboração<small>ST01</small></div>
+  <div class="corpo">
+    <div class="lin"><b>entry /</b><span>Carregar cadastros (Cliente, Peça, Máquina, Materiais, Acabamentos)</span></div>
+    <div class="lin"><b>do /</b><span>Calcular custos de material, insumos, energia e mão de obra</span></div>
+    <div class="lin"><b>exit /</b><span>Validar limites com OrcamentoValidator</span></div>
+  </div>
+</div>
+
+<div class="a card" style="left:562px;top:247px;width:319px">
+  <div class="hdr" style="background:#fef08a;color:#713f12">Pendente<small>ST02</small></div>
+  <div class="corpo">
+    <div class="lin"><b>entry /</b><span>Habilitar edição geral e exclusão</span></div>
+    <div class="lin"><b>do /</b><span>Ajustar peso, tempos e insumos (sem baixa)</span></div>
+    <div class="lin"><b>exit /</b><span>Liberar para a fila de produção</span></div>
+  </div>
+</div>
+
+<div class="a card" style="left:1041px;top:247px;width:319px">
+  <div class="hdr" style="background:#e0f2fe;color:#075985">EmImpressão<small>ST03</small></div>
+  <div class="corpo">
+    <div class="lin"><b>entry /</b><span>Exibir CONCLUIR e FALHA na Linha de Produção</span></div>
+    <div class="lin"><b>do /</b><span>Manufatura aditiva na impressora e pós-processamento</span></div>
+    <div class="lin"><b>exit /</b><span>Exigir confirmação do desfecho (RN005)</span></div>
+  </div>
+</div>
+
+<div class="a card" style="left:1550px;top:141px;width:334px">
+  <div class="hdr" style="background:#dcfce7;color:#14532d">Concluído<small>ST04</small></div>
+  <div class="corpo">
+    <div class="lin"><b>entry /</b><span>Somar receita nos KPIs do Dashboard (RF029)</span></div>
+    <div class="lin"><b>do /</b><span>Disponibilizar peça para entrega</span></div>
+    <div class="lin"><b>exit /</b><span>Edição bloqueada (estado final)</span></div>
+  </div>
+</div>
+
+<div class="a card" style="left:1550px;top:361px;width:334px">
+  <div class="hdr" style="background:#fee2e2;color:#991b1b">Falha ("Espaguete")<small>ST05</small></div>
+  <div class="corpo">
+    <div class="lin"><b>entry /</b><span>Registrar perda de material, insumos e energia</span></div>
+    <div class="lin"><b>do /</b><span>Exibir o botão REIMPRIMIR na Linha de Produção</span></div>
+    <div class="lin"><b>exit /</b><span>Voltar à fila (reimpressão)</span></div>
+  </div>
+</div>
+
+<div class="a card" style="left:2061px;top:247px;width:353px">
+  <div class="hdr" style="background:#f3e8ff;color:#6b21a8">Cofre Histórico Financeiro<small>ST06</small></div>
+  <div class="corpo">
+    <div class="lin"><b>entry /</b><span>Consolidar receitas e despesas em HistoricoFinanceiro (RN007)</span></div>
+    <div class="lin"><b>do /</b><span>Blindar KPIs e estatísticas contra o expurgo</span></div>
+    <div class="lin"><b>exit /</b><span>Remover registro transacional da tabela Orcamento</span></div>
+  </div>
+</div>
+
+<!-- ===================== RÓTULOS DAS TRANSIÇÕES ===================== -->
+<div class="a lbl" style="left:396px;top:168px;width:166px">
+  <span class="ev">SalvarOrcamento()</span><br><span class="gd">[DadosValidos]</span><br><span class="ac">/ Status = Pendente</span><br><span class="rn">RF011: Bloqueia saldo insuficiente</span>
+</div>
+<div class="a lbl" style="left:420px;top:602px;width:520px;text-align:center">
+  <span class="ev">SalvarOrcamento()</span> <span class="gd">[Status inicial = Imprimindo]</span> <span class="ac">/ Status = EmImpressao</span>
+</div>
+<div class="a lbl pilula" style="left:640px;top:162px"><span class="ev">Editar()</span> <span class="ac">/ Recalcular Custos</span></div>
+<div class="a lbl" style="left:890px;top:241px;width:142px">
+  <span class="ev">IniciarImpressao()</span><br><span class="ac">/ Alocar Impressora 3D</span><br><span class="ac">/ Status = EmImpressao</span>
+</div>
+<div class="a lbl pilula" style="left:738px;top:424px"><span class="ev">Excluir()</span> <span class="gd">[RN005]</span></div>
+
+<div class="a lbl" style="left:1370px;top:114px;width:174px">
+  <span class="ev">ConcluirProducao()</span><br><span class="gd">[Confirmado (RN005)]</span><br><span class="ac">/ Baixa SaldoGramas e SaldoMl (RN004)</span><br><span class="rn">Transação única</span>
+</div>
+<div class="a lbl" style="left:1370px;top:448px;width:174px">
+  <span class="ev">RegistrarFalha()</span><br><span class="gd">[Confirmado (RN005)]</span><br><span class="ac">/ Baixa perda física (RN004)</span><br><span class="rn">Energia como despesa</span>
+</div>
+<div class="a lbl pilula" style="left:1250px;top:578px"><span class="ev">ReiniciarImpressao()</span> <span class="ac">/ Botão REIMPRIMIR / Energia da falha no Cofre (RN007)</span></div>
+
+<div class="a lbl" style="left:1892px;top:120px;width:162px">
+  <span class="ev">Excluir()</span> ou<br><span class="ev">Timer180d()</span><br><span class="gd">[RN005] ou [RN006 &gt; 180d]</span><br><span class="ac">/ Receita + Energia no Cofre (RN007)</span>
+</div>
+<div class="a lbl" style="left:1892px;top:450px;width:162px">
+  <span class="ev">Excluir()</span> ou<br><span class="ev">Timer180d()</span><br><span class="ac">/ Energia perdida no Cofre (RN007)</span>
+</div>
+<div class="a lbl pilula" style="left:2420px;top:262px;font-size:11.5px"><span>Fim do Ciclo</span></div>
+
+<!-- ===================== PAINEL: TOKEN ===================== -->
+<div class="a painel" style="left:60px;top:951px;width:1192px;height:440px">
+  <h2><i style="background:#2563eb"></i>MÁQUINA DE ESTADOS COMPLEMENTAR • CICLO DE VIDA DO TOKEN DE SEGURANÇA (RECUPERAÇÃO DE SENHA)</h2>
+  <p class="sub">Governa os campos <code>TokenRedefinicaoSenha</code> e <code>TokenRedefinicaoExpiracao</code> do usuário: token de 256 bits guardado só como hash SHA-256, janela de 30 minutos e nova senha com BCrypt (RF034, RNF006).</p>
+
+  <div class="a card mini" style="left:24px;top:110px">
+    <div class="hdr" style="background:#f1f5f9;color:#1e293b">Token Inativo</div>
+    <div class="corpo"><div class="lin"><b>entry /</b><span>Token = null</span></div><div class="lin"><b>do /</b><span>Operação normal da conta</span></div></div>
+  </div>
+  <div class="a seta" style="left:350px;top:140px;width:116px"><span class="ev">Solicitar(email)</span><br><span class="ac">/ Gerar token + Expira em 30 min (EmailService) →</span></div>
+  <div class="a card mini" style="left:470px;top:110px">
+    <div class="hdr" style="background:#dbeafe;color:#1e3a8a">Token Ativo e Válido</div>
+    <div class="corpo"><div class="lin"><b>entry /</b><span>Gravar hash SHA-256 do token</span></div><div class="lin"><b>do /</b><span>Janela temporal de 30 min</span></div></div>
+  </div>
+  <div class="a seta" style="left:796px;top:132px;width:116px"><span class="ac">NovaSenha()</span><br><span class="gd">[UtcNow ≤ Expira]</span><br><span class="ac">/ BCrypt Hash + Limpa Token →</span></div>
+  <div class="a card mini" style="left:916px;top:110px;width:248px">
+    <div class="hdr" style="background:#dcfce7;color:#14532d">Senha Redefinida</div>
+    <div class="corpo"><div class="lin"><b>entry /</b><span>Hash BCrypt salvo</span></div><div class="lin"><b>do /</b><span>Redirecionar para login</span></div></div>
+  </div>
+  <div class="a nota" style="left:24px;top:270px;width:1140px;background:#fef2f2;border-color:#ef4444;color:#7f1d1d">
+    <span><b>Transição por Expiração Temporal:</b> se <code>UtcNow &gt; TokenRedefinicaoExpiracao</code>, o sistema bloqueia o acesso e transita para o estado <b>Token Expirado</b>, exigindo que o usuário solicite um novo link via e-mail.</span>
+    <span class="tag" style="border-color:#dc2626;color:#991b1b;background:#fee2e2">BLOQUEIO ANTI-BRUTEFORCE</span>
+  </div>
+</div>
+
+<!-- ===================== PAINEL: INSUMOS ===================== -->
+<div class="a painel" style="left:1309px;top:951px;width:1193px;height:440px">
+  <h2><i style="background:#d97706"></i>MÁQUINA DE ESTADOS COMPLEMENTAR • CICLO DE DISPONIBILIDADE DE INSUMOS (MATERIAL / ACABAMENTO)</h2>
+  <p class="sub">Mapeia o nível de estoque físico frente às baixas das ordens concluídas ou com falha (RF003, RF004, RF031, RN001, RN002, RN004).</p>
+
+  <div class="a card mini" style="left:24px;top:110px;width:268px">
+    <div class="hdr" style="background:#dcfce7;color:#14532d">Disponível (Normal)</div>
+    <div class="corpo"><div class="lin"><b>entry /</b><span>Saldo &gt; 50% da capacidade</span></div><div class="lin"><b>do /</b><span>Permite orçamentos sem alertas</span></div></div>
+  </div>
+  <div class="a seta" style="left:300px;top:150px;width:120px"><span class="gd">BaixarProducao()</span><br><span class="gd">[Saldo ≤ 50%] →</span></div>
+  <div class="a card mini" style="left:428px;top:110px;width:286px">
+    <div class="hdr" style="background:#fef08a;color:#713f12">Estoque Crítico</div>
+    <div class="corpo"><div class="lin"><b>entry /</b><span>Alerta no Dashboard (vermelho ≤ 20%)</span></div><div class="lin"><b>do /</b><span>Avisar necessidade de compra</span></div></div>
+  </div>
+  <div class="a seta" style="left:722px;top:150px;width:120px"><span class="vm" style="color:#b91c1c">BaixarProducao()</span><br><span style="color:#b91c1c">[Saldo == 0] →</span></div>
+  <div class="a card mini" style="left:850px;top:110px;width:286px">
+    <div class="hdr" style="background:#fee2e2;color:#991b1b">Esgotado (Ruptura)</div>
+    <div class="corpo"><div class="lin"><b>entry /</b><span>Travar saldo em zero</span></div><div class="lin"><b>do /</b><span>Bloquear novos orçamentos (RF011)</span></div></div>
+  </div>
+  <div class="a nota" style="left:24px;top:270px;width:1112px;background:#f0fdf4;border-color:#22c55e;color:#14532d">
+    <span><b>Reposição (Editar Cadastro):</b> ao atualizar o saldo e o valor pago do material ou insumo, o custo por grama ou por mL é recalculado (RN001, RN002) e o insumo volta ao estado <b>Disponível</b>.</span>
+    <span class="tag" style="border-color:#16a34a;color:#14532d;background:#dcfce7">RN001 &amp; RN002</span>
+  </div>
+</div>
+
+<div class="a rodape"><span>Trabalho de Graduação (TG) • Curso de Análise e Desenvolvimento de Sistemas • FATEC</span><span>Aluno: Felipe Silveira Pessoa • Orientador: [Nome do Orientador]</span></div>
+</body></html>

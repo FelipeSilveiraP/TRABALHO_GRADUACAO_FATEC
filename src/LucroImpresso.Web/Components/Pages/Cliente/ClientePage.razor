@@ -31,6 +31,14 @@
         </div>
     }
 
+    @if (!string.IsNullOrEmpty(mensagemErro))
+    {
+        <div class="alert alert-danger mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">error</span>
+            @mensagemErro
+        </div>
+    }
+
     @if (!string.IsNullOrEmpty(mensagemSucesso))
     {
         <div class="alert alert-success mb-4">
@@ -367,6 +375,7 @@
 </div>
 
 @code {
+    private string? mensagemErro;
     private List<Cliente> clientes = new();
     private PessoaFisica formPF = new();
     private PessoaJuridica formPJ = new();
@@ -415,6 +424,7 @@
     {
         carregando = true;
         mensagemSucesso = null;
+        mensagemErro = null;
         try
         {
             if (modoEdicao)
@@ -490,6 +500,11 @@
             ResetFormulario();
             await CarregarClientes();
         }
+        catch (InvalidOperationException ex)
+        {
+            // RF022: CPF/CNPJ inválido ou duplicado — mantém o formulário preenchido para correção
+            mensagemErro = ex.Message;
+        }
         catch (Exception ex)
         {
             Console.WriteLine($"Erro ao salvar cliente: {ex.Message}");
@@ -556,7 +571,17 @@
         bool confirmado = await JS.InvokeAsync<bool>("confirm", "Você deseja realmente excluir este cliente? Esta ação não pode ser desfeita.");
         if (confirmado)
         {
-            await ClienteRepo.DeleteAsync(id, usuarioId);
+            mensagemErro = null;
+            mensagemSucesso = null;
+            try
+            {
+                await ClienteRepo.DeleteAsync(id, usuarioId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Cliente com orçamentos (FK RESTRICT): exibe aviso em vez de derrubar a tela
+                mensagemErro = ex.Message;
+            }
             await CarregarClientes();
             StateHasChanged();
         }

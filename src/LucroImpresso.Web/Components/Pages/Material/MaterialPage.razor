@@ -31,6 +31,14 @@
         </div>
     }
 
+    @if (!string.IsNullOrEmpty(mensagemExclusao))
+    {
+        <div class="alert alert-danger mb-4">
+            <span class="material-symbols-outlined me-2 fs-5">error</span>
+            @mensagemExclusao
+        </div>
+    }
+
     <!-- Topo: Master-Detail Form Neo-Brutalista -->
     <div class="bg-white brutal-border p-4 p-md-5 mb-5 brutal-shadow-lg">
         <div class="d-flex align-items-center justify-content-between pb-3 border-bottom brutal-border-b mb-4">
@@ -62,7 +70,7 @@
                         <input type="text" 
                                class="form-control" 
                                placeholder="Ex: 1000" 
-                               oninput="window.masks.weightUnit(this)"
+                               oninput="window.masks.weight(this)"
                                @onchange="UpdatePeso"
                                value="@pesoFormatted"
                                maxlength="10" />
@@ -75,7 +83,7 @@
                     <div class="input-group">
                         <input type="text" 
                                class="form-control" 
-                               placeholder="Ex: 850" 
+                               placeholder="Ex: 850,00" 
                                oninput="window.masks.weightUnit(this)"
                                @onchange="UpdateSaldo"
                                value="@saldoFormatted"
@@ -212,6 +220,7 @@
 </div>
 
 @code {
+    private string? mensagemExclusao;
     private List<Material> materiais = new();
     private Material formularioMaterial = new();
     private bool erroCarregamento = false;
@@ -275,6 +284,7 @@
             carregando = true;
             if (modoEdicao && formularioMaterial.Id > 0)
             {
+                formularioMaterial.UsuarioId = usuarioId;
                 await MaterialRepo.UpdateAsync(formularioMaterial);
             }
             else
@@ -319,8 +329,8 @@
             DataCadastro = mat.DataCadastro
         };
         pesoFormatted = mat.PesoRoloGramas.ToString("N0");
-        saldoFormatted = mat.SaldoGramas.ToString("N0");
-        valorPagoFormatted = mat.ValorPago.ToString("C2");
+        saldoFormatted = mat.SaldoGramas.ToString("N2");
+        valorPagoFormatted = mat.ValorPago.ToString("N2");
         modoEdicao = true;
     }
 
@@ -338,7 +348,16 @@
         bool confirmado = await JS.InvokeAsync<bool>("confirm", "Você deseja realmente deletar esse registro?");
         if (confirmado)
         {
-            await MaterialRepo.DeleteAsync(id, usuarioId);
+            mensagemExclusao = null;
+            try
+            {
+                await MaterialRepo.DeleteAsync(id, usuarioId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Material em uso por orçamentos (FK RESTRICT): exibe aviso em vez de derrubar a tela
+                mensagemExclusao = ex.Message;
+            }
             await CarregarMateriais();
             StateHasChanged();
         }

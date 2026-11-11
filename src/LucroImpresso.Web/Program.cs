@@ -274,9 +274,11 @@ app.MapPost("/auth/esqueci-senha", async (HttpContext ctx, [FromForm] string ema
         var (sucesso, token, nomeUsuario) = await repo.GerarTokenRecuperacaoAsync(emailLimpo);
         if (sucesso && !string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(nomeUsuario))
         {
-            var scheme = ctx.Request.Scheme;
-            var host = ctx.Request.Host.Value;
-            var linkRedefinicao = $"{scheme}://{host}/redefinir-senha?token={token}";
+            // Anti Host-Header Injection: usa a URL pública configurada (AppSettings:BaseUrl) quando existir;
+            // sem ela (uso local), cai para o endereço da própria requisição.
+            var baseUrl = app.Configuration["AppSettings:BaseUrl"]?.TrimEnd('/')
+                ?? $"{ctx.Request.Scheme}://{ctx.Request.Host.Value}";
+            var linkRedefinicao = $"{baseUrl}/redefinir-senha?token={token}";
             await emailService.EnviarEmailRecuperacaoSenhaAsync(emailLimpo, nomeUsuario, linkRedefinicao);
         }
     }
@@ -330,79 +332,21 @@ using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         
-        // ── Migração Segura do Banco de Dados: Tinta -> Acabamento ──
+        // ── Migrations do EF Core: aplica as pendentes (ex.: Tinta -> Acabamento, peso decimal) ──
+        // Substitui o antigo SQL manual executado a cada inicialização. As migrations são
+        // idempotentes nesse ponto, então funcionam também em bancos já ajustados à mão.
         try
         {
-            await db.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 0;");
-
-            // 1. Renomear tabela Tinta para Acabamento (se existir)
-            await db.Database.ExecuteSqlRawAsync(@"
-                SET @table_exists = (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'Tinta');
-                SET @rename_sql = IF(@table_exists > 0, 'RENAME TABLE Tinta TO Acabamento;', 'SELECT 1;');
-                PREPARE stmt FROM @rename_sql;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            ");
-
-            // 2. Renomear tabela ORC_TINT para ORC_ACABAMENTO (se existir)
-            await db.Database.ExecuteSqlRawAsync(@"
-                SET @table_exists = (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'ORC_TINT');
-                SET @rename_sql = IF(@table_exists > 0, 'RENAME TABLE ORC_TINT TO ORC_ACABAMENTO;', 'SELECT 1;');
-                PREPARE stmt FROM @rename_sql;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            ");
-
-            // 3. Renomear coluna id_tinta -> id_acabamento em Acabamento
-            await db.Database.ExecuteSqlRawAsync(@"
-                SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'Acabamento' AND column_name = 'id_tinta');
-                SET @col_sql = IF(@col_exists > 0, 'ALTER TABLE Acabamento CHANGE COLUMN id_tinta id_acabamento INT NOT NULL AUTO_INCREMENT;', 'SELECT 1;');
-                PREPARE stmt FROM @col_sql;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            ");
-
-            // 4. Renomear coluna nome_tinta -> nome_acabamento em Acabamento
-            await db.Database.ExecuteSqlRawAsync(@"
-                SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'Acabamento' AND column_name = 'nome_tinta');
-                SET @col_sql = IF(@col_exists > 0, 'ALTER TABLE Acabamento CHANGE COLUMN nome_tinta nome_acabamento LONGTEXT NOT NULL;', 'SELECT 1;');
-                PREPARE stmt FROM @col_sql;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            ");
-
-            // 5. Garantir que a coluna tipo exista em Acabamento
-            await db.Database.ExecuteSqlRawAsync(@"
-                SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'Acabamento' AND column_name = 'tipo');
-                SET @col_sql = IF(@col_exists = 0, 'ALTER TABLE Acabamento ADD COLUMN tipo VARCHAR(50) NOT NULL DEFAULT \'Tinta\';', 'SELECT 1;');
-                PREPARE stmt FROM @col_sql;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            ");
-
-            // 6. Renomear coluna fk_tinta -> fk_acabamento em ORC_ACABAMENTO
-            await db.Database.ExecuteSqlRawAsync(@"
-                SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'ORC_ACABAMENTO' AND column_name = 'fk_tinta');
-                SET @col_sql = IF(@col_exists > 0, 'ALTER TABLE ORC_ACABAMENTO CHANGE COLUMN fk_tinta fk_acabamento INT NOT NULL;', 'SELECT 1;');
-                PREPARE stmt FROM @col_sql;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            ");
-
-            // 7. Renomear coluna despesas_tinta_acumuladas -> despesas_acabamento_acumuladas em HistoricoFinanceiro
-            await db.Database.ExecuteSqlRawAsync(@"
-                SET @col_exists = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'HistoricoFinanceiro' AND column_name = 'despesas_tinta_acumuladas');
-                SET @col_sql = IF(@col_exists > 0, 'ALTER TABLE HistoricoFinanceiro CHANGE COLUMN despesas_tinta_acumuladas despesas_acabamento_acumuladas DECIMAL(18,2) NOT NULL DEFAULT 0.00;', 'SELECT 1;');
-                PREPARE stmt FROM @col_sql;
-                EXECUTE stmt;
-                DEALLOCATE PREPARE stmt;
-            ");
-
-            await db.Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 1;");
+            var pendentes = (await db.Database.GetPendingMigrationsAsync()).ToList();
+            if (pendentes.Count > 0)
+            {
+                Log.Information("Aplicando {Quantidade} migration(s) pendente(s): {Migrations}", pendentes.Count, string.Join(", ", pendentes));
+                await db.Database.MigrateAsync();
+            }
         }
         catch (Exception exMig)
         {
-            Log.Warning(exMig, "Aviso ao aplicar migração de schema Tinta -> Acabamento.");
+            Log.Warning(exMig, "Aviso ao aplicar migrations do banco de dados. Rode 'dotnet ef database update' manualmente.");
         }
 
         var userRepo = scope.ServiceProvider.GetRequiredService<IUsuarioRepository>();
@@ -419,8 +363,10 @@ using (var scope = app.Services.CreateScope())
 app.Run(); // Esta deve ser a ÚLTIMA linha do seu Program.cs
 
 }
-catch (Exception ex)
+catch (Exception ex) when (ex is not HostAbortedException)
 {
+    // HostAbortedException é lançada de propósito pelas ferramentas do EF (dotnet ef migrations)
+    // ao inspecionar o host — não é um erro da aplicação.
     Log.Fatal(ex, "Aplicação encerrada de forma inesperada.");
 }
 finally

@@ -342,7 +342,10 @@
   <p>
     Para viabilizar a portabilidade instantânea em qualquer ambiente sem necessidade de instalar manualmente runtimes ou bancos de dados locais, o projeto disponibiliza os arquivos <code>Dockerfile</code> e <code>docker-compose.yml</code> na raiz:
   </p>
-  <pre># Inicialização em contêiner em qualquer sistema operacional
+  <pre># Credenciais do banco: copiar o modelo e ajustar o arquivo .env
+cp .env.example .env
+
+# Inicialização em contêiner em qualquer sistema operacional
 docker compose up -d
 
 # Verificação do status dos serviços

@@ -100,13 +100,13 @@
     </tr>
     <tr>
       <td>RF001</td>
-      <td>Permitir o cadastro de matérias-primas de impressão (filamentos e resinas), registrando nome, marca, cor, tipo de polímero (PLA, ABS, PETG, Resina), peso líquido inicial (g) e valor pago (R$).</td>
+      <td>Permitir o cadastro de matérias-primas de impressão (filamentos e resinas), registrando nome descritivo (tipo de polímero — PLA, ABS, PETG, Resina —, marca e cor), peso líquido inicial (g), saldo atual (g) e valor pago (R$).</td>
       <td>Entrada/Armazenamento</td>
       <td>Alta</td>
     </tr>
     <tr>
       <td>RF002</td>
-      <td>Permitir o cadastro de insumos de acabamento (tintas, primers, vernizes, solventes/diluentes e outros), registrando nome, categoria/tipo, cor (ou incolor), volume/capacidade líquida (mL) e valor pago (R$).</td>
+      <td>Permitir o cadastro de insumos de acabamento (tintas, primers, vernizes, solventes/diluentes e outros), registrando nome, categoria/tipo, cor (ou incolor), volume/capacidade líquida (L), saldo atual (mL) e valor pago (R$).</td>
       <td>Entrada/Armazenamento</td>
       <td>Alta</td>
     </tr>
@@ -118,7 +118,7 @@
     </tr>
     <tr>
       <td>RF004</td>
-      <td>Exibir alerta visual em destaque na interface caso o estoque de filamento ou de qualquer insumo de acabamento esteja abaixo da margem de segurança configurada.</td>
+      <td>Exibir alerta visual em destaque na interface caso o estoque de filamento ou de qualquer insumo de acabamento esteja igual ou abaixo da margem de segurança de 50% da capacidade original (destaque em vermelho a partir de 20%).</td>
       <td>Processamento/Saída</td>
       <td>Média</td>
     </tr>
@@ -130,7 +130,7 @@
     </tr>
     <tr>
       <td>RF006</td>
-      <td>Permitir a exclusão manual de matérias-primas ou insumos de acabamento do banco de dados, mediante etapa obrigatória de confirmação do usuário.</td>
+      <td>Permitir a exclusão manual de matérias-primas ou insumos de acabamento do banco de dados, mediante etapa obrigatória de confirmação do usuário, bloqueando com mensagem de aviso a exclusão de itens vinculados a orçamentos.</td>
       <td>Exclusão</td>
       <td>Baixa</td>
     </tr>
@@ -157,7 +157,7 @@
     </tr>
     <tr>
       <td>RF009</td>
-      <td>Permitir o registro do tempo dedicado ao acabamento manual e pós-processamento (formato HH:MM) e calcular automaticamente o custo através da taxa horária de mão de obra de acabamento.</td>
+      <td>Permitir o registro do tempo dedicado ao acabamento manual e pós-processamento (formato HH:MM) e calcular automaticamente o custo de mão de obra sobre o tempo total (impressão + acabamento) multiplicado pela taxa horária informada.</td>
       <td>Entrada/Processamento</td>
       <td>Alta</td>
     </tr>
@@ -175,13 +175,13 @@
     </tr>
     <tr>
       <td>RF012</td>
-      <td>Calcular o preço de venda sugerido através da composição analítica dos custos diretos (material, insumos de acabamento em mL, energia elétrica e mão de obra de acabamento) somado à margem de lucro real.</td>
+      <td>Calcular o preço de venda sugerido através da composição analítica dos custos diretos (material, insumos de acabamento em mL e energia elétrica) somados à mão de obra (tempo total × taxa horária), que representa a margem de lucro real do maker.</td>
       <td>Processamento</td>
       <td>Alta</td>
     </tr>
     <tr>
       <td>RF013</td>
-      <td>Salvar o orçamento no sistema com status operacional inicial definido automaticamente como "Pendente" atrelado ao tenant.</td>
+      <td>Salvar o orçamento no sistema com status operacional inicial "Pendente" (ou "Em Impressão", quando a peça já foi enviada à impressora) atrelado ao tenant.</td>
       <td>Armazenamento</td>
       <td>Alta</td>
     </tr>
@@ -202,7 +202,7 @@
     </tr>
     <tr>
       <td>RF015</td>
-      <td>Permitir a alteração do status do orçamento para "Aprovado", "Em Produção", "Concluído" ou "Cancelado/Rejeitado" conforme o ciclo comercial e produtivo.</td>
+      <td>Permitir a alteração do status do orçamento entre "Pendente", "Em Impressão", "Concluído" e "Falha" conforme o ciclo produtivo, respeitando as transições da máquina de estados (incluindo a reimpressão após falha).</td>
       <td>Atualização</td>
       <td>Alta</td>
     </tr>
@@ -268,7 +268,7 @@
     </tr>
     <tr>
       <td>RF023</td>
-      <td>Registrar informações completas de contato (celular com DDD) e endereço (Logradouro, Número, Bairro, Cidade, Estado) atrelados ao cliente.</td>
+      <td>Registrar informações completas de contato (celular com DDD) e endereço (Logradouro, Número, Bairro, Cidade e CEP) atrelados ao cliente.</td>
       <td>Entrada/Processamento</td>
       <td>Alta</td>
     </tr>
@@ -310,13 +310,13 @@
     </tr>
     <tr>
       <td>RF027</td>
-      <td>Permitir o cadastro (CRUD) de peças e modelos 3D produzidos recorrentemente, definindo nome descritivo, peso estimado em gramas e tempo estimado de impressão.</td>
+      <td>Permitir o cadastro (CRUD) de peças e modelos 3D produzidos recorrentemente, definindo nome descritivo e link do arquivo STL.</td>
       <td>Entrada / Armazenamento</td>
       <td>Média</td>
     </tr>
     <tr>
       <td>RF028</td>
-      <td>Permitir o carregamento automático dos dados da peça cadastrada diretamente no formulário de elaboração de orçamentos, acelerando a precificação.</td>
+      <td>Permitir a seleção da peça cadastrada diretamente no formulário de elaboração de orçamentos, vinculando o modelo 3D ao pedido.</td>
       <td>Processamento/Interface</td>
       <td>Média</td>
     </tr>
@@ -370,7 +370,7 @@
     </tr>
     <tr>
       <td>RF034</td>
-      <td>Permitir a recuperação de credenciais através de envio de e-mail seguro (via protocolo SMTP) com token temporário e expirável para redefinição de senha.</td>
+      <td>Permitir a recuperação de credenciais através de envio de e-mail seguro (via protocolo SMTP) com token temporário de alta entropia, válido por 30 minutos e armazenado somente como hash, para redefinição de senha.</td>
       <td>Segurança/Processamento</td>
       <td>Média</td>
     </tr>
@@ -454,7 +454,7 @@
     </tr>
     <tr>
       <td>RN002</td>
-      <td>Precificação de Insumos de Acabamento: O valor por mL de cada insumo (tinta, primer, verniz, solvente) é obtido pela divisão do preço do frasco pelo volume total em mL. O custo de acabamento no orçamento corresponde à soma do consumo de todos os insumos selecionados (mL consumido × custo/mL) acrescido do tempo de mão de obra de acabamento (Tempo Acabamento × Taxa Horária de Acabamento).</td>
+      <td>Precificação de Insumos de Acabamento: O valor por mL de cada insumo (tinta, primer, verniz, solvente) é obtido pela divisão do preço do frasco pelo volume total em mL. O custo de acabamento no orçamento corresponde à soma do consumo de todos os insumos selecionados (mL consumido × custo/mL). A mão de obra é calculada à parte sobre o tempo total do pedido (Tempo de Impressão + Tempo de Acabamento) × Taxa Horária.</td>
       <td>Precificação</td>
       <td>A seleção de insumos e mão de obra de acabamento é opcional no orçamento.</td>
     </tr>
@@ -486,7 +486,7 @@
       <td>RN007</td>
       <td>Preservação de Histórico (Cofre Acumulador): Nenhum registro ou valor contábil é perdido durante a limpeza de dados.</td>
       <td>Banco de Dados / Financeiro</td>
-      <td>Ao expurgar ou excluir orçamentos via rotina periódica ou exclusão de concluídos, o sistema transfere obrigatoriamente os valores totais (receitas, custos e lucros) para o Histórico Financeiro, garantindo que os KPIs históricos permaneçam íntegros.</td>
+      <td>Ao expurgar ou excluir orçamentos via rotina periódica ou exclusão de concluídos, o sistema transfere obrigatoriamente os valores totais (receitas e despesas de energia; e, na exclusão de materiais e insumos, o valor pago) para o Histórico Financeiro, garantindo que os KPIs históricos permaneçam íntegros.</td>
     </tr>
     <tr>
       <td>RN008</td>

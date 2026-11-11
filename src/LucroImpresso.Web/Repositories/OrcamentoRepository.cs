@@ -1,6 +1,7 @@
 using LucroImpresso.Web.Data;
 using LucroImpresso.Web.Interfaces;
 using LucroImpresso.Web.Models;
+using LucroImpresso.Web.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace LucroImpresso.Web.Repositories
@@ -9,11 +10,13 @@ namespace LucroImpresso.Web.Repositories
     {
         private readonly AppDbContext _context;
         private readonly ILogger<OrcamentoRepository> _logger;
+        private readonly OrcamentoStateMachine _stateMachine;
 
-        public OrcamentoRepository(AppDbContext context, ILogger<OrcamentoRepository> logger)
+        public OrcamentoRepository(AppDbContext context, ILogger<OrcamentoRepository> logger, OrcamentoStateMachine stateMachine)
         {
             _context = context;
             _logger = logger;
+            _stateMachine = stateMachine;
         }
 
         private IQueryable<Orcamento> QueryBase(int usuarioId) =>
@@ -31,7 +34,7 @@ namespace LucroImpresso.Web.Repositories
 
         public async Task<List<Orcamento>> GetAllAsync(int usuarioId)
         {
-            return await QueryBase(usuarioId).ToListAsync();
+            return await QueryBase(usuarioId).AsNoTracking().ToListAsync();
         }
 
         public async Task AddAsync(Orcamento orcamento)
@@ -39,22 +42,197 @@ namespace LucroImpresso.Web.Repositories
             if (orcamento.UsuarioId <= 0)
                 throw new InvalidOperationException("Não é possível cadastrar orçamento sem um Usuário válido (Multi-Tenant).");
 
+            // Máquina de Estados: um orçamento nasce Pendente ou já Em Impressão.
+            // Concluído/Falha só são alcançados pela Linha de Produção (com baixa de estoque).
+            if (orcamento.Status is not (StatusOrcamento.Pendente or StatusOrcamento.EmImpressao))
+                throw new InvalidOperationException("Um novo orçamento só pode iniciar como Pendente ou Em Impressão.");
+
+            await GarantirReferenciasDoUsuarioAsync(orcamento);
+
+            // Grava apenas o orçamento e seus vínculos N:N — nunca regrava material, máquina etc.
+            _context.ChangeTracker.Clear();
+            orcamento.Material = null;
+            orcamento.Maquina = null;
+            orcamento.Cliente = null;
+            orcamento.Peca = null;
+            foreach (var oa in orcamento.OrcamentoAcabamentos)
+            {
+                oa.Acabamento = null;
+                oa.UsuarioId = orcamento.UsuarioId;
+            }
+
             await _context.Orcamentos.AddAsync(orcamento);
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Auditoria: Orçamento {OrcamentoId} ({NomeProjeto}) cadastrado para Usuário {UsuarioId}.", orcamento.Id, orcamento.UsuarioId, orcamento.NomeProjeto);
+            _logger.LogInformation("Auditoria: Orçamento {OrcamentoId} ({NomeProjeto}) cadastrado para Usuário {UsuarioId}.", orcamento.Id, orcamento.NomeProjeto, orcamento.UsuarioId);
         }
 
         public async Task UpdateAsync(Orcamento orcamento)
         {
             _context.ChangeTracker.Clear();
-            var existente = await _context.Orcamentos.AsNoTracking().FirstOrDefaultAsync(o => o.Id == orcamento.Id);
-            if (existente == null) return;
 
-            // Segurança Multi-Tenant (Anti-IDOR): Preserva o tenant proprietário do registro
-            orcamento.UsuarioId = existente.UsuarioId;
-            _context.Orcamentos.Update(orcamento);
+            // Segurança Multi-Tenant (Anti-IDOR): só edita registros do próprio usuário
+            var existente = await _context.Orcamentos
+                .Include(o => o.OrcamentoAcabamentos)
+                .FirstOrDefaultAsync(o => o.Id == orcamento.Id && o.UsuarioId == orcamento.UsuarioId)
+                ?? throw new InvalidOperationException("Orçamento não encontrado para este usuário.");
+
+            if (existente.Status == StatusOrcamento.Concluido)
+                throw new InvalidOperationException("Orçamentos concluídos não podem ser editados.");
+
+            // Máquina de Estados: a edição não pode pular etapas nem concluir/registrar falha,
+            // pois essas transições exigem baixa de estoque e passam pela Linha de Produção.
+            if (orcamento.Status != existente.Status &&
+                (!_stateMachine.PodeTransitar(existente.Status, orcamento.Status) || _stateMachine.DisparaBaixaEstoque(orcamento.Status)))
+                throw new InvalidOperationException($"Transição inválida: de '{existente.Status}' para '{orcamento.Status}'.");
+
+            await GarantirReferenciasDoUsuarioAsync(orcamento);
+
+            // Atualiza apenas os campos do próprio orçamento (não regrava estoque de material/acabamento)
+            existente.NomeProjeto = orcamento.NomeProjeto;
+            existente.ClienteId = orcamento.ClienteId;
+            existente.PecaId = orcamento.PecaId;
+            existente.MaquinaId = orcamento.MaquinaId;
+            existente.MaterialId = orcamento.MaterialId;
+            existente.PesoGramas = orcamento.PesoGramas;
+            existente.TempoHrsImpressao = orcamento.TempoHrsImpressao;
+            existente.TempoHrsPinturaLixamento = orcamento.TempoHrsPinturaLixamento;
+            existente.TempoTotal = orcamento.TempoTotal;
+            existente.CustoMaoDeObraHora = orcamento.CustoMaoDeObraHora;
+            existente.Status = orcamento.Status;
+
+            // Sincroniza a tabela N:N de acabamentos: remove os retirados, altera e adiciona os novos
+            var novos = orcamento.OrcamentoAcabamentos
+                .Where(oa => oa.AcabamentoId > 0)
+                .GroupBy(oa => oa.AcabamentoId)
+                .ToDictionary(g => g.Key, g => g.Sum(x => x.QuantidadeMl));
+
+            foreach (var atual in existente.OrcamentoAcabamentos.ToList())
+            {
+                if (novos.TryGetValue(atual.AcabamentoId, out var qtd))
+                    atual.QuantidadeMl = qtd;
+                else
+                    _context.OrcamentoAcabamentos.Remove(atual);
+            }
+
+            foreach (var (acabamentoId, qtd) in novos)
+            {
+                if (existente.OrcamentoAcabamentos.All(a => a.AcabamentoId != acabamentoId))
+                {
+                    existente.OrcamentoAcabamentos.Add(new OrcamentoAcabamento
+                    {
+                        OrcamentoId = existente.Id,
+                        AcabamentoId = acabamentoId,
+                        QuantidadeMl = qtd,
+                        UsuarioId = existente.UsuarioId
+                    });
+                }
+            }
+
             await _context.SaveChangesAsync();
-            _logger.LogInformation("Auditoria: Orçamento {OrcamentoId} atualizado com sucesso para Usuário {UsuarioId}. Novo status: {Status}", orcamento.Id, orcamento.UsuarioId, orcamento.Status);
+            _logger.LogInformation("Auditoria: Orçamento {OrcamentoId} atualizado com sucesso para Usuário {UsuarioId}. Novo status: {Status}", existente.Id, existente.UsuarioId, existente.Status);
+        }
+
+        public async Task<(bool Sucesso, string? Erro)> IniciarImpressaoAsync(int id, int usuarioId)
+        {
+            _context.ChangeTracker.Clear();
+            var orcamento = await _context.Orcamentos
+                .Include(o => o.Maquina)
+                .FirstOrDefaultAsync(o => o.Id == id && o.UsuarioId == usuarioId);
+            if (orcamento == null)
+                return (false, "Orçamento não encontrado.");
+
+            var eraReimpressao = orcamento.Status == StatusOrcamento.Falha;
+
+            try
+            {
+                // Pendente → EmImpressao, ou Falha → EmImpressao (reimpressão)
+                _stateMachine.TransitarParaImpressao(orcamento);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return (false, ex.Message);
+            }
+
+            // RN007: a energia gasta na tentativa que falhou é preservada no cofre antes da reimpressão;
+            // sem isso ela sumiria do Dashboard quando o status deixa de ser "Falha".
+            if (eraReimpressao)
+            {
+                var resumo = await _context.HistoricoFinanceiro.FirstOrDefaultAsync(r => r.UsuarioId == usuarioId);
+                if (resumo == null)
+                {
+                    resumo = new HistoricoFinanceiro { UsuarioId = usuarioId };
+                    _context.HistoricoFinanceiro.Add(resumo);
+                }
+                var consumoW = orcamento.Maquina?.ConsumoWatts ?? 0;
+                var custoKwh = orcamento.Maquina?.CustoKwh ?? 0;
+                resumo.DespesasEnergiaAcumuladas += (consumoW / 1000m) * orcamento.TempoHrsImpressao * custoKwh;
+            }
+
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Auditoria: Orçamento {OrcamentoId} enviado para impressão pelo Usuário {UsuarioId}.", id, usuarioId);
+            return (true, null);
+        }
+
+        public async Task<(bool Sucesso, string? Erro)> FinalizarProducaoAsync(int id, int usuarioId, bool sucesso)
+        {
+            _context.ChangeTracker.Clear();
+            var orcamento = await _context.Orcamentos
+                .Include(o => o.Material)
+                .Include(o => o.OrcamentoAcabamentos)
+                    .ThenInclude(oa => oa.Acabamento)
+                .FirstOrDefaultAsync(o => o.Id == id && o.UsuarioId == usuarioId);
+
+            if (orcamento == null)
+                return (false, "Orçamento não encontrado.");
+
+            try
+            {
+                // RN004: a baixa de estoque (g e mL) é aplicada pela Máquina de Estados
+                if (sucesso)
+                    _stateMachine.TransitarParaConcluido(orcamento, orcamento.Material, orcamento.OrcamentoAcabamentos);
+                else
+                    _stateMachine.TransitarParaFalha(orcamento, orcamento.Material, orcamento.OrcamentoAcabamentos);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return (false, ex.Message);
+            }
+
+            // Um único SaveChanges roda em uma única transação: status, material e acabamentos
+            // são gravados juntos ou nenhum é gravado (atomicidade da baixa de estoque).
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Auditoria: Orçamento {OrcamentoId} finalizado como {Status} pelo Usuário {UsuarioId}.", id, orcamento.Status, usuarioId);
+            return (true, null);
+        }
+
+        /// <summary>
+        /// Segurança Multi-Tenant: garante que cliente, peça, máquina, material e acabamentos
+        /// referenciados pelo orçamento pertencem ao mesmo usuário.
+        /// </summary>
+        private async Task GarantirReferenciasDoUsuarioAsync(Orcamento orcamento)
+        {
+            var uid = orcamento.UsuarioId;
+            bool ok =
+                await _context.Clientes.AsNoTracking().AnyAsync(c => c.Id == orcamento.ClienteId && c.UsuarioId == uid) &&
+                await _context.Pecas.AsNoTracking().AnyAsync(p => p.Id == orcamento.PecaId && p.UsuarioId == uid) &&
+                await _context.Maquinas.AsNoTracking().AnyAsync(m => m.Id == orcamento.MaquinaId && m.UsuarioId == uid) &&
+                await _context.Materiais.AsNoTracking().AnyAsync(m => m.Id == orcamento.MaterialId && m.UsuarioId == uid);
+
+            var idsAcabamentos = orcamento.OrcamentoAcabamentos
+                .Select(a => a.AcabamentoId)
+                .Where(a => a > 0)
+                .Distinct()
+                .ToList();
+
+            if (ok && idsAcabamentos.Count > 0)
+            {
+                var encontrados = await _context.Acabamentos.AsNoTracking()
+                    .CountAsync(a => idsAcabamentos.Contains(a.Id) && a.UsuarioId == uid);
+                ok = encontrados == idsAcabamentos.Count;
+            }
+
+            if (!ok)
+                throw new InvalidOperationException("O orçamento referencia cadastros que não pertencem a este usuário.");
         }
 
         public async Task DeleteAsync(int id, int usuarioId)

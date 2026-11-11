@@ -1,6 +1,7 @@
 using LucroImpresso.Web.Data;
 using LucroImpresso.Web.Interfaces;
 using LucroImpresso.Web.Models;
+using LucroImpresso.Web.Validators;
 using Microsoft.EntityFrameworkCore;
 
 namespace LucroImpresso.Web.Repositories
@@ -42,14 +43,48 @@ namespace LucroImpresso.Web.Repositories
             if (cliente.UsuarioId <= 0)
                 throw new InvalidOperationException("Não é possível cadastrar cliente sem um Usuário válido (Multi-Tenant).");
 
+            await GarantirDocumentoValidoEUnicoAsync(cliente);
+
             _context.ChangeTracker.Clear();
             await _context.Clientes.AddAsync(cliente);
             await _context.SaveChangesAsync();
             _logger.LogInformation("Auditoria: Cliente {ClienteId} cadastrado para Usuário {UsuarioId} ({Nome}).", cliente.Id, cliente.UsuarioId, cliente.NomeExibicao);
         }
 
+        /// <summary>
+        /// RF022: CPF/CNPJ com dígitos verificadores válidos e sem duplicidade na base do usuário.
+        /// </summary>
+        private async Task GarantirDocumentoValidoEUnicoAsync(Cliente cliente)
+        {
+            var cpf = cliente.PessoaFisica?.Cpf;
+            var cnpj = cliente.PessoaJuridica?.Cnpj;
+
+            if (cliente.PessoaFisica != null && !DocumentoValidador.CpfValido(cpf))
+                throw new InvalidOperationException("CPF inválido. Verifique os dígitos informados.");
+            if (cliente.PessoaJuridica != null && !DocumentoValidador.CnpjValido(cnpj))
+                throw new InvalidOperationException("CNPJ inválido. Verifique os dígitos informados.");
+
+            var documento = DocumentoValidador.SomenteDigitos(cpf ?? cnpj);
+
+            var cpfsExistentes = await _context.PessoasFisicas.AsNoTracking()
+                .Where(pf => pf.UsuarioId == cliente.UsuarioId && pf.ClienteId != cliente.Id)
+                .Select(pf => pf.Cpf)
+                .ToListAsync();
+            var cnpjsExistentes = await _context.PessoasJuridicas.AsNoTracking()
+                .Where(pj => pj.UsuarioId == cliente.UsuarioId && pj.ClienteId != cliente.Id)
+                .Select(pj => pj.Cnpj)
+                .ToListAsync();
+
+            if (cpfsExistentes.Concat(cnpjsExistentes).Any(d => DocumentoValidador.SomenteDigitos(d) == documento))
+                throw new InvalidOperationException(cliente.PessoaFisica != null
+                    ? "Já existe um cliente cadastrado com este CPF."
+                    : "Já existe um cliente cadastrado com este CNPJ.");
+        }
+
         public async Task UpdateAsync(Cliente cliente)
         {
+            await GarantirDocumentoValidoEUnicoAsync(cliente);
+
             _context.ChangeTracker.Clear();
 
             var existing = await _context.Clientes
@@ -153,6 +188,9 @@ namespace LucroImpresso.Web.Repositories
                 .FirstOrDefaultAsync();
 
             if (cliente == null) return;
+
+            if (await _context.Orcamentos.AnyAsync(o => o.ClienteId == id && o.UsuarioId == usuarioId))
+                throw new InvalidOperationException("Este cliente possui orçamentos e não pode ser excluído. Exclua os orçamentos dele primeiro.");
 
             _context.Clientes.Remove(cliente);
             await _context.SaveChangesAsync();

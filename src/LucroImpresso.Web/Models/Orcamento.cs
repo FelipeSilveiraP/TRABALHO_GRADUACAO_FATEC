@@ -69,8 +69,8 @@ namespace LucroImpresso.Web.Models
         // ── Dados técnicos ────────────────────────────────────────────────
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "O peso deve ser maior que zero.")]
-        [Column("peso_gramas")]
-        public double PesoGramas { get; set; }
+        [Column("peso_gramas", TypeName = "decimal(10,2)")]
+        public decimal PesoGramas { get; set; }
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "O tempo de impressão deve ser maior que zero.")]
@@ -103,7 +103,7 @@ namespace LucroImpresso.Web.Models
         {
             get
             {
-                decimal custoMaterial = Material != null ? (decimal)PesoGramas * Material.PrecoPorGrama : 0m;
+                decimal custoMaterial = Material != null ? PesoGramas * Material.PrecoPorGrama : 0m;
                 decimal consumoW = Maquina?.ConsumoWatts ?? 0;
                 decimal custoKwh = Maquina?.CustoKwh ?? 0;
                 decimal custoEnergia = (consumoW / 1000m) * TempoHrsImpressao * custoKwh;
@@ -131,7 +131,7 @@ namespace LucroImpresso.Web.Models
         {
             get
             {
-                decimal custoMaterial = Material != null ? (decimal)PesoGramas * Material.PrecoPorGrama : 0m;
+                decimal custoMaterial = Material != null ? PesoGramas * Material.PrecoPorGrama : 0m;
                 decimal consumoW = Maquina?.ConsumoWatts ?? 0;
                 decimal custoKwh = Maquina?.CustoKwh ?? 0;
                 decimal custoEnergia = (consumoW / 1000m) * TempoHrsImpressao * custoKwh;

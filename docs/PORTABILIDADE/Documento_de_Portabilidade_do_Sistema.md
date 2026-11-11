@@ -198,7 +198,7 @@ A camada de persistência utiliza o **Entity Framework Core 9** com o provedor *
      $env:ConnectionStrings__DefaultConnection="Server=localhost;Port=3308;Database=LucroImpressoDB;User=dev;Password=segredo;"
      ```
 3. **Migrações Automáticas Code-First:**
-   * A modelagem lógica e seus esquemas de tabela residem no assembly C#. A criação e atualização estrutural do banco pode ser executada em qualquer plataforma mediante o comando padronizado:
+   * A modelagem lógica e seus esquemas de tabela residem no assembly C#. As migrations pendentes são aplicadas automaticamente na inicialização da aplicação (`Database.MigrateAsync()` no `Program.cs`); a criação e atualização estrutural do banco também pode ser executada manualmente em qualquer plataforma mediante o comando padronizado:
      ```bash
      dotnet ef database update
      ```
@@ -221,7 +221,7 @@ A camada de persistência utiliza o **Entity Framework Core 9** com o provedor *
    # Executar aplicação via servidor Kestrel embutido
    dotnet run --project src/LucroImpresso.Web/LucroImpresso.Web.csproj
    ```
-   * A aplicação inicializa no endereço: `http://localhost:5067` ou `https://localhost:7025`.
+   * A aplicação inicializa no endereço: `http://localhost:5067` ou `https://localhost:7067`.
 
 ---
 
@@ -284,12 +284,12 @@ services:
     container_name: lucroimpresso-mariadb
     restart: always
     environment:
-      MARIADB_ROOT_PASSWORD: root_password_123
-      MARIADB_DATABASE: LucroImpressoDB
-      MARIADB_USER: maker_user
-      MARIADB_PASSWORD: maker_password_456
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME:-LucroImpressoDB}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3308:3306"
+      - "${DB_PORT:-3308}:3306"
     volumes:
       - db_data:/var/lib/mysql
 
@@ -302,17 +302,18 @@ services:
     depends_on:
       - db
     ports:
-      - "5067:8080"
+      - "${WEB_PORT:-5067}:8080"
     environment:
-      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=LucroImpressoDB;User=maker_user;Password=maker_password_456;
+      - ConnectionStrings__DefaultConnection=Server=db;Port=3306;Database=${DB_NAME:-LucroImpressoDB};User=${DB_USER};Password=${DB_PASSWORD};
       - ASPNETCORE_ENVIRONMENT=Production
 
 volumes:
   db_data:
 ```
 
-* **Comando Único de Inicialização:**
+* **Comando Único de Inicialização** (as credenciais vêm do arquivo `.env`, criado a partir do `.env.example`):
   ```bash
+  cp .env.example .env
   docker compose up -d
   ```
 

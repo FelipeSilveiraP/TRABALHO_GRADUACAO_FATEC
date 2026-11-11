@@ -274,7 +274,7 @@
       <div class="meta-item"><strong>Aluno:</strong> Felipe Silveira Pessoa</div>
       <div class="meta-item"><strong>Padrões Normativos:</strong> ISO/IEC/IEEE 29148 / ISO/IEC 25010</div>
       <div class="meta-item"><strong>Stack Base:</strong> .NET 9 / Blazor Server / EF Core 9 / MariaDB</div>
-      <div class="meta-item"><strong>Status Geral:</strong> 100% Homologado (82 Testes Verdes)</div>
+      <div class="meta-item"><strong>Status Geral:</strong> 100% Homologado (95 Testes Verdes)</div>
     </div>
   </div>
 
@@ -295,7 +295,7 @@
       <div class="sub">100% Cobertas por Testes</div>
     </div>
     <div class="metric-card">
-      <div class="num">82 / 82</div>
+      <div class="num">95 / 95</div>
       <div class="label">Testes Automatizados</div>
       <div class="sub">0 Falhas (VSTest / xUnit)</div>
     </div>
@@ -331,7 +331,7 @@
     <tbody>
       <tr>
         <td><span class="badge-id">RF001</span></td>
-        <td>Cadastrar matérias-primas (filamentos e resinas) com nome, marca, cor, tipo, peso (g) e valor (R$).</td>
+        <td>Cadastrar matérias-primas (filamentos e resinas) com nome descritivo (tipo, marca e cor), peso do rolo (g), saldo atual (g) e valor (R$).</td>
         <td><span class="badge-prio-alta">Alta</span></td>
         <td><span class="badge-rn">RN001</span></td>
         <td><span class="badge-uc">UC15</span></td>
@@ -495,7 +495,7 @@
       </tr>
       <tr>
         <td><span class="badge-id">RF013</span></td>
-        <td>Salvar o orçamento no banco com status inicial "Pendente" atrelado ao tenant.</td>
+        <td>Salvar o orçamento no banco com status inicial "Pendente" (ou "Em Impressão", se já enviado à impressora) atrelado ao tenant.</td>
         <td><span class="badge-prio-alta">Alta</span></td>
         <td><span class="badge-rn">RN008</span></td>
         <td><span class="badge-uc">UC19</span></td>
@@ -669,8 +669,8 @@
         <td><span class="badge-uc">UC12</span></td>
         <td><code>PessoaFisica</code><br><code>PessoaJuridica</code></td>
         <td><code>ClientePage.razor</code></td>
-        <td><code>ClienteValidator.cs</code><br><code>ClienteRepository.cs</code></td>
-        <td><code>ClienteValidator_NenhumPF_Nem_PJ_DeveFalharRegraXT</code></td>
+        <td><code>DocumentoValidador.cs</code><br><code>ClienteValidator.cs</code><br><code>ClienteRepository.cs</code></td>
+        <td><code>DocumentoValidador_Cpf_RF022</code><br><code>DocumentoValidador_Cnpj_RF022</code><br><code>ClienteValidator_CpfInvalido_DeveFalhar</code></td>
         <td><span class="badge-status">CONCLUÍDO</span></td>
       </tr>
       <tr>
@@ -763,7 +763,7 @@
     <tbody>
       <tr>
         <td><span class="badge-id">RF027</span></td>
-        <td>Cadastro de peças recorrentes com nome, peso estimado (g), tempo de impressão e link de arquivo STL com proteção anti-XSS.</td>
+        <td>Cadastro de peças recorrentes com nome descritivo e link de arquivo STL com proteção anti-XSS.</td>
         <td><span class="badge-prio-media">Média</span></td>
         <td><span class="badge-rn">RN008</span></td>
         <td><span class="badge-uc">UC06</span><br><span class="badge-uc">UC07</span><br><span class="badge-uc">UC08</span></td>
@@ -775,7 +775,7 @@
       </tr>
       <tr>
         <td><span class="badge-id">RF028</span></td>
-        <td>Carregamento automático dos parâmetros técnicos da peça (peso e tempo) no formulário de elaboração de orçamentos.</td>
+        <td>Seleção da peça cadastrada no catálogo diretamente no formulário de elaboração de orçamentos, vinculando-a ao pedido.</td>
         <td><span class="badge-prio-media">Média</span></td>
         <td><span class="badge-rn">RN001</span></td>
         <td><span class="badge-uc">UC19</span></td>
@@ -887,14 +887,14 @@
       </tr>
       <tr>
         <td><span class="badge-id">RF034</span></td>
-        <td>Recuperação de senha por e-mail com geração de token criptográfico de alta entropia válido por 2 horas.</td>
+        <td>Recuperação de senha por e-mail com geração de token criptográfico de alta entropia (256 bits) válido por 30 minutos e armazenado apenas como hash SHA-256.</td>
         <td><span class="badge-prio-media">Média</span></td>
         <td><span class="badge-rn">RN008</span></td>
         <td><span class="badge-uc">UC05</span></td>
-        <td><code>PasswordResetToken</code><br><code>Usuario</code></td>
+        <td><code>Usuario</code><br><code>TokenRedefinicaoSenha</code></td>
         <td><code>EsqueciSenha.razor</code><br><code>RedefinirSenha.razor</code></td>
         <td><code>UsuarioRepository.cs</code><br><code>EmailService.cs</code></td>
-        <td><code>SegurancaAutenticacaoTests.GeracaoTokenCriptografico_DeveTerAltaEntropiaEFormatoValido</code><br><code>EmailService_EmProducao_NaoDeveExporUltimoLinkDev</code></td>
+        <td><code>SegurancaAutenticacaoTests.GeracaoTokenCriptografico_DeveTerAltaEntropiaEFormatoValido</code><br><code>HashToken_DeveSerDeterministicoEDiferenteDoTokenOriginal</code><br><code>EmailService_EmProducao_NaoDeveExporUltimoLinkDev</code></td>
         <td><span class="badge-status">CONCLUÍDO</span></td>
       </tr>
       <tr>
@@ -932,7 +932,7 @@
         <td>Portabilidade e Desempenho</td>
         <td>ISO/IEC 25010 (Adaptabilidade)</td>
         <td><code>Program.cs</code><br><code>LucroImpresso.Web.csproj</code></td>
-        <td>Compilação em .NET 9.0; `dotnet test` com 82 testes executados em 3 segundos.</td>
+        <td>Compilação em .NET 9.0; `dotnet test` com 95 testes executados em 2 segundos.</td>
         <td><span class="badge-status">CONCLUÍDO</span></td>
       </tr>
       <tr>
@@ -940,7 +940,7 @@
         <td>Estética Neo-Brutalista, alto contraste, máscaras JS e viewports responsivos</td>
         <td>Usabilidade e Interface</td>
         <td>ISO/IEC 25010 (Usabilidade)</td>
-        <td><code>app.css</code><br><code>site.js</code><br><code>Components/Layout/</code></td>
+        <td><code>app.css</code><br><code>js/masks.js</code><br><code>Components/Layout/</code></td>
         <td>Teste visual em viewports de 360px a 4K; sem quebra de leiaute.</td>
         <td><span class="badge-status">CONCLUÍDO</span></td>
       </tr>
@@ -1112,7 +1112,7 @@
       </tr>
       <tr>
         <td><strong>Índice de Sucesso dos Testes Automatizados</strong></td>
-        <td style="text-align: center;"><code>82 / 82</code></td>
+        <td style="text-align: center;"><code>95 / 95</code></td>
         <td style="text-align: center;"><span class="badge-status">100.0%</span></td>
         <td>Zero testes quebrados, ignorados ou reprovados no ecossistema .NET 9.</td>
       </tr>

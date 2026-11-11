@@ -129,11 +129,11 @@
     <div class="swimlanes">
       <div class="lane">
         <div class="lane-header">Empreendedor (Usuário)</div>
-        <div class="activity-box">Acessar Módulo de Materiais (/materiais)</div>
+        <div class="activity-box">Acessar Módulo de Materiais (/material)</div>
         <div class="arrow">&darr;</div>
-        <div class="activity-box">Preencher Dados do Insumo (Nome, Marca, Cor, Tipo, Peso Líquido em g e Valor Pago em R$)</div>
+        <div class="activity-box">Preencher Dados do Insumo (Nome com Tipo/Marca/Cor, Peso do Rolo e Saldo em g e Valor Pago em R$)</div>
         <div class="arrow">&darr;</div>
-        <div class="activity-box">Clicar no Botão "SALVAR MATERIAL"</div>
+        <div class="activity-box">Clicar no Botão "SALVAR"</div>
       </div>
       <div class="lane">
         <div class="lane-header">Sistema (Blazor / JS / C#)</div>
@@ -177,7 +177,7 @@
         <div class="arrow">&darr;</div>
         <div class="activity-box system">Validar Saldo Disponível em Estoque (Bloquear se Saldo Insuficiente)<br><span class="badge">RF011</span></div>
         <div class="arrow">&darr;</div>
-        <div class="activity-box system">Definir Status = "Pendente" (Sem Baixa Física de Estoque)<br><span class="badge">RF013</span></div>
+        <div class="activity-box system">Definir Status Inicial "Pendente" ou "Em Impressão" (Sem Baixa Física de Estoque)<br><span class="badge">RF013</span></div>
         <div class="arrow">&darr;</div>
         <div class="activity-box success">Atrelar ao Usuário (Tenant) e Persistir no MariaDB 10.11</div>
         <div class="arrow">&darr;</div>
@@ -199,7 +199,7 @@
         <div class="arrow">&darr;</div>
         <div class="activity-box">Clicar em "INICIAR IMPRESSÃO"</div>
         <div class="arrow">&darr;</div>
-        <div class="activity-box">Clicar em "CONCLUIR" ou "REGISTRAR FALHA"</div>
+        <div class="activity-box">Clicar em "CONCLUIR" ou "FALHA" (após falha: "REIMPRIMIR")</div>
         <div class="arrow">&darr;</div>
         <div class="activity-box">Confirmar Operação no Modal Interceptador<br><span class="badge">RN005</span></div>
       </div>
@@ -213,7 +213,7 @@
         <div class="arrow">&darr;</div>
         <div class="activity-box system">Deduzir Saldo Físico de Material (g) e Insumos Químicos (mL)<br><span class="badge">RN004</span></div>
         <div class="arrow">&darr;</div>
-        <div class="activity-box success">Persistir Baixa de Estoque e Novo Status no MariaDB 10.11</div>
+        <div class="activity-box success">Persistir Baixa de Estoque e Novo Status no MariaDB 10.11 (Transação Única)</div>
         <div class="arrow">&darr;</div>
         <div class="activity-box system">Exibir Alerta Visual de Feedback e Recarregar Fila Operacional</div>
       </div>

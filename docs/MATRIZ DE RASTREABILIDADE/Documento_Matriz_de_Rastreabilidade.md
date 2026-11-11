@@ -17,7 +17,7 @@ A **Matriz de Rastreabilidade de Requisitos (Requirements Traceability Matrix - 
 ### 1.1. Objetivos Acadêmicos e Metodológicos (FATEC)
 1. **Garantia de Cobertura Total (*Forward Traceability*):** Assegurar que 100% dos requisitos funcionais (RF001 a RF035) e não funcionais (RNF001 a RNF008) elicitados foram devidamente projetados em Casos de Uso (UML), decompostos na Estrutura Analítica do Projeto (EAP / WBS), codificados nas camadas de software e validados por suíte de testes automatizados.
 2. **Prevenção de Escopo Fantasma (*Backward Traceability*):** Demonstrar que cada tabela do banco de dados, repositório C#, serviço de domínio e componente de interface do sistema LucroImpresso possui uma justificativa legítima originada nos requisitos de negócio, impedindo a ocorrência de *gold plating*.
-3. **Auditoria da Banca Avaliadora:** Fornecer aos docentes avaliadores um mapa transparente e navegável que correlacione as 8 Regras de Negócio (`RN001` a `RN008`), os 28 Casos de Uso (`UC01` a `UC28`), os componentes Blazor, os repositórios EF Core e os 82 testes unitários aprovados (`dotnet test`).
+3. **Auditoria da Banca Avaliadora:** Fornecer aos docentes avaliadores um mapa transparente e navegável que correlacione as 8 Regras de Negócio (`RN001` a `RN008`), os 28 Casos de Uso (`UC01` a `UC28`), os componentes Blazor, os repositórios EF Core e os 95 testes unitários aprovados (`dotnet test`).
 
 ```mermaid
 graph LR
@@ -43,7 +43,7 @@ graph LR
     end
 
     subgraph Qualidade["5. Garantia da Qualidade (QA)"]
-        TESTS["82 Testes Automatizados (xUnit)"]
+        TESTS["95 Testes Automatizados (xUnit)"]
     end
 
     TAP --> RF
@@ -74,7 +74,7 @@ graph LR
 | **Entidade de Domínio** | Classes EF Core | Modelos relacionais mapeados (`Material`, `Acabamento`, `Maquina`, `Orcamento`, etc.). |
 | **Interface com Usuário** | Páginas `.razor` | Componentes visuais reativos Blazor Server com Design Neo-Brutalista. |
 | **Camada de Negócio / Dados** | Classes C# | Repositórios desacoplados (`IRepository`) e Serviços de domínio (`Services/`). |
-| **Validação / Teste Unitário** | Classes xUnit | Suíte automatizada em `tests/LucroImpresso.Tests` com 82 testes aprovados. |
+| **Validação / Teste Unitário** | Classes xUnit | Suíte automatizada em `tests/LucroImpresso.Tests` com 95 testes aprovados. |
 | **Status de Conformidade** | `IMPLEMENTADO` | Requisito 100% construído, integrado e homologado em testes unitários. |
 
 ---
@@ -85,7 +85,7 @@ graph LR
 
 | ID | Requisito Funcional | Prior. | Regra Negócio | Caso de Uso | Pacote EAP | Entidade / BD | Interface (UI) | Camada C# / Serviço | Teste de Validação (xUnit) | Status |
 | :---: | :--- | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- | :---: |
-| **RF001** | Cadastrar matérias-primas (filamentos e resinas) com nome, marca, cor, tipo, peso (g) e valor (R$). | Alta | RN001 | UC15 | 1.4.7 | `Material` | `MaterialPage.razor` | `MaterialRepository.cs` | `MaterialValidator_SaldoMaiorQuePesoRolo_DeveFalhar` | IMPLEMENTADO |
+| **RF001** | Cadastrar matérias-primas (filamentos e resinas) com nome descritivo (tipo, marca e cor), peso do rolo (g), saldo atual (g) e valor (R$). | Alta | RN001 | UC15 | 1.4.7 | `Material` | `MaterialPage.razor` | `MaterialRepository.cs` | `MaterialValidator_SaldoMaiorQuePesoRolo_DeveFalhar` | IMPLEMENTADO |
 | **RF002** | Cadastrar insumos de acabamento (tintas, primers, vernizes, solventes) com categoria, cor, volume (mL) e valor (R$). | Alta | RN002 | UC16 | 1.4.8 | `Acabamento` | `AcabamentoPage.razor` | `AcabamentoRepository.cs` | `AcabamentoValidator_TiposValidos_DevePassar`, `AcabamentoValidator_TipoVazio_DeveFalhar` | IMPLEMENTADO |
 | **RF003** | Consultar inventário em tempo real, exibindo saldos em gramas e mililitros. | Alta | RN001, RN002 | UC17 | 1.4.7, 1.4.8 | `Material`, `Acabamento` | `MaterialPage.razor`, `AcabamentoPage.razor` | `MaterialRepository.cs`, `AcabamentoRepository.cs` | `MultiTenantEInfraTests.cs` (Isolamento de inventário) | IMPLEMENTADO |
 | **RF004** | Exibir alerta visual em destaque na interface caso o saldo de filamento ou acabamento esteja abaixo da margem crítica. | Média | — | UC17, UC20 | 1.4.7, 1.4.8 | `Material`, `Acabamento` | `Dashboard.razor`, `MaterialPage.razor`, `AcabamentoPage.razor` | `MaterialRepository.cs`, `AcabamentoRepository.cs` | `OrcamentoStateMachineTests.ExigeConfirmacaoExplicita` | IMPLEMENTADO |
@@ -104,7 +104,7 @@ graph LR
 | **RF010** | Calcular automaticamente o custo de energia elétrica consumida (Watts, tempo em horas e tarifa kWh). | Alta | RN003 | UC19 | 1.4.9 | `Orcamento`, `Maquina` | `Orcamentos.razor` | `OrcamentoRepository.cs` | `MaquinaValidator_ValoresNegativos_DevemFalhar` | IMPLEMENTADO |
 | **RF011** | Bloquear a criação de orçamentos quando materiais ou insumos de acabamento possuam saldo insuficiente, exibindo mensagem de erro. | Alta | — | UC20 | 1.4.9 | `Orcamento`, `Material`, `Acabamento` | `Orcamentos.razor` | `OrcamentoRepository.cs`, `OrcamentoStateMachine.cs` | `PodeTransitar_TransicoesValidas_DevemRetornarTrue` | IMPLEMENTADO |
 | **RF012** | Calcular o preço de venda sugerido somando custos diretos e margem de lucro real sobre a mão de obra. | Alta | RN001, RN002, RN003 | UC19 | 1.4.9 | `Orcamento` | `Orcamentos.razor` | `OrcamentoRepository.cs` | `OrcamentoValidator_DadosValidos_DevePassar` | IMPLEMENTADO |
-| **RF013** | Salvar o orçamento no banco com status inicial "Pendente" atrelado ao tenant. | Alta | RN008 | UC19 | 1.4.9 | `Orcamento` | `Orcamentos.razor` | `OrcamentoRepository.cs`, `OrcamentoStateMachine.cs` | `TransitarParaImpressao_DePendente_DeveAlterarStatusComSucesso` | IMPLEMENTADO |
+| **RF013** | Salvar o orçamento no banco com status inicial "Pendente" (ou "Em Impressão", se já enviado à impressora) atrelado ao tenant. | Alta | RN008 | UC19 | 1.4.9 | `Orcamento` | `Orcamentos.razor` | `OrcamentoRepository.cs`, `OrcamentoStateMachine.cs` | `TransitarParaImpressao_DePendente_DeveAlterarStatusComSucesso` | IMPLEMENTADO |
 | **RF014** | Permitir consulta detalhada, edição e exclusão de orçamentos com validação de segurança. | Alta | RN005, RN007, RN008 | UC21, UC22 | 1.4.9 | `Orcamento`, `HistoricoFinanceiro` | `Orcamentos.razor` | `OrcamentoRepository.cs`, `HistoricoFinanceiroRepository.cs` | `MultiTenantEInfraTests.Models_CamposTextoCriticos_DevemPossuirAtributoMaxLength` | IMPLEMENTADO |
 
 ---
@@ -134,7 +134,7 @@ graph LR
 | ID | Requisito Funcional | Prior. | Regra Negócio | Caso de Uso | Pacote EAP | Entidade / BD | Interface (UI) | Camada C# / Serviço | Teste de Validação (xUnit) | Status |
 | :---: | :--- | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- | :---: |
 | **RF021** | Cadastrar clientes segregando Pessoa Física (CPF/Nome) e Pessoa Jurídica (CNPJ/Razão Social) com regra disjunta (XT). | Alta | RN008 | UC12 | 1.4.4 | `Cliente`, `PessoaFisica`, `PessoaJuridica` | `ClientePage.razor` | `ClienteRepository.cs` | `ClienteValidator_SomentePessoaFisica_DevePassar`, `ClienteValidator_SomentePessoaJuridica_DevePassar`, `ClienteValidator_AmbosPF_E_PJ_DeveFalharRegraXT` | IMPLEMENTADO |
-| **RF022** | Validar integridade e formato de CPF e CNPJ em tempo real, impedindo cadastros inválidos ou duplicados. | Alta | RN008 | UC12 | 1.4.4 | `PessoaFisica`, `PessoaJuridica` | `ClientePage.razor` | `ClienteValidator.cs`, `ClienteRepository.cs` | `ClienteValidator_NenhumPF_Nem_PJ_DeveFalharRegraXT` | IMPLEMENTADO |
+| **RF022** | Validar integridade e formato de CPF e CNPJ em tempo real, impedindo cadastros inválidos ou duplicados. | Alta | RN008 | UC12 | 1.4.4 | `PessoaFisica`, `PessoaJuridica` | `ClientePage.razor` | `DocumentoValidador.cs`, `ClienteValidator.cs`, `ClienteRepository.cs` | `DocumentoValidador_Cpf_RF022`, `DocumentoValidador_Cnpj_RF022`, `ClienteValidator_CpfInvalido_DeveFalhar` | IMPLEMENTADO |
 | **RF023** | Registrar informações completas de contato (celular formatado) e endereço com máscara. | Alta | RN008 | UC12 | 1.4.4 | `Cliente`, `Endereco` | `ClientePage.razor` | `ClienteRepository.cs`, `ClienteValidator.cs` | `ClienteValidator_CelularFormatoInvalido_DeveFalhar` | IMPLEMENTADO |
 | **RF024** | Listagem, busca, edição e exclusão de clientes com diálogo de confirmação. | Média | RN005, RN008 | UC13, UC14 | 1.4.4 | `Cliente` | `ClientePage.razor` | `ClienteRepository.cs` | `MultiTenantEInfraTests.Models_NovasInstancias_DevemInicializarComDataUtc` | IMPLEMENTADO |
 
@@ -153,8 +153,8 @@ graph LR
 
 | ID | Requisito Funcional | Prior. | Regra Negócio | Caso de Uso | Pacote EAP | Entidade / BD | Interface (UI) | Camada C# / Serviço | Teste de Validação (xUnit) | Status |
 | :---: | :--- | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- | :---: |
-| **RF027** | Cadastro de peças recorrentes com nome, peso estimado (g), tempo de impressão e link de arquivo STL com proteção anti-XSS. | Média | RN008 | UC06, UC07, UC08 | 1.4.5 | `Peca` | `PecaPage.razor` | `PecaRepository.cs` | `PecaValidator_LinksNaoHttpOuHttps_DevemSerRejeitados`, `PecaValidator_LinksValidosOuVazios_DevemPassar`, `PecaValidator_NomePecaVazioOuMuitoLongo_DeveFalhar` | IMPLEMENTADO |
-| **RF028** | Carregamento automático dos parâmetros técnicos da peça (peso e tempo) no formulário de elaboração de orçamentos. | Média | RN001 | UC19 | 1.4.5, 1.4.9 | `Peca`, `Orcamento` | `Orcamentos.razor` | `PecaRepository.cs`, `OrcamentoRepository.cs` | `OrcamentoValidator_DadosValidos_DevePassar` | IMPLEMENTADO |
+| **RF027** | Cadastro de peças recorrentes com nome descritivo e link de arquivo STL com proteção anti-XSS. | Média | RN008 | UC06, UC07, UC08 | 1.4.5 | `Peca` | `PecaPage.razor` | `PecaRepository.cs` | `PecaValidator_LinksNaoHttpOuHttps_DevemSerRejeitados`, `PecaValidator_LinksValidosOuVazios_DevemPassar`, `PecaValidator_NomePecaVazioOuMuitoLongo_DeveFalhar` | IMPLEMENTADO |
+| **RF028** | Seleção da peça cadastrada no catálogo diretamente no formulário de elaboração de orçamentos, vinculando-a ao pedido. | Média | RN001 | UC19 | 1.4.5, 1.4.9 | `Peca`, `Orcamento` | `Orcamentos.razor` | `PecaRepository.cs`, `OrcamentoRepository.cs` | `OrcamentoValidator_DadosValidos_DevePassar` | IMPLEMENTADO |
 
 ---
 
@@ -174,7 +174,7 @@ graph LR
 | :---: | :--- | :---: | :---: | :---: | :---: | :--- | :--- | :--- | :--- | :---: |
 | **RF032** | Autenticação no sistema (Login) com validação de credenciais via Cookies seguros e Claims do usuário. | Alta | RN008 | UC01 | 1.4.2 | `Usuario` | `Login.razor` | `UsuarioRepository.cs` | `SegurancaAutenticacaoTests.ValidarForcaSenha_SenhasFortes_DevemPassar`, `BCrypt_HashEVerificacao_DeveFuncionarComSaltSeguro` | IMPLEMENTADO |
 | **RF033** | Registro de novas contas (Sign-up) com validação de unicidade de e-mail e regras de senha forte. | Alta | RN008 | UC04 | 1.4.2 | `Usuario` | `Cadastro.razor` | `UsuarioRepository.cs` | `SegurancaAutenticacaoTests.ValidarForcaSenha_SenhasFracas_DevemRetornarErro` | IMPLEMENTADO |
-| **RF034** | Recuperação de senha por e-mail com geração de token criptográfico de alta entropia válido por 2 horas. | Média | RN008 | UC05 | 1.4.3 | `PasswordResetToken`, `Usuario` | `EsqueciSenha.razor`, `RedefinirSenha.razor` | `UsuarioRepository.cs`, `EmailService.cs` | `SegurancaAutenticacaoTests.GeracaoTokenCriptografico_DeveTerAltaEntropiaEFormatoValido`, `EmailService_EmProducao_NaoDeveExporUltimoLinkDev` | IMPLEMENTADO |
+| **RF034** | Recuperação de senha por e-mail com geração de token criptográfico de alta entropia (256 bits) válido por 30 minutos e armazenado apenas como hash SHA-256. | Média | RN008 | UC05 | 1.4.3 | `Usuario` (`TokenRedefinicaoSenha`, `TokenRedefinicaoExpiracao`) | `EsqueciSenha.razor`, `RedefinirSenha.razor` | `UsuarioRepository.cs`, `EmailService.cs` | `SegurancaAutenticacaoTests.GeracaoTokenCriptografico_DeveTerAltaEntropiaEFormatoValido`, `HashToken_DeveSerDeterministicoEDiferenteDoTokenOriginal`, `EmailService_EmProducao_NaoDeveExporUltimoLinkDev` | IMPLEMENTADO |
 | **RF035** | Encerramento de sessão ativa (Logout) com revogação imediata de credenciais e limpeza de cookies. | Média | RN008 | UC01 | 1.4.2 | `Usuario` | `NavMenu.razor` | `UsuarioRepository.cs` | `SegurancaAutenticacaoTests.cs` | IMPLEMENTADO |
 
 ---
@@ -183,8 +183,8 @@ graph LR
 
 | ID | Requisito Não Funcional | Categoria | Padrão / Norma | Componente Arquitetural C# | Mecanismo de Garantia no Software | Verificação e Evidência de QA | Status |
 | :---: | :--- | :---: | :---: | :--- | :--- | :--- | :---: |
-| **RNF001** | Stack C# 13, .NET 9 e Blazor Interactive Server | Portabilidade e Desempenho | ISO/IEC 25010 (Adaptabilidade) | `Program.cs`, `LucroImpresso.Web.csproj` | Renderização reativa de DOM via WebSockets nativos (SignalR) sem recarregar a página. | Compilação em .NET 9.0; `dotnet test` com 82 testes executados em 3 segundos. | IMPLEMENTADO |
-| **RNF002** | Estética Neo-Brutalista, alto contraste, máscaras JS e viewports responsivos | Usabilidade e Interface | ISO/IEC 25010 (Usabilidade) | `app.css`, `site.js`, `Components/Layout/` | Bordas pretas sólidas (3px), sombras projetadas (6px 6px #1e293b), máscaras de moeda, CPF/CNPJ e tempo. | Teste visual em viewports de 360px a 4K; sem quebra de leiaute. | IMPLEMENTADO |
+| **RNF001** | Stack C# 13, .NET 9 e Blazor Interactive Server | Portabilidade e Desempenho | ISO/IEC 25010 (Adaptabilidade) | `Program.cs`, `LucroImpresso.Web.csproj` | Renderização reativa de DOM via WebSockets nativos (SignalR) sem recarregar a página. | Compilação em .NET 9.0; `dotnet test` com 95 testes executados em 2 segundos. | IMPLEMENTADO |
+| **RNF002** | Estética Neo-Brutalista, alto contraste, máscaras JS e viewports responsivos | Usabilidade e Interface | ISO/IEC 25010 (Usabilidade) | `app.css`, `js/masks.js`, `Components/Layout/` | Bordas pretas sólidas (3px), sombras projetadas (6px 6px #1e293b), máscaras de moeda, CPF/CNPJ e tempo. | Teste visual em viewports de 360px a 4K; sem quebra de leiaute. | IMPLEMENTADO |
 | **RNF003** | Banco de dados relacional MariaDB com EF Core 9 Code-First | Arquitetura de Dados | ISO/IEC 25010 (Substituibilidade) | `AppDbContext.cs`, `Pomelo MariaDB Driver` | Migrações Code-First, constraints relacionais, chave estrangeira CASCADE/RESTRICT configuradas. | Migrações EF Core executadas com sucesso no schema relacional. | IMPLEMENTADO |
 | **RNF004** | Inversão de Controle nativa (.NET DI) e Repository Pattern | Qualidade e Manutenibilidade | Clean Architecture / SOLID | `Program.cs`, `Interfaces/`, `Repositories/` | Registro de serviços desacoplados (`AddScoped<IMaterialRepository, MaterialRepository>`). | Mock de dependências em testes unitários; 0 acoplamento direto entre UI e DbContext. | IMPLEMENTADO |
 | **RNF005** | Isolamento Multi-Tenant Estrito no banco (Anti-IDOR por UsuarioId) | Segurança da Informação | OWASP Top 10 (Broken Access Control) | `AppDbContext.cs`, `Repositories/*.cs` | Cláusulas LINQ `.Where(x => x.UsuarioId == usuarioId)` compulsórias em todas as queries e inserts. | Testes em `MultiTenantEInfraTests.cs` garantindo isolamento total entre locatários. | IMPLEMENTADO |
@@ -201,7 +201,7 @@ graph LR
 | **RN001** | Custo do material por grama: $\frac{\text{Preço}}{\text{Peso (g)}}$. | RF001, RF003, RF007, RF012, RF028 | UC15, UC17, UC19 | `Material.cs`, `OrcamentoRepository.cs` | `MaterialValidator_SaldoMaiorQuePesoRolo_DeveFalhar` |
 | **RN002** | Insumos de acabamento por mL: $\frac{\text{Preço}}{\text{Volume (mL)}}$ somado à mão de obra. | RF002, RF003, RF008, RF009, RF012 | UC16, UC17, UC19 | `Acabamento.cs`, `OrcamentoAcabamento.cs`, `Orcamentos.razor` | `AcabamentoValidator_TiposValidos_DevePassar`, `AcabamentoValidator_SaldoMaiorQueVolumeOriginal_DeveFalhar` |
 | **RN003** | Energia = $\frac{W}{1000} \times \text{Horas} \times \text{Tarifa kWh}$. | RF007, RF010, RF012, RF025, RF026 | UC09, UC19 | `Maquina.cs`, `OrcamentoRepository.cs` | `MaquinaValidator_ValoresNegativos_DevemFalhar` |
-| **RN004** | Baixa física de filamento (g) e acabamento (mL) restrita a "Concluído" ou "Falha". | RF015, RF016, RF017, RF018 | UC23, UC24, UC25, UC26 | `Producao.razor`, `OrcamentoStateMachine.cs` | `TransitarParaConcluido_DeveDeduzirEstoqueFisicoENaoPermitirSaldoNegativo`, `TransitarParaFalha_DeveDeduzirMaterialConsumido` |
+| **RN004** | Baixa física de filamento (g) e acabamento (mL) restrita a "Concluído" ou "Falha". | RF015, RF016, RF017, RF018 | UC23, UC24, UC25, UC26 | `Producao.razor`, `OrcamentoStateMachine.cs`, `OrcamentoRepository.FinalizarProducaoAsync` | `TransitarParaConcluido_DeveDeduzirEstoqueFisicoENaoPermitirSaldoNegativo`, `TransitarParaFalha_DeveDeduzirMaterialConsumido`, `TransitarParaConcluido_DePendente_DeveLancarExcecaoSemBaixarEstoque` |
 | **RN005** | Exclusões e desfechos críticos exigem confirmação explícita em modal interceptador. | RF006, RF014, RF024 | UC08, UC11, UC14, UC18, UC22 | `OrcamentoStateMachine.cs`, Componentes Razor | `ExigeConfirmacaoExplicita_StatusCriticos_DeveValidarRN005` |
 | **RN006** | Expurgo automático diário de orçamentos inativos há mais de 180 dias (qualquer status). | RF019 | UC28 | `DatabaseCleanupService.cs`, `OrcamentoStateMachine.cs` | `PodeSerExpurgado_AbaixoDe180Dias_DeveRetornarFalse`, `PodeSerExpurgado_AcimaDe180Dias_DeveRetornarTrue` |
 | **RN007** | Preservação contábil perpétua: totais acumulados no cofre `HistoricoFinanceiro`. | RF014, RF020, RF029, RF030 | UC22, UC27, UC28 | `HistoricoFinanceiroRepository.cs`, `Dashboard.razor` | `MultiTenantEInfraTests.Models_NovasInstancias_DevemInicializarComDataUtc` |
@@ -209,17 +209,17 @@ graph LR
 
 ---
 
-## 6. Matriz de Cobertura da Suíte de Testes Automatizados (82 Testes)
+## 6. Matriz de Cobertura da Suíte de Testes Automatizados (95 Testes)
 
 A integridade do software é atestada pela execução da suíte de testes desenvolvida em **xUnit** e **FluentValidation**, com cobertura direta de 100% das regras críticas e validadores de domínio:
 
 | Classe de Teste xUnit | Quantidade de Fatos e Teorias | Foco de Validação da Matriz de Rastreabilidade | Requisitos Cobertos |
 | :--- | :---: | :--- | :--- |
-| **`ValidadoresDominioTests.cs`** | 33 testes | Validação de limites numéricos, sanitização anti-XSS em links STL, herança disjunta (XT) de clientes PF/PJ, formatos de celular e regras de materiais e acabamentos. | RF001, RF002, RF007, RF008, RF021, RF022, RF023, RF025, RF027, RNF007 |
-| **`OrcamentoStateMachineTests.cs`** | 21 testes | Ciclo de vida da máquina de estados (UML), transições válidas e bloqueadas, deduções atômicas de estoque, exigência de confirmação explícita (RN005) e cálculo de expurgo de 180 dias (RN006). | RF006, RF011, RF013, RF015, RF016, RF017, RF019, RN004, RN005, RN006 |
-| **`SegurancaAutenticacaoTests.cs`** | 16 testes | Avaliação de complexidade de senhas (maiúsculas, minúsculas, dígitos e caracteres especiais), salts dinâmicos no BCrypt e entropia criptográfica de tokens para reset de credenciais. | RF032, RF033, RF034, RNF003, RNF006, RNF007 |
-| **`MultiTenantEInfraTests.cs`** | 12 testes | Inicialização obrigatória de timestamps em UTC (`DateTimeKind.Utc`), limites estritos de colunas (`MaxLength`), blindagem do serviço de e-mail em produção e isolamento de dados. | RF003, RF014, RF020, RF029, RF034, RNF001, RNF004, RNF005 |
-| **TOTAL CONSOLIDADO** | **82 TESTES** | **100% de Aprovação e 0 Falhas registradas no executor VSTest / .NET 9 CLI** | **COBERTURA GLOBAL** |
+| **`ValidadoresDominioTests.cs`** | 43 testes | Validação de limites numéricos, sanitização anti-XSS em links STL, herança disjunta (XT) de clientes PF/PJ, dígitos verificadores de CPF/CNPJ, formatos de celular e regras de materiais e acabamentos. | RF001, RF002, RF007, RF008, RF021, RF022, RF023, RF025, RF027, RNF007 |
+| **`OrcamentoStateMachineTests.cs`** | 23 testes | Ciclo de vida da máquina de estados (UML), transições válidas e bloqueadas, reimpressão após falha, deduções atômicas de estoque, exigência de confirmação explícita (RN005) e cálculo de expurgo de 180 dias (RN006). | RF006, RF011, RF013, RF015, RF016, RF017, RF019, RN004, RN005, RN006 |
+| **`SegurancaAutenticacaoTests.cs`** | 16 testes | Avaliação de complexidade de senhas (maiúsculas, minúsculas, dígitos e caracteres especiais), salts dinâmicos no BCrypt, entropia criptográfica de tokens para reset de credenciais e hash SHA-256 do token armazenado. | RF032, RF033, RF034, RNF003, RNF006, RNF007 |
+| **`MultiTenantEInfraTests.cs`** | 13 testes | Inicialização obrigatória de timestamps em UTC (`DateTimeKind.Utc`), limites estritos de colunas (`MaxLength`), blindagem do serviço de e-mail em produção e isolamento de dados. | RF003, RF014, RF020, RF029, RF034, RNF001, RNF004, RNF005 |
+| **TOTAL CONSOLIDADO** | **95 TESTES** | **100% de Aprovação e 0 Falhas registradas no executor VSTest / .NET 9 CLI** | **COBERTURA GLOBAL** |
 
 ---
 
