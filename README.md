@@ -51,6 +51,12 @@ Exercício acadêmico de estimativa de esforço baseado em **Análise de Pontos 
 
 ---
 
+## 📘 Projeto de Software (Documento Final do TG)
+Documento final no modelo oficial da Fatec (Projeto de Software), reunindo TAP, Canvas, SWOT, 5W2H, requisitos, casos de uso, diagramas UML, DER, ferramentas, desenvolvimento, resultados, referências e apêndices:
+* **[Projeto de Software (Word)](docs/PROJETO%20DE%20SOFTWARE/Projeto_de_Software_LucroImpresso.docx)** — também em [PDF](docs/PROJETO%20DE%20SOFTWARE/Projeto_de_Software_LucroImpresso.pdf).
+
+---
+
 ## 🎤 Apresentação dos CRUDs (Clientes, Máquinas e Materiais)
 Slides no modelo oficial da Fatec, com prints reais do sistema (dados fictícios de demonstração) e roteiro de fala por slide:
 * **[Slides (PowerPoint .pptx)](docs/APRESENTACAO/Apresentacao_CRUDs_LucroImpresso.pptx)** — também em [.ppt](docs/APRESENTACAO/Apresentacao_CRUDs_LucroImpresso.ppt) e [PDF](docs/APRESENTACAO/Apresentacao_CRUDs_LucroImpresso.pdf).
